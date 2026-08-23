@@ -1,0 +1,84 @@
+/* ============================================================
+   Tokens — a única fonte de cor, forma e ritmo do site.
+   Nenhum valor bruto de cor deve aparecer fora deste arquivo.
+
+   A paleta é papel azulado + tinta grafite, com um acento só: azul escuro.
+   Sobre o papel entra o tom fechado; sobre o escuro da abertura entra o mesmo
+   azul mais claro, que é o único jeito de manter contraste de leitura.
+
+   A tipografia é pequena e leve: peso 300/400, corpo curto e entrelinha larga —
+   leitura de instrumento, não de revista. Números e rótulos vão em monoespaçada
+   do sistema, sem baixar fonte nenhuma.
+   ============================================================ */
+:root{
+  /* --- cor: papel (branco puxado para o azul) ---
+     Claro o bastante para o texto escuro saltar: a leitura acontece sobre ele, e
+     tudo o que é decoração fica abaixo em valor. */
+  --paper:#eef2fa;
+  --paper-2:#e5ebf6;
+  --paper-3:#d5ddec;
+  --surface:#f7f9fd;        /* usado só onde há mesmo uma superfície: o modal */
+
+  /* --- cor: tinta --- */
+  --ink:#0d1220;
+  --ink-2:#182031;
+  --muted:#4e5768;          /* fechado o suficiente para texto de apoio pequeno */
+  --muted-2:#727b8d;
+
+  /* --- cor: acento --- */
+  --blue:#1d3a6b;           /* traços, números, rótulos — sobre o papel */
+  --blue-ink:#16305c;       /* o mesmo em texto pequeno */
+  --blue-hot:#5b8ade;       /* sobre o escuro da abertura */
+  --blue-soft:rgba(29,58,107,.07);
+
+  /* --- fios --- */
+  --line:rgba(15,20,32,.10);
+  --line-soft:rgba(15,20,32,.05);
+  --line-strong:rgba(15,20,32,.24);
+
+  /* --- sobre o escuro da abertura --- */
+  --on-dark:#eef2fa;
+  --on-dark-soft:rgba(226,233,246,.72);
+
+  /* --- forma --- */
+  --r-sm:2px;               /* praticamente reto: o site é de fios, não de caixas */
+  --r-md:3px;
+  --r-pill:999px;
+
+  /* --- tipografia --- */
+  --font-display:"Sora","Inter",system-ui,sans-serif;
+  --font-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,"JetBrains Mono","Roboto Mono",Menlo,monospace;
+  --fs-body:clamp(13.5px,.92vw,14.5px);
+  --fs-lead:clamp(14px,1.1vw,16.5px);
+  --fs-micro:11.5px;
+  --fs-h1:clamp(34px,5.6vw,74px);
+  --fs-h2:clamp(22px,2.9vw,38px);
+  --fs-h3:clamp(16px,1.55vw,21px);
+  --fs-eyebrow:9.5px;
+  --track-eyebrow:.3em;
+  --w-display:300;          /* o título grande é fino */
+  --w-heading:400;
+
+  /* --- ritmo --- */
+  --shell:min(1240px,90vw);
+  --gap:clamp(18px,2vw,30px);
+  --section-y:clamp(62px,9vh,116px);
+  --ease:cubic-bezier(.22,.7,.24,1);
+
+  /* --- camadas --- */
+  --z-veil:0;
+  --z-backdrop:1;           /* bolas e bolinhas animadas */
+  --z-bg:2;                 /* o robô */
+  --z-content:3;
+  --z-front:4;              /* bolas em primeiro plano, por cima do texto */
+  --z-modal:60;
+
+  /* --- estado da abertura escura (escrito pelo laço de animação) ---
+     --dark      opacidade do véu
+     --dark-step curva mais fechada, para elementos pequenos trocarem de cor rápido
+     --hero-fade opacidade do conteúdo claro da abertura */
+  --dark:1;
+  --dark-step:1;
+  --hero-fade:1;
+}

@@ -1,0 +1,8 @@
+# Lixo do sistema e do OneDrive
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores
+.vscode/
+.idea/

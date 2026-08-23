@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Currículo — Joabe Alves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --gray-700:#4a4a4a;
+    --gray-500:#767676;
+    --gray-400:#9b9b9b;
+    --gray-300:#d9d9d9;
+    --gray-150:#ececec;
+    --gray-100:#f5f5f5;
+    --paper:#ffffff;
+    --page-bg:#e7e6e2;
+    --accent:#33449e;
+    --accent-soft:#eef0fb;
+    --danger:#b3413a;
+    --danger-soft:#fbeceb;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--page-bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .gicon{width:1em; height:1em; display:inline-block; vertical-align:-0.15em; flex-shrink:0;}
+  .gicon *{vector-effect:non-scaling-stroke;}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:12px 20px;
+    background:#20232b;
+    color:#f2f2f2;
+    box-shadow:0 2px 10px rgba(0,0,0,.18);
+  }
+  .toolbar-title{
+    font-family:'Poppins',sans-serif;
+    font-weight:600; font-size:15px; margin-right:6px; white-space:nowrap;
+  }
+  .toolbar-title span{color:#9aa5e8; font-weight:400; font-size:12px; display:block; margin-top:1px;}
+  .tb-group{display:flex; gap:6px; align-items:center; margin-left:auto; flex-wrap:wrap;}
+  .tb-btn{
+    display:inline-flex; align-items:center; gap:7px;
+    background:#2c3040; color:#f2f2f2; border:1px solid #3c4157;
+    padding:8px 13px; border-radius:7px; font-size:12.5px; font-weight:500;
+    cursor:pointer; font-family:'Inter',sans-serif; transition:.15s;
+    white-space:nowrap;
+  }
+  .tb-btn:hover{background:var(--accent); border-color:var(--accent);}
+  .tb-btn.primary{background:var(--accent); border-color:var(--accent);}
+  .tb-btn.primary:hover{background:#2a3980;}
+  .tb-btn .gicon{width:13px; height:13px;}
+  .tb-status{font-size:11.5px; color:#9aa5e8; min-width:70px;}
+  #photoInput{display:none;}
+
+  .help-panel{
+    max-width:900px; margin:14px auto 0; padding:12px 18px;
+    background:#fffbe9; border:1px solid #f0e2ad; border-radius:8px;
+    font-size:13px; color:#5c4d1a; line-height:1.6;
+  }
+  .help-panel b{color:#3a2f0a;}
+  .help-panel .close-help{
+    float:right; cursor:pointer; border:none; background:none; color:#8a742a; font-size:13px;
+  }
+
+  /* ---------- Page / sheet ---------- */
+  .page-wrap{ padding:34px 16px 70px; display:flex; justify-content:center; }
+  .resume-sheet{
+    position:relative;
+    width:100%; max-width:900px;
+    background:var(--paper);
+    box-shadow:0 10px 40px rgba(0,0,0,.14);
+    padding:54px 60px 44px;
+  }
+
+  /* ---------- Header ---------- */
+  .resume-header{display:flex; justify-content:space-between; align-items:flex-start; gap:24px;}
+  .name-block h1{
+    font-family:'Poppins',sans-serif; font-weight:300; font-size:34px; margin:0; letter-spacing:.3px;
+    display:flex; gap:9px; flex-wrap:wrap;
+  }
+  .name-block h1 .lname{font-weight:700;}
+  .subtitle{
+    margin:6px 0 0; font-size:12px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--gray-500); font-weight:500;
+  }
+  .photo-wrap{position:relative; flex-shrink:0;}
+  .photo{
+    width:96px; height:96px; border-radius:50%; background:var(--gray-100);
+    border:1px solid var(--gray-300); background-size:cover; background-position:center;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;
+    color:var(--gray-400); transition:.15s;
+  }
+  .photo .gicon{width:32px; height:32px;}
+  .photo:hover{border-color:var(--accent);}
+  .photo.mono{filter:grayscale(1) contrast(1.05);}
+  .photo-actions{position:absolute; bottom:-6px; right:-6px; display:flex; gap:4px;}
+  .photo-mini-btn{
+    width:26px; height:26px; border-radius:50%; background:var(--ink); color:#fff; border:2px solid #fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .photo-mini-btn .gicon{width:12px; height:12px;}
+  .photo-mini-btn:hover{background:var(--accent);}
+
+  .divider{border:none; border-top:1px solid var(--gray-300); margin:26px 0;}
+
+  /* ---------- Section headings ---------- */
+  .sec-head{display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:9px; border-bottom:1px solid var(--gray-150);}
+  .sec-head h2{
+    font-size:12.5px; letter-spacing:2.5px; text-transform:uppercase; font-weight:600; margin:0;
+  }
+  .icon-slot{
+    width:16px; height:16px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--ink); flex-shrink:0; border-radius:3px;
+  }
+  .icon-slot:hover{background:var(--accent-soft); color:var(--accent);}
+
+  .profile-text{font-size:13.5px; line-height:1.75; color:var(--gray-700); margin:0;}
+
+  /* ---------- Columns ---------- */
+  .columns{display:grid; grid-template-columns:1fr 1.32fr; gap:40px; margin-top:6px;}
+  .col-left, .col-right{display:flex; flex-direction:column; gap:26px;}
+
+  .section-block{border-radius:6px;}
+  .entries-list{display:flex; flex-direction:column; gap:16px;}
+
+  /* ---------- Entries (education / cert / job / ref) ---------- */
+  .entry{border-radius:5px; padding:4px 4px 4px 0;}
+  .entry-top{display:flex; align-items:flex-start; gap:8px;}
+  .entry-text{flex:1; min-width:0;}
+  .entry-title{font-size:13px; font-weight:600; color:var(--ink);}
+  .entry-sub{font-size:12.5px; color:var(--gray-700); margin-top:2px;}
+  .entry-date{font-size:11.5px; color:var(--gray-500); margin-top:2px; letter-spacing:.3px;}
+  .entry-desc{font-size:12.3px; color:var(--gray-700); margin-top:6px; line-height:1.55;}
+  .entry .bullets{margin-top:8px;}
+
+  .ref-line{font-size:12px; color:var(--gray-700); display:flex; align-items:center; gap:6px; margin-top:3px;}
+  .ref-line .icon-slot{width:12px; height:12px;}
+  .ref-line .icon-slot .gicon{width:11px; height:11px;}
+
+  /* ---------- Skills / bullet lists ---------- */
+  ul.bullets{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px;}
+  li.bullet-item{
+    display:flex; align-items:flex-start; gap:7px; font-size:12.8px; color:var(--gray-700);
+    border-radius:4px; padding:2px 4px 2px 2px;
+  }
+  .bullet-dot{width:4px; height:4px; border-radius:50%; background:var(--ink); margin-top:6px; flex-shrink:0;}
+  .bullet-text{flex:1; line-height:1.55;}
+
+  /* ---------- Drag handles & delete buttons (always visible, subtle) ---------- */
+  .drag-handle{
+    color:var(--gray-300); cursor:grab; flex-shrink:0; padding-top:2px; line-height:0;
+  }
+  .drag-handle:hover{color:var(--accent);}
+  .drag-handle .gicon{width:13px; height:13px;}
+  .del-btn{
+    border:none; background:none; color:var(--gray-400); cursor:pointer;
+    flex-shrink:0; padding:3px; border-radius:4px; margin-left:auto; line-height:0;
+  }
+  .del-btn .gicon{width:12px; height:12px;}
+  .del-btn:hover{color:var(--danger); background:var(--danger-soft);}
+  .del-section-btn{margin-left:auto; padding:5px;}
+  .del-section-btn .gicon{width:13px; height:13px;}
+  .sortable-item.dragging{opacity:.35; outline:1.5px dashed var(--accent);}
+
+  .add-item{
+    align-self:flex-start; border:1.5px dashed var(--gray-300); background:none; color:var(--gray-500);
+    font-size:11.5px; padding:6px 11px; border-radius:5px; cursor:pointer; margin-top:2px;
+    display:flex; align-items:center; gap:6px; font-family:'Inter',sans-serif;
+  }
+  .add-item .gicon{width:11px; height:11px;}
+  .add-item:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-soft);}
+
+  /* ---------- Contact / footer bar ---------- */
+  .contact-bar{
+    margin-top:34px; padding-top:18px; border-top:1px solid var(--gray-300);
+    display:flex; justify-content:center; gap:0; flex-wrap:wrap;
+  }
+  .contact-item{
+    display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--gray-700);
+    padding:0 22px; border-left:1px solid var(--gray-300);
+  }
+  .contact-item:first-child{border-left:none;}
+  .contact-item .icon-slot{color:var(--ink); width:14px; height:14px;}
+  .contact-item .icon-slot .gicon{width:13px; height:13px;}
+  .contact-text{outline-offset:2px;}
+
+  /* ---------- Editable affordance ---------- */
+  [contenteditable="true"]{outline:none; cursor:text; border-radius:2px;}
+  [contenteditable="true"]:hover{background:var(--accent-soft);}
+  [contenteditable="true"]:focus{outline:1.5px dashed var(--accent); background:#fff;}
+  [contenteditable="true"]:empty:before{content:'Clique para editar…'; color:#b7b7b7; font-style:italic;}
+
+  /* ---------- Icon picker modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(20,20,25,.5); z-index:100;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.hidden{display:none;}
+  .modal{background:#fff; border-radius:10px; width:100%; max-width:420px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .modal-head h3{margin:0; font-family:'Poppins',sans-serif; font-size:16px; font-weight:600;}
+  .modal-head button{border:none; background:var(--gray-100); width:28px; height:28px; border-radius:50%; cursor:pointer; color:var(--gray-700); display:flex; align-items:center; justify-content:center;}
+  .modal-head button .gicon{width:12px; height:12px;}
+  .modal-hint{font-size:11.5px; color:var(--gray-500); margin:-6px 0 14px;}
+  .icon-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; max-height:280px; overflow-y:auto;}
+  .icon-pick{
+    aspect-ratio:1; border:1px solid var(--gray-150); background:var(--gray-100); border-radius:7px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink);
+  }
+  .icon-pick .gicon{width:16px; height:16px;}
+  .icon-pick:hover{background:var(--accent); color:#fff; border-color:var(--accent);}
+
+  .icon-inline{margin-right:3px;}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:760px){
+    .resume-sheet{padding:36px 22px 30px 32px;}
+    .columns{grid-template-columns:1fr; gap:30px;}
+    .toolbar{gap:8px;}
+    .tb-group{margin-left:0; width:100%;}
+    .name-block h1{font-size:26px;}
+  }
+
+  /* ---------- Print ---------- */
+  /* ---------- Impressão / PDF ----------
+     "Exportar PDF" abre a impressão do navegador; em "Destino" escolha
+     "Salvar como PDF". O que vale para o arquivo está todo aqui. */
+  @media print{
+    @page{ size:A4; margin:11mm; }
+
+    html,body{background:#fff !important;}
+    /* mantém as cores do modelo no PDF em vez de imprimir tudo em branco */
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+
+    /* nada de interface de edição no arquivo */
+    .toolbar, .help-panel, .drag-handle, .del-btn, .add-item,
+    .add-item-wrapper, .photo-actions, .modal-overlay{display:none !important;}
+
+    .page-wrap{padding:0; display:block;}
+    .resume-sheet{box-shadow:none; max-width:100%; width:100%; padding:0; border-radius:0;}
+
+    [contenteditable="true"]:hover, [contenteditable="true"]:focus{background:none !important; outline:none !important;}
+    [contenteditable="true"]:empty:before{content:'';}
+
+    /* nada de item partido no meio entre duas páginas */
+    .section-block, .entry, .bullet-item, .contact-bar{ break-inside:avoid; page-break-inside:avoid; }
+    h1,h2,h3{ break-after:avoid; page-break-after:avoid; }
+
+    .contact-bar{ break-before:auto; }
+
+    /* Compactação de impressão: na tela o modelo respira, no papel ele precisa
+       caber em **uma** folha. Sem isso sobrava uma segunda página só com o rodapé.
+       O corte é de espaçamento e de meio ponto de corpo — nada de conteúdo. */
+    /* A folha impressa tem ~711px de largura útil (A4 menos as margens), o que caía
+       na regra de tela estreita e empilhava as colunas — era isso que estourava para
+       uma segunda página. No papel as duas colunas são obrigatórias. */
+    .columns{display:grid !important; grid-template-columns:1fr 1.3fr !important; gap:26px !important;}
+
+    .divider{margin:14px 0;}
+    .profile-text{font-size:12px; line-height:1.55;}
+    .columns{gap:30px; margin-top:0;}
+    .col-left > .section-block, .col-right > .section-block{margin-bottom:10px;}
+
+    .sec-head{margin-bottom:9px; padding-bottom:6px;}
+    .sec-head h2{font-size:11.5px; letter-spacing:2px;}
+
+    .entry{padding:0;}
+    .entry + .entry{margin-top:8px;}
+    .entry-title{font-size:12.2px;}
+    .entry-sub{font-size:11.6px;}
+    .entry-date{font-size:10.8px;}
+    .entry-desc{font-size:11.4px; line-height:1.45; margin-top:4px;}
+    .entry .bullets{margin-top:5px;}
+
+    ul.bullets{gap:4px;}
+    li.bullet-item{font-size:11.8px; padding:0;}
+    .bullet-text{line-height:1.45;}
+
+    .resume-header{gap:16px;}
+    .contact-bar{margin-top:14px; padding-top:10px; font-size:11.5px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <div class="toolbar-title">Editor de Currículo Acadêmico<span>arraste, edite e personalize</span></div>
+    <div class="tb-group">
+      <button class="tb-btn" id="btnPhoto" type="button"><span class="gicon" data-icon="camera"></span> Foto</button>
+      <button class="tb-btn" id="btnIcon" type="button"><span class="gicon" data-icon="sparkle"></span> Inserir ícone</button>
+      <button class="tb-btn" id="btnHelp" type="button"><span class="gicon" data-icon="help"></span> Ajuda</button>
+      <button class="tb-btn" id="btnReset" type="button"><span class="gicon" data-icon="undo"></span> Restaurar</button>
+      <button class="tb-btn" id="btnPrint" type="button"><span class="gicon" data-icon="print"></span> Exportar PDF</button>
+      <button class="tb-btn primary" id="btnSave" type="button"><span class="gicon" data-icon="save"></span> Salvar</button>
+      <span class="tb-status" id="tbStatus"></span>
+    </div>
+    <input type="file" id="photoInput" accept="image/*">
+  </div>
+
+  <div class="help-panel" id="helpPanel">
+    <button class="close-help" id="closeHelp" type="button">✕ fechar</button>
+    <b>Como usar:</b> clique em qualquer texto para editá-lo; o que estiver entre colchetes é lembrete para você preencher. Use <b>⠿</b> para arrastar e reordenar (funciona até com seções inteiras) e <b>×</b> para excluir. “+ adicionar” cria novos itens.
+    <br><b>Baixar em PDF:</b> clique em <b>Exportar PDF</b> e, na janela de impressão, escolha <b>Destino → Salvar como PDF</b>. Deixe as margens no padrão: o modelo já está ajustado para sair em <b>uma página A4</b>, com as duas colunas e sem os controles de edição. O nome sugerido do arquivo vem do título da página.
+    <br><b>Salvar:</b> guarda o progresso neste navegador (não é o PDF). <b>Restaurar</b> volta ao modelo em branco.
+  </div>
+
+  <div class="page-wrap" id="pageWrap">
+    <div class="resume-sheet" id="sheet">
+
+      <!-- HEADER -->
+      <header class="resume-header">
+        <div class="name-block">
+          <h1><span class="single-line" contenteditable="true">Joabe</span><span class="lname single-line" contenteditable="true">Alves</span></h1>
+          <p class="subtitle single-line" contenteditable="true">Engenharia de Computação com Inteligência Artificial — Universidade Federal de Uberlândia</p>
+        </div>
+        <div class="photo-wrap">
+          <div class="photo mono" id="photoCircle"><span class="gicon" data-icon="user"></span></div>
+          <div class="photo-actions">
+            <div class="photo-mini-btn" id="toggleMono" title="Alternar preto e branco"><span class="gicon" data-icon="adjust"></span></div>
+          </div>
+        </div>
+      </header>
+
+      <hr class="divider">
+
+      <!-- PROFILE -->
+      <section class="section-block">
+        <div class="sec-head">
+          <h2 class="single-line" contenteditable="true">Objetivo</h2>
+        </div>
+        <p class="profile-text" contenteditable="true">Curso Engenharia de Computação com Inteligência Artificial na Universidade Federal de Uberlândia. Convivo com computação desde os quatorze anos, e foi nessa formação que me conectei de vez com a engenharia. Fui aprovado em projetos como o GRVA, no qual trabalho com aprendizado de máquina, Python e inteligência artificial. Sempre fui reconhecido pela comunicação eficiente e pelo comportamento profissional. Busco destaque na minha área e reconhecimento por isso — mais do que um objetivo, é um desejo.</p>
+      </section>
+
+      <hr class="divider">
+
+      <!-- COLUMNS -->
+      <div class="columns">
+        <div class="col-left sortable-container" id="colLeft">
+
+          <!-- FORMACAO ACADEMICA -->
+          <section class="section-block sortable-item" id="eduBlock">
+            <div class="sec-head">
+              <span class="drag-handle" contenteditable="false" title="Arrastar seção"><span class="gicon" data-icon="grip"></span></span>
+              <h2 class="single-line" contenteditable="true">Formação Acadêmica</h2>
+              <button class="del-btn del-section-btn" contenteditable="false" data-confirm="Excluir a seção inteira de Formação Acadêmica?" title="Excluir seção"><span class="gicon" data-icon="close"></span></button>
+            </div>
+            <div class="entries-list sortable-container" id="eduList">
+              <div class="entry sortable-item">
+                <div class="entry-top">
+                  <span class="drag-handle" contenteditable="false" title="Arrastar"><span class="gicon" data-icon="grip"></span></span>
+                  <div class="entry-text">
+                    <div class="entry-title single-line" contenteditable="true">Engenharia de Computação com Inteligência Artificial</div>
+                    <div class="entry-sub single-line" contenteditable="true">Universidade Federal de Uberlândia — Uberlândia, MG</div>
+                    <div class="entry-date single-line" contenteditable="true">Ingresso: 2025 · Previsão de conclusão: 2029</div>
+                    <div class="entry-desc" contenteditable="true">Ênfase em inteligência artificial, aprendizado de máquina e computação gráfica.</div>
+                  </div>
+                  <button class="del-btn" contenteditable="false" title="Remover"><span class="gicon" data-icon="close"></span></button>
+                </div>
+              </div>
+              <button class="add-item" type="button" data-type="edu"><span class="gicon" data-icon="plus"></span> adicionar formação</button>
+            </div>
+          </section>
+
+          <!-- IDIOMAS -->
+          <section class="section-block sortable-item" id="langBlock">
+            <div class="sec-head">
+              <span class="drag-handle" contenteditable="false" title="Arrastar seção"><span class="gicon" data-icon="grip"></span></span>
+              <h2 class="single-line" contenteditable="true">Idiomas</h2>
+              <button class="del-btn del-section-btn" contenteditable="false" data-confirm="Excluir a seção inteira de Idiomas?" title="Excluir seção"><span class="gicon" data-icon="close"></span></button>
+            </div>
+            <ul class="bullets sortable-container" id="langList">
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Inglês — nível básico</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Espanhol — nível básico</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Francês — nível básico</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="add-item-wrapper"><button class="add-item" type="button" data-type="skill"><span class="gicon" data-icon="plus"></span> adicionar idioma</button></li>
+            </ul>
+          </section>
+
+          <!-- CURSOS E CERTIFICACOES -->
+          <section class="section-block sortable-item" id="certBlock">
+            <div class="sec-head">
+              <span class="drag-handle" contenteditable="false" title="Arrastar seção"><span class="gicon" data-icon="grip"></span></span>
+              <h2 class="single-line" contenteditable="true">Cursos e Certificações</h2>
+              <button class="del-btn del-section-btn" contenteditable="false" data-confirm="Excluir a seção inteira de Cursos e Certificações?" title="Excluir seção"><span class="gicon" data-icon="close"></span></button>
+            </div>
+            <div class="entries-list sortable-container" id="certList">
+              <div class="entry sortable-item">
+                <div class="entry-top">
+                  <span class="drag-handle" contenteditable="false" title="Arrastar"><span class="gicon" data-icon="grip"></span></span>
+                  <div class="entry-text">
+                    <div class="entry-title single-line" contenteditable="true">Inteligência Artificial Fundacional</div>
+                    <div class="entry-sub single-line" contenteditable="true">UFU — NeoSpace</div>
+                    <div class="entry-date single-line" contenteditable="true">Concluído em setembro de 2025</div>
+                    <div class="entry-desc" contenteditable="true">Fundamentos de inteligência artificial e aprendizado de máquina aplicados a projetos.</div>
+                  </div>
+                  <button class="del-btn" contenteditable="false" title="Remover"><span class="gicon" data-icon="close"></span></button>
+                </div>
+              </div>
+              <button class="add-item" type="button" data-type="cert"><span class="gicon" data-icon="plus"></span> adicionar curso</button>
+            </div>
+          </section>
+
+
+        </div>
+
+        <div class="col-right sortable-container" id="colRight">
+
+          <!-- EXPERIENCIA -->
+          <section class="section-block sortable-item" id="jobsBlock">
+            <div class="sec-head">
+              <span class="drag-handle" contenteditable="false" title="Arrastar seção"><span class="gicon" data-icon="grip"></span></span>
+              <h2 class="single-line" contenteditable="true">Experiências</h2>
+              <button class="del-btn del-section-btn" contenteditable="false" data-confirm="Excluir a seção inteira de Experiência?" title="Excluir seção"><span class="gicon" data-icon="close"></span></button>
+            </div>
+            <div class="entries-list sortable-container" id="jobsList">
+              <div class="entry sortable-item">
+                <div class="entry-top">
+                  <span class="drag-handle" contenteditable="false" title="Arrastar"><span class="gicon" data-icon="grip"></span></span>
+                  <div class="entry-text">
+                    <div class="entry-title single-line" contenteditable="true">Projeto — Simulação 3D da terceira via de Santos</div>
+                    <div class="entry-sub single-line" contenteditable="true">Instituto Brasileiro de Infraestrutura — São Paulo, SP</div>
+                    <div class="entry-date single-line" contenteditable="true">Abril de 2026</div>
+                    <ul class="bullets sortable-container">
+                      <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text" contenteditable="true">Projetei uma simulação 3D que explorava a possibilidade de uma terceira via para o transporte rodoviário passando por Cubatão e Santos.</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+                      <li class="add-item-wrapper"><button class="add-item" type="button" data-type="jobbullet"><span class="gicon" data-icon="plus"></span> adicionar item</button></li>
+                    </ul>
+                  </div>
+                  <button class="del-btn" contenteditable="false" title="Remover"><span class="gicon" data-icon="close"></span></button>
+                </div>
+              </div>
+              <button class="add-item" type="button" data-type="job"><span class="gicon" data-icon="plus"></span> adicionar experiência</button>
+            </div>
+          </section>
+
+          <!-- PROJETOS ACADEMICOS -->
+          <section class="section-block sortable-item" id="projBlock">
+            <div class="sec-head">
+              <span class="drag-handle" contenteditable="false" title="Arrastar seção"><span class="gicon" data-icon="grip"></span></span>
+              <h2 class="single-line" contenteditable="true">Experiências acadêmicas</h2>
+              <button class="del-btn del-section-btn" contenteditable="false" data-confirm="Excluir a seção inteira de Experiências acadêmicas?" title="Excluir seção"><span class="gicon" data-icon="close"></span></button>
+            </div>
+            <div class="entries-list sortable-container" id="projList">
+              <div class="entry sortable-item">
+                <div class="entry-top">
+                  <span class="drag-handle" contenteditable="false" title="Arrastar"><span class="gicon" data-icon="grip"></span></span>
+                  <div class="entry-text">
+                    <div class="entry-title single-line" contenteditable="true">GRVA — Treinamento de robótica com aprendizado de máquina</div>
+                    <div class="entry-sub single-line" contenteditable="true">Orientação: GRVA — Grupo de Realidade Virtual e Aumentada (UFU)</div>
+                    <div class="entry-date single-line" contenteditable="true">2026</div>
+                    <ul class="bullets sortable-container">
+                      <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text" contenteditable="true">Descreva o objetivo do projeto e o seu papel nele</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+                      <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text" contenteditable="true">Mencione resultados, métodos ou publicações relevantes</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+                      <li class="add-item-wrapper"><button class="add-item" type="button" data-type="jobbullet"><span class="gicon" data-icon="plus"></span> adicionar item</button></li>
+                    </ul>
+                  </div>
+                  <button class="del-btn" contenteditable="false" title="Remover"><span class="gicon" data-icon="close"></span></button>
+                </div>
+              </div>
+              <button class="add-item" type="button" data-type="job"><span class="gicon" data-icon="plus"></span> adicionar projeto</button>
+            </div>
+          </section>
+
+
+          <!-- HABILIDADES -->
+          <section class="section-block sortable-item" id="skillsBlock">
+            <div class="sec-head">
+              <span class="drag-handle" contenteditable="false" title="Arrastar seção"><span class="gicon" data-icon="grip"></span></span>
+              <h2 class="single-line" contenteditable="true">Habilidades</h2>
+              <button class="del-btn del-section-btn" contenteditable="false" data-confirm="Excluir a seção inteira de Habilidades?" title="Excluir seção"><span class="gicon" data-icon="close"></span></button>
+            </div>
+            <ul class="bullets sortable-container" id="skillsList">
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Comunicação</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Eficiência produtiva e organizacional</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Gestão de equipe</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Design e marketing</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="bullet-item sortable-item"><span class="drag-handle" contenteditable="false"><span class="gicon" data-icon="grip"></span></span><span class="bullet-dot" contenteditable="false"></span><span class="bullet-text single-line" contenteditable="true">Python, aprendizado de máquina e computação gráfica</span><button class="del-btn" contenteditable="false"><span class="gicon" data-icon="close"></span></button></li>
+              <li class="add-item-wrapper"><button class="add-item" type="button" data-type="skill"><span class="gicon" data-icon="plus"></span> adicionar habilidade</button></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+
+      <!-- CONTACT BAR -->
+      <div class="contact-bar">
+        <div class="contact-item"><span class="icon-slot"><span class="gicon" data-icon="phone"></span></span><span class="contact-text single-line" contenteditable="true">(00) 00000-0000</span></div>
+        <div class="contact-item"><span class="icon-slot"><span class="gicon" data-icon="envelope"></span></span><span class="contact-text single-line" contenteditable="true">seuemail@exemplo.com</span></div>
+        <div class="contact-item"><span class="icon-slot"><span class="gicon" data-icon="linkedin"></span></span><span class="contact-text single-line" contenteditable="true">linkedin.com/in/seunome</span></div>
+        <div class="contact-item"><span class="icon-slot"><span class="gicon" data-icon="link"></span></span><span class="contact-text single-line" contenteditable="true">lattes.cnpq.br/0000000000000000</span></div>
+      </div>
+
+    </div><!-- /.resume-sheet -->
+  </div><!-- /.page-wrap -->
+
+  <!-- ICON PICKER MODAL -->
+  <div class="modal-overlay hidden" id="iconModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Escolher ícone</h3>
+        <button type="button" id="closeModal"><span class="gicon" data-icon="close"></span></button>
+      </div>
+      <p class="modal-hint" id="modalHint">Clique em um ícone para inserir.</p>
+      <div class="icon-grid" id="iconGrid"></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+
+  // ---------------------------------------------------------------
+  // Self-contained SVG icon set (no external CDN / network needed)
+  // ---------------------------------------------------------------
+  const ICONS_SVG = {
+    square:        '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>',
+    circle:        '<circle cx="12" cy="12" r="7" fill="currentColor"/>',
+    star:          '<path fill="currentColor" d="M12 2l2.9 6.26L22 9.27l-5 4.87L18.2 21 12 17.27 5.8 21 7 14.14l-5-4.87 7.1-1.01z"/>',
+    check:         '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 12.5l2.5 2.5L16 9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    phone:         '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1.1.5 1.1 1.1v3.4c0 .6-.5 1.1-1.1 1.1C10.9 21.2 2.8 13.1 2.8 3.1c0-.6.5-1.1 1.1-1.1H7.3c.6 0 1.1.5 1.1 1.1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1L6.6 10.8z"/>',
+    envelope:      '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 6.5l8 6.5 8-6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+    linkedin:      '<rect x="3" y="3" width="18" height="18" rx="3" fill="currentColor"/><path d="M8.2 10.3v7.1M8.2 7.4v.1" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M11.2 17.4v-4.3c0-1.6 1-2.6 2.4-2.6 1.3 0 2.2 1 2.2 2.6v4.3" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    globe:         '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.5"/><path d="M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+    'map-pin':     '<path d="M12 22s7-7.4 7-12.5A7 7 0 0 0 5 9.5C5 14.6 12 22 12 22z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.3" fill="none" stroke="currentColor" stroke-width="1.7"/>',
+    'graduation-cap':'<path d="M2 8.5L12 4l10 4.5-10 4.5L2 8.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 10.7V16c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-5.3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M21 9v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    briefcase:     '<rect x="3" y="8" width="18" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 13h18" stroke="currentColor" stroke-width="1.7"/>',
+    user:          '<circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+    users:         '<circle cx="9" cy="8.5" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 19c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15.5 6.5a2.8 2.8 0 0 1 0 5.4M17.5 19c0-2.4-1.5-4.3-3.6-5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+    book:          '<path d="M4 4.5C4 3.7 4.7 3 5.5 3H12v18H5.5c-.8 0-1.5-.7-1.5-1.5v-15z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 4.5c0-.8-.7-1.5-1.5-1.5H12v18h6.5c.8 0 1.5-.7 1.5-1.5v-15z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+    lightbulb:     '<path d="M9 18h6M10 21h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2h5.6c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    award:         '<circle cx="12" cy="8.5" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 12.8L7.5 21l4.5-2.5 4.5 2.5-1.5-8.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    heart:         '<path d="M12 20.5s-7.5-4.7-9.5-9.4C1.1 7.7 3 4.7 6.2 4.4c2-.2 3.6.9 4.8 2.6 1.2-1.7 2.8-2.8 4.8-2.6 3.2.3 5.1 3.3 3.7 6.7-2 4.7-9.5 9.4-9.5 9.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    clock:         '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+    'calendar-days':'<rect x="3.5" y="5" width="17" height="15.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    'chart-line':  '<path d="M4 20V4M4 20h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M6.5 15.5l4-4 3 3 5-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+    camera:        '<path d="M4 8h3l1.5-2h7L17 8h3a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 4 8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+    music:         '<path d="M9 18.5a2.5 2.5 0 1 1-2.5-2.5A2.5 2.5 0 0 1 9 18.5zM19 16.5a2.5 2.5 0 1 1-2.5-2.5 2.5 2.5 0 0 1 2.5 2.5z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 18.5V5.5l10-2v13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+    house:         '<path d="M4 11l8-7 8 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 9.5V20h12V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+    pencil:        '<path d="M4 20l.9-4L16 4.9a1.8 1.8 0 0 1 2.6 0l.5.5a1.8 1.8 0 0 1 0 2.6L8 19.1 4 20z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14.5 6.5l3 3" stroke="currentColor" stroke-width="1.5"/>',
+    gear:          '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 2.5v2.3M12 19.2v2.3M4.6 5.6l1.6 1.6M17.8 16.8l1.6 1.6M2.5 12h2.3M19.2 12h2.3M4.6 18.4l1.6-1.6M17.8 7.2l1.6-1.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    handshake:     '<path d="M2 12l4-4 4 2 2-2 3 1 5 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12l3 3M13 10.5l3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M6 8l4.5 4.5-1.4 1.4a1.5 1.5 0 0 1-2.1 0l-1-1a1.5 1.5 0 0 1 0-2.1z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+    link:          '<path d="M9.5 13.8L14.5 8.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M11 6.3l1.3-1.3a3.4 3.4 0 0 1 4.8 4.8l-2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 17.7l-1.3 1.3a3.4 3.4 0 0 1-4.8-4.8l2-2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+    // chrome-only
+    grip:          '<circle cx="9" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="6" r="1.4" fill="currentColor"/><circle cx="9" cy="12" r="1.4" fill="currentColor"/><circle cx="15" cy="12" r="1.4" fill="currentColor"/><circle cx="9" cy="18" r="1.4" fill="currentColor"/><circle cx="15" cy="18" r="1.4" fill="currentColor"/>',
+    close:         '<path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    plus:          '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    save:          '<path d="M4 4h13l3 3v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 4v5h8V4" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="7" y="13" width="10" height="7" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+    undo:          '<path d="M4 9a8 8 0 1 1 1.6 8.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 4v5h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+    print:         '<path d="M6 9V3h12v6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><rect x="4" y="9" width="16" height="8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 17v4h12v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    help:          '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 9.3a2.5 2.5 0 1 1 3.7 2.2c-.9.5-1.2 1-1.2 1.9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="12" cy="17" r="0.9" fill="currentColor"/>',
+    adjust:        '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
+    sparkle:       '<path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3z" fill="currentColor"/><circle cx="18.5" cy="17" r="1.6" fill="currentColor"/><circle cx="5.5" cy="18" r="1.2" fill="currentColor"/>'
+  };
+
+  const PICKER_ICONS = ['square','circle','star','check','phone','envelope','linkedin','link','globe','map-pin',
+    'graduation-cap','briefcase','user','users','book','lightbulb','award','heart','clock','calendar-days',
+    'chart-line','camera','music','house','pencil','gear','handshake'];
+
+  function iconSvg(name){
+    return '<svg class="gicon" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS_SVG[name]||ICONS_SVG.square)+'</svg>';
+  }
+  function initIcons(root){
+    root.querySelectorAll('[data-icon]').forEach(el=>{
+      const name = el.getAttribute('data-icon');
+      el.outerHTML = '<svg class="'+el.className+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS_SVG[name]||ICONS_SVG.square)+'</svg>';
+    });
+  }
+  initIcons(document);
+
+  // ---------------------------------------------------------------
+  // Icon picker modal
+  // ---------------------------------------------------------------
+  const iconGrid = document.getElementById('iconGrid');
+  iconGrid.innerHTML = PICKER_ICONS.map(name=>
+    '<button type="button" class="icon-pick" data-icon="'+name+'">'+iconSvg(name)+'</button>'
+  ).join('');
+
+  const modal = document.getElementById('iconModal');
+  const modalHint = document.getElementById('modalHint');
+  let pickMode = 'cursor';
+  let activeSlot = null;
+  let savedRange = null;
+
+  function openModal(mode, slotEl){
+    pickMode = mode; activeSlot = slotEl || null;
+    modalHint.textContent = mode==='slot' ? 'Clique em um ícone para usar neste marcador.' : 'Clique em um ícone para inserir no texto selecionado.';
+    modal.classList.remove('hidden');
+  }
+  function closeModal(){ modal.classList.add('hidden'); }
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+  document.getElementById('btnIcon').addEventListener('click', ()=> openModal('cursor'));
+
+  document.addEventListener('click', e=>{
+    const slot = e.target.closest('.icon-slot');
+    if(slot){ openModal('slot', slot); }
+  });
+
+  iconGrid.addEventListener('click', e=>{
+    const btn = e.target.closest('.icon-pick');
+    if(!btn) return;
+    const name = btn.dataset.icon;
+    if(pickMode==='slot' && activeSlot){
+      activeSlot.innerHTML = iconSvg(name);
+    } else {
+      insertIconAtCursor('<span class="icon-inline" contenteditable="false">'+iconSvg(name)+'</span>&nbsp;');
+    }
+    closeModal();
+  });
+
+  document.addEventListener('selectionchange', ()=>{
+    const sel = window.getSelection();
+    if(!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    let node = range.commonAncestorContainer;
+    const el = node.nodeType===3 ? node.parentElement : node;
+    if(el && el.closest && el.closest('[contenteditable="true"]') && !el.closest('.icon-slot')){
+      savedRange = range.cloneRange();
+    }
+  });
+
+  function insertIconAtCursor(html){
+    if(!savedRange){
+      alert('Clique dentro de um texto do currículo antes de inserir o ícone.');
+      return;
+    }
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+    document.execCommand('insertHTML', false, html);
+  }
+
+  // ---------------------------------------------------------------
+  // Enter key: keep single-line fields single-line
+  // ---------------------------------------------------------------
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){
+      const el = e.target.closest && e.target.closest('.single-line[contenteditable="true"]');
+      if(el){ e.preventDefault(); el.blur(); }
+    }
+  });
+
+  // ---------------------------------------------------------------
+  // Delete buttons (items AND whole sections)
+  // ---------------------------------------------------------------
+  document.addEventListener('click', e=>{
+    const del = e.target.closest('.del-btn');
+    if(!del) return;
+    const confirmMsg = del.getAttribute('data-confirm');
+    if(confirmMsg && !confirm(confirmMsg)) return;
+    const item = del.closest('.sortable-item');
+    if(item) item.remove();
+  });
+
+  // ---------------------------------------------------------------
+  // Add-item buttons
+  // ---------------------------------------------------------------
+  function makeBullet(text){
+    const li = document.createElement('li');
+    li.className = 'bullet-item sortable-item';
+    li.innerHTML = '<span class="drag-handle" contenteditable="false">'+iconSvg('grip')+'</span>'+
+      '<span class="bullet-dot" contenteditable="false"></span>'+
+      '<span class="bullet-text single-line" contenteditable="true">'+text+'</span>'+
+      '<button class="del-btn" contenteditable="false">'+iconSvg('close')+'</button>';
+    return li;
+  }
+  function makeEduLikeEntry(title, sub, date, desc){
+    const div = document.createElement('div');
+    div.className = 'entry sortable-item';
+    div.innerHTML = '<div class="entry-top">'+
+      '<span class="drag-handle" contenteditable="false">'+iconSvg('grip')+'</span>'+
+      '<div class="entry-text">'+
+        '<div class="entry-title single-line" contenteditable="true">'+title+'</div>'+
+        '<div class="entry-sub single-line" contenteditable="true">'+sub+'</div>'+
+        '<div class="entry-date single-line" contenteditable="true">'+date+'</div>'+
+        '<div class="entry-desc" contenteditable="true">'+(desc||'Breve descrição do que o curso propôs (opcional).')+'</div>'+
+      '</div>'+
+      '<button class="del-btn" contenteditable="false" title="Remover">'+iconSvg('close')+'</button>'+
+    '</div>';
+    return div;
+  }
+  function makeJobEntry(){
+    const div = document.createElement('div');
+    div.className = 'entry sortable-item';
+    div.innerHTML = '<div class="entry-top">'+
+      '<span class="drag-handle" contenteditable="false">'+iconSvg('grip')+'</span>'+
+      '<div class="entry-text">'+
+        '<div class="entry-title single-line" contenteditable="true">Cargo</div>'+
+        '<div class="entry-sub single-line" contenteditable="true">Empresa — Cidade, UF</div>'+
+        '<div class="entry-date single-line" contenteditable="true">Mês Ano – Presente</div>'+
+        '<ul class="bullets sortable-container">'+
+          '<li class="add-item-wrapper"><button class="add-item" type="button" data-type="jobbullet">'+iconSvg('plus')+' adicionar item</button></li>'+
+        '</ul>'+
+      '</div>'+
+      '<button class="del-btn" contenteditable="false" title="Remover">'+iconSvg('close')+'</button>'+
+    '</div>';
+    return div;
+  }
+  function makeRefEntry(){
+    const div = document.createElement('div');
+    div.className = 'entry sortable-item';
+    div.innerHTML = '<div class="entry-top">'+
+      '<span class="drag-handle" contenteditable="false">'+iconSvg('grip')+'</span>'+
+      '<div class="entry-text">'+
+        '<div class="entry-title single-line" contenteditable="true">Nome</div>'+
+        '<div class="entry-sub single-line" contenteditable="true">Empresa — Cidade</div>'+
+        '<div class="ref-line"><span class="icon-slot">'+iconSvg('phone')+'</span><span class="single-line" contenteditable="true">(00) 00000-0000</span></div>'+
+        '<div class="ref-line"><span class="icon-slot">'+iconSvg('envelope')+'</span><span class="single-line" contenteditable="true">email@exemplo.com</span></div>'+
+      '</div>'+
+      '<button class="del-btn" contenteditable="false" title="Remover">'+iconSvg('close')+'</button>'+
+    '</div>';
+    return div;
+  }
+
+  document.addEventListener('click', e=>{
+    const btn = e.target.closest('.add-item');
+    if(!btn) return;
+    const type = btn.dataset.type;
+    let node = null;
+    if(type==='skill') node = makeBullet('Nova habilidade');
+    else if(type==='jobbullet') node = makeBullet('Descreva uma responsabilidade ou conquista');
+    else if(type==='edu') node = makeEduLikeEntry('Nome do curso', 'Instituição — Cidade, UF', 'Ingresso: mês/ano · Previsão de conclusão: mês/ano', 'Breve descrição do curso: principais áreas de foco ou linha de estudo (opcional).');
+    else if(type==='cert') node = makeEduLikeEntry('Nome do curso ou certificação', 'Instituição ou plataforma', 'Concluído em mês/ano', 'Breve descrição do que o curso propôs: temas abordados ou principal aprendizado (opcional).');
+    else if(type==='job') node = makeJobEntry();
+    else if(type==='ref') node = makeRefEntry();
+    if(!node) return;
+    const wrapper = btn.closest('.add-item-wrapper');
+    if(wrapper){
+      wrapper.before(node);
+    } else {
+      btn.before(node);
+    }
+  });
+
+  // ---------------------------------------------------------------
+  // Drag & drop reordering (bullets, entries, and whole sections)
+  // ---------------------------------------------------------------
+  let draggingItem = null, currentContainer = null;
+
+  document.addEventListener('mousedown', e=>{
+    const handle = e.target.closest('.drag-handle');
+    if(!handle) return;
+    const item = handle.closest('.sortable-item');
+    if(item) item.setAttribute('draggable','true');
+  });
+  document.addEventListener('mouseup', ()=>{
+    document.querySelectorAll('.sortable-item[draggable="true"]').forEach(el=>{
+      if(el !== draggingItem) el.removeAttribute('draggable');
+    });
+  });
+
+  document.addEventListener('dragstart', e=>{
+    const item = e.target.closest('.sortable-item');
+    if(!item || item.getAttribute('draggable')!=='true'){ return; }
+    draggingItem = item;
+    currentContainer = item.parentElement.closest('.sortable-container') || item.parentElement;
+    requestAnimationFrame(()=> item.classList.add('dragging'));
+    e.dataTransfer.effectAllowed = 'move';
+    try{ e.dataTransfer.setData('text/plain','drag'); }catch(err){}
+  });
+
+  function getDragAfterElement(container, y){
+    const items = [...container.children].filter(c=>c.classList && c.classList.contains('sortable-item') && c!==draggingItem);
+    let closest = {offset:-Infinity, element:null};
+    for(const child of items){
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height/2;
+      if(offset < 0 && offset > closest.offset){ closest = {offset, element:child}; }
+    }
+    return closest.element;
+  }
+
+  document.addEventListener('dragover', e=>{
+    if(!draggingItem) return;
+    e.preventDefault();
+    const container = e.target.closest('.sortable-container');
+    if(!container || container !== currentContainer) return;
+    const after = getDragAfterElement(container, e.clientY);
+    if(after == null) container.appendChild(draggingItem);
+    else container.insertBefore(draggingItem, after);
+  });
+  document.addEventListener('drop', e=> e.preventDefault());
+  document.addEventListener('dragend', ()=>{
+    if(draggingItem){ draggingItem.classList.remove('dragging'); draggingItem.removeAttribute('draggable'); }
+    draggingItem = null; currentContainer = null;
+  });
+
+  // ---------------------------------------------------------------
+  // Photo upload
+  // ---------------------------------------------------------------
+  const photoInput = document.getElementById('photoInput');
+  const photoCircle = document.getElementById('photoCircle');
+  document.getElementById('btnPhoto').addEventListener('click', ()=> photoInput.click());
+  photoCircle.addEventListener('click', ()=> photoInput.click());
+  photoInput.addEventListener('change', ()=>{
+    const file = photoInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      photoCircle.style.backgroundImage = 'url('+reader.result+')';
+      photoCircle.innerHTML = '';
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('toggleMono').addEventListener('click', e=>{
+    e.stopPropagation();
+    photoCircle.classList.toggle('mono');
+  });
+
+  // ---------------------------------------------------------------
+  // Help panel
+  // ---------------------------------------------------------------
+  const helpPanel = document.getElementById('helpPanel');
+  document.getElementById('btnHelp').addEventListener('click', ()=>{
+    helpPanel.style.display = helpPanel.style.display==='none' ? 'block' : 'none';
+  });
+  document.getElementById('closeHelp').addEventListener('click', ()=> helpPanel.style.display='none');
+
+  // ---------------------------------------------------------------
+  // Print
+  // ---------------------------------------------------------------
+  document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+
+  // ---------------------------------------------------------------
+  // Persistência (localStorage)
+  //
+  // A versão anterior usava `window.storage`, que não existe em navegador
+  // nenhum: salvar falhava sempre e o progresso nunca voltava. Aqui é
+  // localStorage puro, que funciona inclusive abrindo o arquivo do disco.
+  // ---------------------------------------------------------------
+  const pageWrap = document.getElementById('pageWrap');
+  const DEFAULT_SHEET_HTML = document.getElementById('sheet').outerHTML;
+  const STORAGE_KEY = 'resume-sheet-html';
+  const statusEl = document.getElementById('tbStatus');
+
+  function flash(msg){
+    statusEl.textContent = msg;
+    setTimeout(()=>{ if(statusEl.textContent===msg) statusEl.textContent=''; }, 2200);
+  }
+
+  document.getElementById('btnSave').addEventListener('click', ()=>{
+    try{
+      localStorage.setItem(STORAGE_KEY, document.getElementById('sheet').outerHTML);
+      flash('Salvo ✓');
+    }catch(err){
+      console.error(err);
+      flash('Falha ao salvar');
+    }
+  });
+
+  document.getElementById('btnReset').addEventListener('click', ()=>{
+    if(!confirm('Restaurar o modelo original? As edições atuais serão perdidas.')) return;
+    pageWrap.innerHTML = DEFAULT_SHEET_HTML;
+    initIcons(pageWrap);
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(err){}
+    flash('Restaurado');
+  });
+
+  (function loadSaved(){
+    let salvo = null;
+    try{ salvo = localStorage.getItem(STORAGE_KEY); }catch(err){ return; }
+    if(!salvo) return;
+
+    pageWrap.innerHTML = salvo;
+    /* o HTML salvo já traz os ícones como <svg>, mas se vier de uma versão
+       antiga (com data-icon) eles são montados aqui */
+    initIcons(pageWrap);
+    flash('Progresso carregado');
+  })();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+Coloque aqui os arquivos desta pasta. O site trata ausência como estado normal:
+vídeo que falta vira placeholder, PDF que falta vira recado no modal.
