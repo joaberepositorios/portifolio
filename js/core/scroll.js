@@ -34,7 +34,9 @@
   const SPEED = 0.78;
 
   /* respiro no topo do salto automático da abertura */
-  const OFFSET = 40;
+  /* Folga do topo ao pousar numa seção: a barra fixa cobre os primeiros ~52px,
+     e o título tem de sobrar embaixo dela, não atrás. */
+  const OFFSET = 76;
 
   let target = 0;
   let current = 0;

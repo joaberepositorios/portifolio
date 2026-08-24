@@ -26,6 +26,7 @@
     const ponteiro = seguirPonteiro();
 
     bindAnchors();
+    marcarSecaoAtual();
 
     onFrame(() => {
       paintDark(root, veil, scroll.y / page.viewport);
@@ -97,6 +98,37 @@
   }
 
 
+
+  /* Qual seção está sendo lida: a barra acende o item correspondente.
+     Um IntersectionObserver resolve isso por evento — nada entra no laço de
+     quadro, que é onde o custo aparece. A janela cortada em cima e embaixo faz
+     a troca acontecer quando a seção ocupa a faixa central da tela, não quando
+     encosta a borda. */
+  function marcarSecaoAtual() {
+    const links = qsa('.menubar a[href^="#"]');
+    if (!links.length) return;
+
+    const porId = new Map(links.map((link) => [link.getAttribute('href').slice(1), link]));
+    const alvos = [...porId.keys()].map((id) => qs(`#${id}`)).filter(Boolean);
+    const visiveis = new Set();
+
+    const observer = new IntersectionObserver((entradas) => {
+      for (const entrada of entradas) {
+        if (entrada.isIntersecting) visiveis.add(entrada.target.id);
+        else visiveis.delete(entrada.target.id);
+      }
+
+      /* mais de uma seção pode cruzar a faixa: vale a primeira na ordem da página */
+      let atual = null;
+      for (const id of porId.keys()) {
+        if (visiveis.has(id)) { atual = id; break; }
+      }
+
+      for (const [id, link] of porId) link.classList.toggle('is-current', id === atual);
+    }, { rootMargin: '-45% 0px -45% 0px' });
+
+    for (const alvo of alvos) observer.observe(alvo);
+  }
 
   function bindAnchors() {
     for (const anchor of qsa('a[href^="#"]')) {

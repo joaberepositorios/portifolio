@@ -11,6 +11,9 @@
   const modal = P.modal;
   const badges = P.badges;
 
+  /* largura de uma folha A4 em pixels de CSS, a 96dpi */
+  const LARGURA_A4 = 794;
+
   /* ---------- abertura ---------- */
   function renderIntro(content) {
     qs('#heroName').textContent = content.nome;
@@ -191,7 +194,7 @@
         arte.addEventListener('error', () => arte.remove());
         capa.prepend(arte);
       } else if (paper.pdf) {
-        previewSobDemanda(capa, paper.pdf);
+        previewSobDemanda(capa, previewDePdf(paper.pdf));
       } else {
         capa.prepend(folha());
       }
@@ -232,22 +235,25 @@
       leitor de PDF é caro, e três deles no carregamento custariam a rolagem.
       É um `object` de propósito — se o arquivo não existe, o navegador desenha
       o conteúdo de reserva (a folha) em vez de deixar um retângulo quebrado. */
-  function previewSobDemanda(capa, arquivo) {
+  function previewSobDemanda(capa, montar) {
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
         observer.disconnect();
-        capa.prepend(el('object.paper__preview', {
-          data: `${arquivo}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`,
-          type: 'application/pdf',
-          tabIndex: -1,
-          'aria-hidden': true
-        }, folha()));
+        capa.prepend(montar());
       }
     }, { rootMargin: '200px' });
 
     observer.observe(capa);
   }
+
+  /** Prévia de um PDF: `object` para ter reserva quando o arquivo não existe. */
+  const previewDePdf = (arquivo) => () => el('object.paper__preview', {
+    data: `${arquivo}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`,
+    type: 'application/pdf',
+    tabIndex: -1,
+    'aria-hidden': true
+  }, folha());
 
   /* ---------- competências: lista sequencial com os logos ----------
      Grupo em cima, itens em sequência embaixo — cada um com o selo da tecnologia,
@@ -286,13 +292,80 @@
   }
 
   /* ---------- currículo: faixa de fecho ---------- */
+  /* ---------- currículo: a folha em exibição ----------
+     A última seção mostra o próprio modelo, não um cartão falando dele. A prévia é
+     `curr.html?vitrine=1` — a mesma página, sem a barra de edição — montada só
+     quando chega à tela e inerte ao toque: o clique é da folha inteira, que abre o
+     currículo no modal. */
   function renderCv(content) {
+    const pagina = content.cv.pagina;
+    const folha = el('div.cv__folha', {
+      role: 'button',
+      tabIndex: 0,
+      'aria-label': 'Abrir o currículo'
+    }, el('span.cv__marca', { 'aria-hidden': true }, [icon('art'), 'A4']));
+
+    /* No modal entra a folha limpa: quem visita quer ler o currículo, não a barra
+       de edição. Para editar e exportar existe o link ao lado, que abre a página
+       inteira noutra aba. */
+    const abrir = () => {
+      if (pagina) modal.openPagina(`${pagina}?vitrine=1`, 'Currículo');
+      else if (content.cv.arquivo) modal.openPdf(content.cv.arquivo, 'Currículo');
+    };
+
+    if (pagina) {
+      previewSobDemanda(folha, () => {
+        const preview = el('iframe.cv__preview', {
+          src: `${pagina}?vitrine=1`,
+          tabIndex: -1,
+          'aria-hidden': true,
+          loading: 'lazy',
+          scrolling: 'no'
+        });
+
+        /* A página é montada na largura real de uma A4 (794px a 96dpi) e depois
+           reduzida para caber na moldura. A conta fica aqui porque `scale()` só
+           aceita número puro — `calc(300px / 794)` daria pixel, e o navegador
+           descarta a regra inteira sem avisar. */
+        const encaixar = () => {
+          const escala = folha.clientWidth / LARGURA_A4;
+          if (escala > 0) preview.style.transform = `scale(${escala.toFixed(4)})`;
+        };
+
+        encaixar();
+        requestAnimationFrame(encaixar);
+        if (typeof ResizeObserver === 'function') new ResizeObserver(encaixar).observe(folha);
+        else addEventListener('resize', encaixar, { passive: true });
+
+        return preview;
+      });
+    }
+
+    folha.addEventListener('click', abrir);
+    folha.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        abrir();
+      }
+    });
+
+    const acao = el('button.action', { type: 'button' }, ['Abrir currículo', arrow()]);
+    acao.addEventListener('click', abrir);
+
     fill(qs('#cvCard'), [
       el('div.cv__text', null, [
         el('h3', { text: 'Currículo atual' }),
-        el('p', { text: content.cv.nota })
+        el('p', { text: content.cv.nota }),
+        el('div.cv__acoes', null, [
+          acao,
+          pagina
+            ? el('a.action.action--fraca', {
+                href: pagina, target: '_blank', rel: 'noopener'
+              }, ['Editar e exportar em PDF', arrow()])
+            : null
+        ])
       ]),
-      pdfAction(content.cv.arquivo, 'Currículo', 'Visualizar no site')
+      folha
     ]);
   }
 

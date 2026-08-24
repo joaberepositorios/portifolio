@@ -13,6 +13,7 @@ inclusive por duplo clique — módulos ES seriam bloqueados por `file://`.
 
 ```
 index.html
+curr.html           currículo: editável na página e exportável em uma folha A4
 css/
   tokens.css        variáveis de cor, forma, tipografia e ritmo — a única fonte desses valores
   base.css          reset, tipografia e peças reutilizadas (chips, botões, revelação)
@@ -90,10 +91,10 @@ Três princípios de sustentação:
   `iframe`, de propósito: sem o arquivo o navegador desenha o conteúdo de reserva — uma
   página em branco no cartão, um recado com o caminho no modal — em vez de um retângulo
   quebrado.
-- **Sem menu, e sem caixa branca com sombra fora dos cartões.** O que separa os blocos são
-  réguas de 1px, espaço e tipografia, e a navegação é a própria rolagem (o atalho de
-  teclado e as âncoras das seções continuam lá). As competências viraram linhas e o
-  currículo virou uma faixa de fecho.
+- **Sem caixa branca com sombra fora dos cartões.** O que separa os blocos são réguas de
+  1px, espaço e tipografia. A navegação continua sendo a rolagem — a barra do topo é atalho,
+  não moldura: sem fundo próprio no escuro, sem sombra, sem borda em volta. As competências
+  viraram linhas e o currículo virou uma faixa de fecho.
 - **Tipografia de instrumento.** Corpo curto (13,5–14,5 px), entrelinha larga e peso leve
   — 300 no título grande, 400 no resto. Números, rótulos e ações vão em monoespaçada do
   sistema (`ui-monospace`), sem baixar fonte nenhuma: é o que dá o ar técnico sem pesar
@@ -140,10 +141,39 @@ Três princípios de sustentação:
 - **As estrelas são só da abertura.** Abaixo de 2% de véu elas nem entram no laço. São 90
   pontos de 1 a 2 pixels, com a cor reaproveitada em 24 faixas de brilho — sem isso
   seriam noventa strings de `rgba()` por repintura. Custo medido: indistinguível de zero.
+- **Barra de seções, fixa no topo.** Quatro entradas de uma palavra — Experiências,
+  Projetos, Artigos, Competências. Sem ícone e sem caixa: só a palavra.
+  **A cor troca com o fundo, não em cima dele**: `color-mix` interpola branco e
+  tinta pela variável `--dark-step`, a mesma curva que dissolve o véu escuro, então a barra
+  clareia e escurece no mesmo movimento da página. A faixa de papel atrás dela só aparece
+  no claro, onde o texto precisa de base para não disputar com o conteúdo que passa por
+  baixo — no escuro ela é transparente e as estrelas continuam visíveis.
+- **A entrada da seção que está sendo lida acende.** Um `IntersectionObserver` com a janela
+  cortada em 45% em cima e embaixo resolve isso por evento: nada entra no laço de quadro,
+  que é onde o custo apareceria.
+- **Uma palavra cabe em qualquer tela.** Abaixo de 560px o que aperta é o espaço entre
+  elas, não o texto: as quatro continuam numa linha só, sem transbordo horizontal.
+- **A folga do topo subiu para 76px.** É o que faz o título da seção pousar embaixo da
+  barra em vez de atrás dela. A última seção pousa mais abaixo porque a página acaba: o
+  navegador limita a rolagem, e não há como levá-la ao topo sem inventar espaço vazio.
+- **O currículo sai sempre em uma folha.** `curr.html` mede a si mesmo antes de imprimir:
+  as regras do `@media print` são copiadas para uma classe temporária, a folha é medida na
+  largura real do papel (188mm) e, se passar dos 271mm de altura útil, um `zoom` proporcional
+  entra em cena. É `zoom` e não `transform` de propósito — a paginação enxerga zoom, e
+  encolher com `transform` deixaria a segunda página em branco do mesmo jeito. Com o texto
+  atual o fator é 1: o documento ocupa 72% da folha e sai no tamanho projetado.
+- **A última seção exibe o próprio currículo.** Não um cartão falando dele: a folha
+  aparece reduzida ali, montada a partir de `curr.html?vitrine=1` — a mesma página, sem a
+  barra de edição. Clicar abre o documento inteiro num modal rolável; ao lado, um link
+  leva à página completa, onde dá para editar e exportar. A prévia só é criada quando
+  chega à tela, e a redução é calculada em JS porque `scale()` exige número puro:
+  `calc(300px / 794)` devolveria pixel e o navegador descartaria a regra sem avisar.
+- **Duas divisórias no currículo, e só duas:** a horizontal que fecha o objetivo e a vertical
+  que separa a coluna lateral. O resto do que separava blocos virou espaço.
 - **Ícones.** Um sprite SVG no `index.html` (traço único, herdando a cor do texto) marca
-  o play dos projetos, o selo de PDF na capa dos artigos e as quatro redes da abertura.
-  As seções abrem direto no título: a faixa de ícone e régua que existia acima deles saiu,
-  e com ela os símbolos que só serviam para aquilo.
+  o play dos projetos, o selo de PDF na capa dos artigos e as quatro redes da abertura — a
+  barra do topo não usa nenhum.
+  As seções abrem direto no título: a faixa de ícone e régua que existia acima deles saiu.
 - **Competências em três frentes.** *Linguagens*, *Softwares* e *Profissionais*. Grupo em
   cima, itens em sequência embaixo — cada tecnologia com o **logo oficial** num quadrado da
   cor da marca. As competências profissionais não têm logo e não ganham um inventado: vão

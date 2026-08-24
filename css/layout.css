@@ -3,6 +3,52 @@
    Sem barra de menu: a leitura é contínua, só rolando.
    ============================================================ */
 
+/* ---------- barra de seções ----------
+   Fixa no topo, sem caixa e sem ícone: o que existe é a palavra. Sobre a abertura escura ela é
+   branca; sobre o papel, tinta — a interpolação sai de --dark-step, escrita pelo
+   mesmo laço que dissolve o véu, então a barra troca de cor junto com o fundo.
+
+   A faixa de papel atrás dela só aparece quando o escuro acaba: no claro o texto
+   precisa de base para não disputar com o conteúdo que passa por baixo. */
+.menubar{
+  position:fixed;top:0;left:0;right:0;z-index:calc(var(--z-front) + 1);
+  padding:clamp(12px,1.8vh,18px) 0;
+}
+.menubar::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:var(--paper);
+  border-bottom:1px solid var(--line);
+  opacity:calc(1 - var(--dark-step,1));
+}
+.menubar__list{
+  position:relative;list-style:none;
+  display:flex;justify-content:center;flex-wrap:wrap;
+  gap:6px clamp(14px,2.4vw,34px);
+  width:var(--shell);margin:0 auto;
+}
+.menubar a{
+  display:inline-flex;align-items:center;
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);
+  letter-spacing:.16em;text-transform:uppercase;text-decoration:none;
+  color:color-mix(in srgb,var(--on-dark) calc(var(--dark-step,1) * 100%),var(--muted));
+  transition:color .35s var(--ease),opacity .35s var(--ease);
+  opacity:.82;
+}
+.menubar a:hover,.menubar a:focus-visible,.menubar a.is-current{opacity:1}
+.menubar a:hover,.menubar a:focus-visible{
+  color:color-mix(in srgb,var(--blue-hot) calc(var(--dark-step,1) * 100%),var(--blue-ink));
+}
+/* seção em que a leitura está: um traço embaixo, nada de cápsula */
+.menubar a.is-current{
+  color:color-mix(in srgb,var(--on-dark) calc(var(--dark-step,1) * 100%),var(--ink));
+}
+.menubar a.is-current::after{
+  content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;
+  background:color-mix(in srgb,var(--blue-hot) calc(var(--dark-step,1) * 100%),var(--blue));
+}
+.menubar li{position:relative;display:flex}
+.menubar a{position:static}
+
 /* ---------- seções ---------- */
 .section{position:relative;width:var(--shell);margin:0 auto;padding:var(--section-y) 0}
 
@@ -20,7 +66,7 @@
 .section--intro{
   position:relative;
   min-height:100svh;display:flex;flex-direction:column;justify-content:center;
-  padding-top:clamp(96px,13vh,150px);padding-bottom:clamp(96px,14vh,160px);
+  padding-top:clamp(112px,15vh,168px);padding-bottom:clamp(96px,14vh,160px);
   text-align:center;
 }
 /* a seção seguinte respira menos no topo: a metade de baixo da abertura já é
@@ -105,9 +151,12 @@
 }
 
 /* Sem color-mix não há como interpolar as cores do texto com segurança:
-   o site cai no tema claro de sempre, sem véu. */
+   o site cai no tema claro de sempre, sem véu — e a barra fica escura desde o topo. */
 @supports not (color:color-mix(in srgb,red 50%,blue)){
   .page-dark{display:none}
+  .menubar::before{opacity:1}
+  .menubar a{color:var(--muted)}
+  .menubar a:hover,.menubar a:focus-visible,.menubar a.is-current{color:var(--blue-ink)}
   .intro-head{opacity:1}
   .display{color:var(--ink)}
   .lead{color:var(--muted)}
@@ -118,6 +167,10 @@
 /* ---------- responsivo ---------- */
 @media (max-width:980px){
   .intro-head{max-width:100%}
+}
+@media (max-width:560px){
+  /* uma palavra cabe em qualquer tela; o que aperta é o espaço entre elas */
+  .menubar__list{gap:6px clamp(12px,4vw,20px);letter-spacing:.1em}
 }
 @media (max-width:760px){
   .section--intro{min-height:auto;padding-top:clamp(110px,18vh,160px)}

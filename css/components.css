@@ -242,6 +242,37 @@
 }
 .cv h3{font-size:clamp(19px,2.4vw,30px);color:var(--ink)}
 .cv p{color:var(--muted);font-size:var(--fs-micro);margin-top:8px;max-width:44ch}
+.cv__acoes{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:20px}
+.action--fraca{color:var(--muted)}
+.action--fraca:hover{color:var(--blue-ink)}
+
+/* A folha em exibição: a própria página do currículo, reduzida. O `iframe` é
+   inerte — o clique é do bloco, que abre o documento inteiro no modal. */
+.cv__folha{
+  position:relative;flex:none;width:min(300px,74vw);aspect-ratio:1/1.414;
+  overflow:hidden;cursor:pointer;border-radius:var(--r-sm);background:#fff;
+  border:1px solid var(--line);
+  box-shadow:0 14px 40px -26px rgba(13,18,32,.65);
+  transition:transform .55s var(--ease),box-shadow .55s var(--ease),border-color .45s var(--ease);
+}
+.cv__folha:hover,.cv__folha:focus-visible{
+  transform:translateY(-4px);border-color:var(--blue-hot);
+  box-shadow:0 26px 50px -28px rgba(13,18,32,.8);
+}
+/* A página é montada em tamanho de A4 e reduzida por JS (ui/sections.js): a
+   escala precisa ser um número puro, e isso `calc()` não entrega. */
+.cv__preview{
+  position:absolute;top:0;left:0;width:794px;height:1123px;border:0;
+  transform-origin:top left;pointer-events:none;background:#fff;
+}
+.cv__marca{
+  position:absolute;right:12px;bottom:11px;z-index:2;
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:.18em;
+  color:var(--blue);background:var(--paper);padding:5px 9px;border-radius:999px;
+  border:1px solid var(--line);
+}
+.cv__marca .icon{width:11px;height:11px}
 
 /* ---------- modal (vídeo e PDF, sem download) ---------- */
 .modal{position:fixed;inset:0;z-index:var(--z-modal);display:none}
@@ -299,4 +330,5 @@
   .projects,.papers{grid-template-columns:1fr}
   .skill__items{gap:12px 20px}
   .cv{flex-direction:column;align-items:flex-start}
+  .cv__folha{width:min(260px,70vw)}
 }

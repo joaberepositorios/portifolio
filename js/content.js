@@ -23,8 +23,11 @@ window.Portfolio.CONTENT = {
     youtube: ''
   },
 
+  /* O currículo é a própria página `curr.html` — editável, e com botão de exportar
+     em uma folha A4. `arquivo` só é usado se você preferir apontar para um PDF. */
   cv: {
-    arquivo: 'assets/pdf/curriculo.pdf',
+    pagina: 'curr.html',
+    arquivo: '',
     nota: 'Versão consolidada, leitura direta no navegador.'
   },
 

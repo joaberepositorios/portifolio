@@ -81,6 +81,12 @@
     open(label, el('object', { data: src, type: 'application/pdf', title: label }, reserva));
   }
 
+  /* Uma página do próprio site dentro do modal — é assim que o currículo aparece
+     inteiro sem tirar o visitante do portfólio. Quem rola é o documento de dentro. */
+  function openPagina(url, label) {
+    open(label, el('iframe', { src: url, title: label }));
+  }
+
   function trapFocus(event) {
     const items = Array.from(panel.querySelectorAll(FOCUSABLE)).filter((node) => node.offsetParent !== null);
     if (!items.length) return;
@@ -96,5 +102,5 @@
     }
   }
 
-  P.modal = { init, isOpen, close, openVideo, openPdf };
+  P.modal = { init, isOpen, close, openVideo, openPdf, openPagina };
 })(window.Portfolio = window.Portfolio || {});
