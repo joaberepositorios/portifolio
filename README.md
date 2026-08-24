@@ -163,11 +163,12 @@ Três princípios de sustentação:
   encolher com `transform` deixaria a segunda página em branco do mesmo jeito. Com o texto
   atual o fator é 1: o documento ocupa 72% da folha e sai no tamanho projetado.
 - **A última seção exibe o próprio currículo.** Não um cartão falando dele: a folha
-  aparece reduzida ali, montada a partir de `curr.html?vitrine=1` — a mesma página, sem a
-  barra de edição. Clicar abre o documento inteiro num modal rolável; ao lado, um link
-  leva à página completa, onde dá para editar e exportar. A prévia só é criada quando
-  chega à tela, e a redução é calculada em JS porque `scale()` exige número puro:
-  `calc(300px / 794)` devolveria pixel e o navegador descartaria a regra sem avisar.
+  aparece no centro da seção, grande o bastante para se ler, montada a partir de
+  `curr.html?vitrine=1` — a mesma página, sem a barra de edição. **Uma ação só, abrir**:
+  o documento se lê dentro do site, num modal rolável, e não há caminho de download na
+  vitrine. A prévia só é criada quando chega à tela, e a redução é calculada em JS porque
+  `scale()` exige número puro: `calc(620px / 794)` devolveria pixel e o navegador
+  descartaria a regra sem avisar.
 - **Duas divisórias no currículo, e só duas:** a horizontal que fecha o objetivo e a vertical
   que separa a coluna lateral. O resto do que separava blocos virou espaço.
 - **Ícones.** Um sprite SVG no `index.html` (traço único, herdando a cor do texto) marca

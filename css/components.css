@@ -235,21 +235,21 @@
 .skill__items li:hover .badge{transform:translateY(-2px)}
 
 /* ---------- currículo: faixa, não cartão ---------- */
+/* Coluna centrada: o documento é o assunto da seção, então ele fica no meio e
+   grande o bastante para se ler o que está escrito. */
 .cv{
   margin-top:clamp(40px,6vh,78px);padding-top:clamp(22px,3.4vh,38px);
   border-top:1px solid var(--line-strong);
-  display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:clamp(22px,3.2vh,36px);
 }
 .cv h3{font-size:clamp(19px,2.4vw,30px);color:var(--ink)}
-.cv p{color:var(--muted);font-size:var(--fs-micro);margin-top:8px;max-width:44ch}
-.cv__acoes{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:20px}
-.action--fraca{color:var(--muted)}
-.action--fraca:hover{color:var(--blue-ink)}
+.cv p{color:var(--muted);font-size:var(--fs-micro);margin-top:8px;max-width:52ch;margin-inline:auto}
 
 /* A folha em exibição: a própria página do currículo, reduzida. O `iframe` é
    inerte — o clique é do bloco, que abre o documento inteiro no modal. */
 .cv__folha{
-  position:relative;flex:none;width:min(300px,74vw);aspect-ratio:1/1.414;
+  position:relative;flex:none;width:min(620px,88vw);aspect-ratio:1/1.414;
   overflow:hidden;cursor:pointer;border-radius:var(--r-sm);background:#fff;
   border:1px solid var(--line);
   box-shadow:0 14px 40px -26px rgba(13,18,32,.65);
@@ -329,6 +329,5 @@
 @media (max-width:680px){
   .projects,.papers{grid-template-columns:1fr}
   .skill__items{gap:12px 20px}
-  .cv{flex-direction:column;align-items:flex-start}
-  .cv__folha{width:min(260px,70vw)}
+  .cv__folha{width:min(520px,92vw)}
 }

@@ -349,23 +349,17 @@
       }
     });
 
+    /* Uma ação só: abrir. Nada de baixar — o currículo se lê aqui dentro. */
     const acao = el('button.action', { type: 'button' }, ['Abrir currículo', arrow()]);
     acao.addEventListener('click', abrir);
 
     fill(qs('#cvCard'), [
       el('div.cv__text', null, [
         el('h3', { text: 'Currículo atual' }),
-        el('p', { text: content.cv.nota }),
-        el('div.cv__acoes', null, [
-          acao,
-          pagina
-            ? el('a.action.action--fraca', {
-                href: pagina, target: '_blank', rel: 'noopener'
-              }, ['Editar e exportar em PDF', arrow()])
-            : null
-        ])
+        el('p', { text: content.cv.nota })
       ]),
-      folha
+      folha,
+      acao
     ]);
   }
 
