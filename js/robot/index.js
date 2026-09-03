@@ -28,7 +28,10 @@
   const { createGuides } = P.robot.guides;
 
   const MESH_URL = 'js/model/go2-mesh.js';
-  const MIN_WIDTH = 760;          /* abaixo disso o pacote de malhas não compensa */
+  const MIN_WIDTH = 360;          /* abaixo disso o pacote de malhas não compensa */
+  const LARGURA_CELULAR = 760;    /* daqui para baixo ele é fundo, não protagonista */
+  const CELULAR_RESOLUCAO = 0.5;  /* metade dos pixels: é daí que vem o amaciamento */
+  const CELULAR_ALPHA = 0.5;      /* e metade da presença, para o texto mandar */
   const EYE = [0, 0.3, 2.02];
   const FOV = 0.42;               /* lente longa (24°): perspectiva de foto de produto */
   /* Teto do buffer de render, com supersampling incluso. Não é firula: passar disso
@@ -180,7 +183,10 @@
       height = canvas.clientHeight;
 
       const area = Math.max(width * height * dpr * dpr, 1);
-      const scale = Math.max(1, Math.min(
+      /* no celular o quadro é desenhado em menos pixels e esticado pela tela:
+         é isso que dá o aspecto macio, sem filtro nenhum */
+      const macio = width < LARGURA_CELULAR ? CELULAR_RESOLUCAO : 1;
+      const scale = macio * Math.max(1, Math.min(
         wanted,
         Math.sqrt(MAX_PIXELS / area),
         maxSide / Math.max(width * dpr, 1),
@@ -292,7 +298,8 @@
 
       /* presença de fundo: discreta o bastante para o texto por cima continuar
          sendo o assunto, com um empurrão quando a desmontagem começa */
-      const alpha = (0.44 + 0.18 * explode) * arrive * vanish;
+      const fundo = width < LARGURA_CELULAR ? CELULAR_ALPHA : 1;
+      const alpha = (0.44 + 0.18 * explode) * arrive * vanish * fundo;
       canvas.style.opacity = alpha.toFixed(3);
       if (alpha <= 0.003) return;
 
@@ -307,7 +314,10 @@
 
       const breath = reduce ? 0 : Math.sin(time * 0.22);
       const look = Math.sin(p * Math.PI * 2) * 0.13 * (1 - explode);
-      const distance = 3.72 + (wide ? 0 : 0.75)
+      /* no celular ele recua mais: cabe inteiro na tela estreita e fica sendo
+         fundo, e não um bicho recortado atravessando o texto */
+      const celular = width < LARGURA_CELULAR;
+      const distance = 3.72 + (wide ? 0 : 0.75) + (celular ? 1.15 : 0)
         - 0.3 * smoothstep(0.05, 0.6, p) + 1.9 * explode;
       const yaw = -0.86 + look + 0.62 * explode + breath * 0.04 + pointer.x * 0.16;
       const pitch = 0.13 + 0.1 * explode + breath * 0.012 - pointer.y * 0.05;

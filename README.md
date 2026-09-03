@@ -262,6 +262,12 @@ custo**. O que o mantém sob controle:
   a peça em vez de cair a pique), o ambiente tem dois tons — papel morno em cima, sombra
   fria embaixo — e resta apenas um contorno largo e tênue. É plástico fosco de robô, não
   plástico polido.
+- **No celular ele é fundo.** Abaixo de 760px o robô continua aparecendo — atrás do
+  texto da seção —, mas com metade da presença e desenhado em **metade dos pixels**, que o
+  navegador estica de volta para a tela. É daí que vem o aspecto macio: nada de
+  `filter: blur` sobre WebGL, que foi o que derrubou o contexto desta página uma vez. A
+  câmera também recua, para o bicho caber inteiro na tela estreita. Menos pixels no
+  telefone é, de quebra, mais barato.
 - **Acabamento chapado, em três tons.** A superfície não tem mais estúdio de três
   luzes, wrap, tonemap nem dither: uma direção de luz só, quantizada em luz, meia-luz e
   sombra, mais um contorno largo para a peça não encostar no fundo escuro. A geometria é a
