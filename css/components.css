@@ -159,12 +159,12 @@
 }
 .paper{display:flex;flex-direction:column;gap:16px}
 .paper__capa{
-  position:relative;overflow:hidden;cursor:pointer;aspect-ratio:5/6;
+  position:relative;overflow:hidden;aspect-ratio:5/6;
   border-radius:var(--r-sm);background:var(--folha);
   box-shadow:0 10px 30px -22px rgba(13,18,32,.6);
   transition:transform .55s var(--ease),box-shadow .55s var(--ease);
 }
-.paper__capa:hover,.paper__capa:focus-visible{
+.paper:hover .paper__capa{
   transform:translateY(-4px);box-shadow:0 22px 44px -26px rgba(13,18,32,.75);
 }
 .paper__capa::after{
@@ -172,10 +172,12 @@
   border:1px solid var(--line);border-radius:inherit;
   transition:border-color .45s var(--ease);
 }
-.paper__capa:hover::after{border-color:var(--blue-hot)}
-.paper__arte,.paper__preview{
+.paper:hover .paper__capa::after{border-color:var(--blue-hot)}
+/* A imagem não recebe ponteiro nem seleção: o cartão é vitrine, não leitor. */
+.paper__arte{
   position:absolute;inset:0;width:100%;height:100%;border:0;display:block;
-  background:#fff;pointer-events:none;z-index:1;
+  background:var(--folha);pointer-events:none;z-index:1;
+  user-select:none;-webkit-user-drag:none;
 }
 /* a folha de reserva mora dentro do object e ocupa a capa inteira */
 .paper__preview .paper__folha{position:absolute;inset:0}
@@ -292,15 +294,6 @@
 .modal__body iframe,.modal__body video,.modal__body object,.modal__body embed{
   width:100%;height:100%;border:0;display:block;background:#000;
 }
-/* recado de reserva quando o arquivo não abre: some assim que o PDF existe */
-.modal__reserva{
-  height:100%;display:grid;place-content:center;justify-items:center;gap:12px;
-  text-align:center;padding:30px;background:var(--surface);color:var(--ink);
-}
-.modal__reserva .modal__arquivo{
-  font-family:var(--font-mono);font-size:var(--fs-eyebrow);color:var(--muted);
-  letter-spacing:.06em;
-}
 
 /* ---------- responsivo ---------- */
 /* Em telas largas o currículo ocupa a coluna da esquerda: a faixa da direita fica
@@ -352,3 +345,9 @@
 .contato__redes .social{justify-content:center;margin-top:0}
 
 
+
+/* Na impressão a vitrine de artigos não vai junto: o que está exposto na tela
+   não vira folha impressa. */
+@media print{
+  .papers{display:none}
+}

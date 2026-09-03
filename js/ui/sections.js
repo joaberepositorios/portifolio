@@ -228,43 +228,33 @@
     observer.observe(video);
   }
 
-  /* ---------- artigos: cartões com a capa do PDF ----------
-     Mesma leitura dos projetos — uma grade que mostra o conjunto de uma vez.
-     A capa é clicável e abre o PDF num modal rolável, sem baixar nada. */
+  /* ---------- artigos: só a vitrine ----------
+     A capa é uma imagem da primeira página, em resolução baixa de propósito: o
+     cartão mostra que o trabalho existe sem entregar o texto. Não há arquivo
+     servido, então não há o que abrir, baixar ou imprimir a partir daqui. */
   function renderPapers(content) {
     const cards = content.artigos.map((paper) => {
-      const capa = el('div.paper__capa', {
-        role: 'button',
-        tabIndex: 0,
-        'aria-label': `Abrir PDF — ${paper.titulo}`
-      });
+      const capa = el('div.paper__capa', null, folha());
 
       if (paper.capa) {
-        const arte = el('img.paper__arte', { src: paper.capa, alt: '', loading: 'lazy' });
+        const arte = el('img.paper__arte', {
+          src: paper.capa,
+          alt: `Primeira página do artigo ${paper.titulo}`,
+          loading: 'lazy',
+          draggable: false
+        });
+        /* sem arquivo não sobra imagem quebrada: volta a folha desenhada */
         arte.addEventListener('error', () => arte.remove());
+        /* o menu de contexto sobre a capa não abre: não é proteção, é atrito */
+        arte.addEventListener('contextmenu', (evento) => evento.preventDefault());
         capa.prepend(arte);
-      } else if (paper.pdf) {
-        previewSobDemanda(capa, previewDePdf(paper.pdf));
-      } else {
-        capa.prepend(folha());
       }
 
-      const abrir = () => paper.pdf && modal.openPdf(paper.pdf, paper.titulo);
-      capa.addEventListener('click', abrir);
-      capa.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          abrir();
-        }
-      });
-
-      /* o cartão diz o essencial: o artigo e onde ele saiu */
       return el('article.paper', { dataset: { reveal: '' } }, [
         capa,
         el('div.paper__info', { dataset: { parallax: '-0.05' } }, [
           el('h3', { text: paper.titulo }),
-          el('p.paper__where', null, [el('span.eyebrow', { text: 'Publicado em' }), paper.evento]),
-          paper.pdf ? pdfAction(paper.pdf, paper.titulo, 'Ler no site') : null
+          el('p.paper__where', null, [el('span.eyebrow', { text: 'Publicado em' }), paper.evento])
         ])
       ]);
     });
@@ -272,39 +262,8 @@
     fill(qs('#papers'), cards);
   }
 
-  /** Botão que abre um PDF no modal, sem download. */
-  function pdfAction(file, title, label) {
-    const button = el('button.action', { type: 'button' }, [label, arrow()]);
-    button.addEventListener('click', () => modal.openPdf(file, title));
-    return button;
-  }
-
-  /** Página em branco desenhada: é o que aparece enquanto o PDF não existe. */
+  /** Página em branco desenhada: é o que aparece se a imagem faltar. */
   const folha = () => el('span.paper__folha', { 'aria-hidden': true });
-
-  /** A prévia do PDF só é montada quando o cartão chega à tela: instanciar o
-      leitor de PDF é caro, e três deles no carregamento custariam a rolagem.
-      É um `object` de propósito — se o arquivo não existe, o navegador desenha
-      o conteúdo de reserva (a folha) em vez de deixar um retângulo quebrado. */
-  function previewSobDemanda(capa, montar) {
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        observer.disconnect();
-        capa.prepend(montar());
-      }
-    }, { rootMargin: '200px' });
-
-    observer.observe(capa);
-  }
-
-  /** Prévia de um PDF: `object` para ter reserva quando o arquivo não existe. */
-  const previewDePdf = (arquivo) => () => el('object.paper__preview', {
-    data: `${arquivo}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`,
-    type: 'application/pdf',
-    tabIndex: -1,
-    'aria-hidden': true
-  }, folha());
 
   /* ---------- competências: cartões com nível ----------
      Um cartão por tecnologia: logo da marca, nome e a barra do seu nível. O

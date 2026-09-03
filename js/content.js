@@ -118,22 +118,19 @@ window.Portfolio.CONTENT = {
     }
   ],
 
-  /* Artigos: a capa é a primeira página do PDF, e o cartão diz duas coisas — o
-     título e onde o trabalho saiu. O arquivo abre no modal, sem download.
-     As versões em português dos dois estão em assets/pdf/, fora da vitrine. */
+  /* Artigos: só em exibição. A capa é uma imagem da primeira página em
+     resolução baixa — o suficiente para mostrar o trabalho, não para lê-lo — e
+     não há PDF servido: sem arquivo no site, não há o que abrir ou baixar. */
   artigos: [
     {
       titulo: 'Virtual Environment and 3D Simulation for the Visualization of Analytic Geometry and Physics',
       evento: 'SVR',
-      capa: '',
-      pdf: 'assets/pdf/geopsics-en.pdf'
+      capa: 'assets/img/artigo-geopsics.jpg'
     },
     {
       titulo: 'Robotics Teaching with Interactive Dashboards: A Visual Machine Learning Methodology for Engineering',
       evento: 'LatinoWare 2026 — em avaliação',
-      capa: '',
-      /* Versão anônima, a mesma submetida à avaliação às cegas. */
-      pdf: 'assets/pdf/robotica-en.pdf'
+      capa: 'assets/img/artigo-robotica.jpg'
     }
   ],
 

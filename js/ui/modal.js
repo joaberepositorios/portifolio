@@ -1,4 +1,4 @@
-/* Modal de leitura: vídeo e PDF abrem dentro do site, sem download.
+/* Modal de leitura: o vídeo abre dentro do site, sem download.
    Enquanto está aberto, a rolagem fica travada e o foco não escapa do painel. */
 
 (function (P) {
@@ -66,21 +66,6 @@
     }
   }
 
-  /* O PDF abre dentro do site, e quem rola é o próprio leitor do navegador — daí
-     o visor ocupar o painel inteiro. É um `object` para ter reserva: sem o arquivo
-     (ou num navegador sem leitor embutido), em vez de um retângulo preto aparece
-     um recado com o caminho e a saída para abrir fora. */
-  function openPdf(file, label) {
-    const src = `${file}#toolbar=0&navpanes=0&view=FitH`;
-    const reserva = el('div.modal__reserva', null, [
-      el('p', { text: 'Não foi possível exibir este PDF aqui.' }),
-      el('p.modal__arquivo', { text: file }),
-      el('a.action', { href: file, target: '_blank', rel: 'noopener', text: 'Abrir em nova aba' })
-    ]);
-
-    open(label, el('object', { data: src, type: 'application/pdf', title: label }, reserva));
-  }
-
   function trapFocus(event) {
     const items = Array.from(panel.querySelectorAll(FOCUSABLE)).filter((node) => node.offsetParent !== null);
     if (!items.length) return;
@@ -96,5 +81,5 @@
     }
   }
 
-  P.modal = { init, isOpen, close, openVideo, openPdf };
+  P.modal = { init, isOpen, close, openVideo };
 })(window.Portfolio = window.Portfolio || {});

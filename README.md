@@ -96,14 +96,14 @@ Três princípios de sustentação:
   corpo e entrega ao programa de e-mail de quem escreveu. Sem servidor, sem serviço de
   terceiro, sem promessa de envio que a página não pode cumprir: enquanto
   `contato.email` estiver vazio, ela diz isso na cara.
-- **Artigos na mesma leitura dos projetos.** Uma grade de cartões: a capa mostra a
-  primeira página do PDF, e embaixo vêm título, sua função de escrita e onde o texto saiu.
-  Clicar na capa (ou no botão) abre o arquivo num modal rolável, sem baixar nada.
-- **A prévia só é montada quando o cartão chega à tela.** Instanciar o leitor de PDF é
-  caro; três deles no carregamento custariam a rolagem. E ela é um `object`, não um
-  `iframe`, de propósito: sem o arquivo o navegador desenha o conteúdo de reserva — uma
-  página em branco no cartão, um recado com o caminho no modal — em vez de um retângulo
-  quebrado.
+- **Artigos ficam em exibição, e só.** A capa é uma imagem da primeira página em
+  resolução baixa — mostra que o trabalho existe, sem entregar o texto —, e **não há PDF
+  servido**: sem arquivo no site, não há endereço para abrir ou baixar. O cartão não é
+  clicável, não tem botão, e a seção some na impressão.
+- **Isso não é proteção, e o código não finge que é.** Uma imagem que aparece na tela pode
+  ser salva ou fotografada. O que dá para fazer é não servir o documento e não facilitar o
+  resto: sem menu de contexto na capa, sem arrastar, sem seleção.
+
 - **Sem caixa branca com sombra fora dos cartões.** O que separa os blocos são réguas de
   1px, espaço e tipografia. A navegação continua sendo a rolagem — a barra do topo é atalho,
   não moldura: sem fundo próprio no escuro, sem sombra, sem borda em volta. As competências
