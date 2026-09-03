@@ -5,7 +5,7 @@
 html{-webkit-text-size-adjust:100%}
 
 body{
-  background:linear-gradient(180deg,var(--paper),var(--paper-2)) fixed;
+  background:var(--paper);
   color:var(--ink);
   font-family:var(--font-text);
   font-size:var(--fs-body);
@@ -24,7 +24,7 @@ h1,h2,h3,h4{
 }
 img,video,canvas{display:block;max-width:100%}
 
-::selection{background:var(--blue);color:var(--paper)}
+::selection{background:var(--blue);color:#0b0e15}
 :focus-visible{outline:1px solid var(--blue);outline-offset:3px;border-radius:2px}
 
 /* ---------- fundo ---------- */

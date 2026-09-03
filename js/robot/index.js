@@ -18,7 +18,7 @@
   const { onFrame, prefersReducedMotion } = P.ticker;
   const { scroll } = P.scroll;
   const { page, watch } = P.geometry;
-  const { clamp, damp, lerp, opening, smoothstep } = P.ease;
+  const { clamp, damp, lerp, smoothstep } = P.ease;
   const { chain, lookAt, mat4, multiply, normalMatrix, perspective,
     resetScratch, rotationX, rotationY, translation } = P.robot.math;
   const { createContext, createProgram, decodeBase64, uploadMeshes } = P.robot.gl;
@@ -122,8 +122,7 @@
         qscale: gl.getUniformLocation(program, 'uQScale'),
         color: gl.getUniformLocation(program, 'uColor'),
         eye: gl.getUniformLocation(program, 'uEye'),
-        alpha: gl.getUniformLocation(program, 'uAlpha'),
-        room: gl.getUniformLocation(program, 'uRoom')
+        alpha: gl.getUniformLocation(program, 'uAlpha')
       };
 
       const meshes = uploadMeshes(gl, program, pack.manifest, pack.buffer);
@@ -335,7 +334,6 @@
       gl.uniform3fv(U.eye, EYE);
       gl.uniform1f(U.alpha, 1);
       /* a luz segue a sala: escura na abertura, papel depois — a mesma curva do véu */
-      gl.uniform1f(U.room, opening(eased / page.viewport));
 
       for (const piece of pieces) {
         multiply(root, piece.matrix, model);

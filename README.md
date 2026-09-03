@@ -17,7 +17,7 @@ curr.html           currículo: editável na página e exportável em uma folha 
 css/
   tokens.css        variáveis de cor, forma, tipografia e ritmo — a única fonte desses valores
   base.css          reset, tipografia e peças reutilizadas (chips, botões, revelação)
-  layout.css        menu, seções, abertura e o véu escuro do topo
+  layout.css        barra de seções, abertura, botões e o esqueleto das seções
   components.css    linha do tempo, projetos, artigos, competências e modal
 js/
   content.js        todo o conteúdo editável do site
@@ -35,7 +35,7 @@ js/
     tech-icons.js   logos oficiais (GERADO por tools/gera-icones.mjs)
     reveal.js       revelação dos blocos ao entrar em tela
     modal.js        vídeo e PDF dentro do site, com foco preso e rolagem travada
-    chrome.js       véu escuro, órbitas e trilho da linha do tempo
+    chrome.js       barra do topo, trilho da linha do tempo e a câmera do ponteiro
   robot/
     index.js        cena: câmera, laço de desenho e a coreografia ligada à rolagem
     rig.js          esqueleto e marcha, direto do URDF
@@ -68,7 +68,7 @@ Três princípios de sustentação:
   eventos de rolagem são agrupados pelo navegador e um booleano seria consumido pelo
   primeiro deles, cancelando a própria animação no meio.
 - **Um laço só.** `core/ticker.js` mantém um único `requestAnimationFrame`; rolagem, menu,
-  véu, trilho e robô são assinantes dele. Todo amortecimento é por tempo real
+  barra, trilho e robô são assinantes dele. Todo amortecimento é por tempo real
   (`1 - exp(-dt/τ)`), então a sensação é a mesma em 60, 120 ou 144 Hz e nada acelera
   quando a taxa cai.
 - **Nada de layout dentro do laço.** As medidas ficam em `core/geometry.js` e são refeitas
@@ -83,6 +83,19 @@ Três princípios de sustentação:
 
 - **Projetos em grade de três.** Cartões compactos, três por linha: mostra o conjunto de
   uma vez e economiza a altura que o formato anterior gastava com um projeto por tela.
+- **O cartão de projeto é vitrine, não catálogo.** Uma imagem da tela do projeto, o
+  título e uma linha do que ele faz — sem etiqueta de linguagem, sem botão de acesso e
+  **sem link escondido na imagem**, que seria um destino sem aviso nenhum. As capas são
+  tiradas do projeto rodando e guardadas em `assets/img/`; o endereço de cada um continua
+  em `js/content.js`, à espera do dia em que fizer sentido voltar. Um arquivo de imagem
+  que suma devolve o cartão ao acabamento de espera em vez de mostrar imagem quebrada.
+- **Cada tecnologia é um cartão com barra de nível.** A nota vem de `js/content.js` e
+  pode estar vazia: nesse caso o cartão diz **"a definir"** em vez de inventar um número —
+  autoavaliação é sua, não minha.
+- **O contato é um `mailto:`, não um formulário de mentira.** O botão monta assunto e
+  corpo e entrega ao programa de e-mail de quem escreveu. Sem servidor, sem serviço de
+  terceiro, sem promessa de envio que a página não pode cumprir: enquanto
+  `contato.email` estiver vazio, ela diz isso na cara.
 - **Artigos na mesma leitura dos projetos.** Uma grade de cartões: a capa mostra a
   primeira página do PDF, e embaixo vêm título, sua função de escrita e onde o texto saiu.
   Clicar na capa (ou no botão) abre o arquivo num modal rolável, sem baixar nada.
@@ -111,9 +124,12 @@ Três princípios de sustentação:
   passando. Nada de formas circulares soltas. Cada traço tem profundidade própria, que rege
   velocidade em relação à rolagem, comprimento, opacidade e em que plano ele vive; e o campo
   se repete sem emenda (cada corpo reentra pela borda oposta enquanto está fora de tela).
-- **A cor segue a mesma curva `opening()` do véu** — azul claro sobre a abertura escura,
-  azul escuro sobre o papel. Com `prefers-reduced-motion` o campo é pintado uma vez e fica
-  parado.
+- **O fundo é fundo.** As linhas e as estrelas foram rebaixadas de propósito, para se
+  perceberem pelo canto do olho e não disputarem com o texto. Uma cor só, o azul claro,
+  agora que a página inteira é escura. A
+  curva `opening()` ficou responsável apenas pelo campo de estrelas, que vive na primeira
+  tela e se apaga conforme a leitura desce. Com `prefers-reduced-motion` o campo é pintado
+  uma vez e fica parado.
 - **Parallax por camadas.** `ui/parallax.js` desloca cada camada em relação ao centro da
   tela conforme o fator em `data-parallax` (título da seção 0,05; mídia do projeto 0,085
   contra o texto em −0,05; rótulos 0,03; número de fundo 0,26).
@@ -130,24 +146,29 @@ Três princípios de sustentação:
   deslocamento da revelação, então um efeito não apaga o outro. Terminada a entrada, o
   bloco é marcado como assentado e o transform deixa de ser animado — o parallax responde
   no mesmo quadro, sem arrasto.
-- **A abertura não usa degradê.** O escuro é **cor chapada**. O que dá distância são
-  duas coisas simples: as linhas, que deslizam em velocidades diferentes conforme a
-  profundidade, e um campo de **estrelas pequenas** atrás delas — as fracas quase
-  paradas, as fortes acompanhando a rolagem. Sem cintilação: piscar atrás do nome deixa
-  a leitura inquieta.
+- **O site é escuro do começo ao fim.** Não há mais transição para o papel: o
+  fundo é cor chapada e o texto é claro em toda a página. Os nomes das variáveis em
+  `tokens.css` continuam os de antes — `--paper` é o fundo e `--ink` é o texto, seja qual
+  for o tema —, então trocar de tema é trocar aquele bloco, e nada mais.
+- **A abertura é em duas colunas**, como um cartão de visita: saudação, nome, a função
+  entre `</ >`, o texto curto, dois convites (contato e projetos) e as redes; do outro
+  lado, o retrato num anel aceso. Sem foto o anel fica e as iniciais entram no lugar —
+  marca o espaço em vez de deixar um buraco redondo.
+- **A profundidade vem das linhas e de um campo de estrelas** — as fracas quase paradas,
+  as fortes acompanhando a rolagem. Sem cintilação: piscar atrás do nome deixa a leitura
+  inquieta.
 - **O ponteiro desloca o campo alguns pixels**, o bastante para o fundo não parecer
   colado no vidro, e o nome anda 3px ao contrário. Um ouvinte de `pointermove` guardando
   dois números; quem desenha é o laço que já existia.
-- **As estrelas são só da abertura.** Abaixo de 2% de véu elas nem entram no laço. São 90
+- **As estrelas são só da abertura.** Fora da primeira tela elas nem entram no laço. São 90
   pontos de 1 a 2 pixels, com a cor reaproveitada em 24 faixas de brilho — sem isso
   seriam noventa strings de `rgba()` por repintura. Custo medido: indistinguível de zero.
 - **Barra de seções, fixa no topo.** Quatro entradas de uma palavra — Experiências,
   Projetos, Artigos, Competências. Sem ícone e sem caixa: só a palavra.
   **A cor troca com o fundo, não em cima dele**: `color-mix` interpola branco e
-  tinta pela variável `--dark-step`, a mesma curva que dissolve o véu escuro, então a barra
-  clareia e escurece no mesmo movimento da página. A faixa de papel atrás dela só aparece
-  no claro, onde o texto precisa de base para não disputar com o conteúdo que passa por
-  baixo — no escuro ela é transparente e as estrelas continuam visíveis.
+  clara em toda a página. A faixa opaca atrás dela só entra quando a página sai do lugar:
+  na abertura a barra flutua sobre o campo de estrelas, e no resto ela precisa de base para
+  o texto não disputar com o conteúdo que passa por baixo.
 - **A entrada da seção que está sendo lida acende.** Um `IntersectionObserver` com a janela
   cortada em 45% em cima e embaixo resolve isso por evento: nada entra no laço de quadro,
   que é onde o custo apareceria.
@@ -197,13 +218,12 @@ Três princípios de sustentação:
   marca, sem tabela manual: o amarelo do JavaScript recebe traço escuro, o preto do Java
   recebe traço claro. Marca quase branca (Unity) inverte — quadrado escuro, logo claro. E
   tecnologia sem logo na tabela vira um selo de iniciais em vez de um buraco.
-- **A abertura ocupa a tela inteira por um motivo prático.** O véu escuro só se dissolve
-  ao longo da primeira rolagem; qualquer conteúdo que subisse antes disso apareceria em
-  tinta escura sobre fundo escuro. A tela cheia garante que a próxima seção só chegue
+- **A abertura ocupa a tela inteira** porque é a composição de entrada: nome, função,
+  convite e retrato lado a lado, sem nada disputando espaço. A tela cheia garante que a próxima seção só chegue
   quando o papel já clareou.
 - **Sinal de que há mais abaixo.** A chamada de rolagem fica presa ao rodapé da abertura,
   com um traço que desce sem parar — é o que diz, sem texto, que a página continua. Ela
-  desvanece junto com o véu.
+  desvanece conforme a leitura desce.
 ## Desempenho
 
 O robô é, de longe, o item mais caro da página: 28 chamadas de desenho e 68 mil triângulos
@@ -242,10 +262,10 @@ custo**. O que o mantém sob controle:
   a peça em vez de cair a pique), o ambiente tem dois tons — papel morno em cima, sombra
   fria embaixo — e resta apenas um contorno largo e tênue. É plástico fosco de robô, não
   plástico polido.
-- **A luz é a da sala, e a sala muda.** Um valor só (`uRoom`, a curva `opening()` do véu)
-  leva ambiente, tinta do albedo e exposição da abertura escura ao papel claro: lá o robô
-  perde brilho e ganha azul para pertencer ao fundo; aqui volta a ser um objeto claro sobre
-  papel. Sem isso ele virava um vulto branco recortado contra o escuro.
+- **Acabamento chapado, em três tons.** A superfície não tem mais estúdio de três
+  luzes, wrap, tonemap nem dither: uma direção de luz só, quantizada em luz, meia-luz e
+  sombra, mais um contorno largo para a peça não encostar no fundo escuro. A geometria é a
+  mesma — o que ficou mais simples foi o desenho dela, não o modelo.
 - **Chave, preenchimento e contraluz**, todos com wrap, os dois últimos francamente azuis.
   Um ruído de meio nível (dither) quebra as faixas que apareciam nos degradês largos, já
   que as normais chegam em `Int8`.
@@ -328,17 +348,15 @@ grupos muda o que se solta.
 
 ## Abertura escura
 
-A primeira tela nasce escura — um véu fixo em azul profundo com brilho velvet — e vai
-clareando conforme a página desce. Três valores acompanham a mesma curva, escritos em
-`--dark`, `--dark-step` e `--hero-fade`:
+O site é escuro do começo ao fim. O que muda ao longo da rolagem não é a cor do fundo,
+e sim o que vive sobre ele:
 
-- o **véu** perde opacidade ao longo da primeira tela;
-- o **menu** troca de cor com uma curva mais fechada, para não atravessar um cinza sem
-  contraste;
-- o **conteúdo da abertura** é claro sobre o escuro e **desvanece junto com o véu** em vez
-  de trocar de cor — assim nunca fica ilegível no meio do caminho.
+- o **campo de estrelas** existe na primeira tela e se apaga conforme a leitura desce;
+- as **linhas de circuito** atravessam a página inteira, em planos de profundidade
+  diferentes;
+- o **robô** só vive na seção de experiências;
+- a **barra do topo** ganha uma faixa opaca assim que a página sai do lugar.
 
-Navegadores sem `color-mix` caem no tema claro de sempre, sem véu.
 
 ## Editar conteúdo
 

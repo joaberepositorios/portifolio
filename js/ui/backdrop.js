@@ -46,8 +46,7 @@
   const DPR_MAX = 1.35;
   const PASSO = 1 / 30;           /* segundos entre repinturas */
 
-  const DARK = [29, 58, 107];
-  const LIGHT = [91, 138, 222];
+  const LIGHT = [91, 138, 222];   /* a cor das linhas e das estrelas */
 
   function init() {
     const back = layer(qs('#backdrop'));
@@ -184,8 +183,8 @@
         x: random(),
         y: random(),
         /* as de longe são menores, mais fracas e quase não se mexem */
-        tamanho: longe > 0.86 ? 2 : 1,
-        alpha: lerp(0.16, 0.62, longe),
+        tamanho: longe > 0.93 ? 2 : 1,
+        alpha: lerp(0.06, 0.22, longe),
         depth: lerp(0.03, 0.34, longe)
       });
     }
@@ -221,11 +220,15 @@
     front.ctx.clearRect(0, 0, front.width, front.height);
     if (!back.width || !back.height) return;
 
-    /* mesma curva do véu: 1 na abertura escura, 0 no papel */
+    /* A página é escura do começo ao fim, então a linha tem uma cor só — o azul
+       claro. O que a curva da abertura ainda decide é o campo de estrelas, que
+       vive na primeira tela e se apaga conforme a leitura desce. */
     const dark = page.viewport ? opening(scrollY / page.viewport) : 1;
-    const tone = mix(DARK, LIGHT, dark);
-    const cor = (alpha) => rgba(tone, alpha);
-    const boost = 0.85 + dark * 0.65;
+    const cor = (alpha) => rgba(LIGHT, alpha);
+    /* O fundo é fundo: existe para dar profundidade, não para ser lido. Este
+       fator é o volume dele — baixo o bastante para passar despercebido e alto
+       o bastante para a página não ficar chapada. */
+    const boost = 0.46;
 
     for (const ctx of [back.ctx, front.ctx]) {
       ctx.lineWidth = 1;
@@ -234,12 +237,12 @@
     }
 
     /* as estrelas são o fundo do fundo: entram antes das linhas, e só no escuro */
-    if (dark > 0.02) pintarEstrelas(back, estrelas, scrollY, ponteiro, tone, dark);
+    if (dark > 0.02) pintarEstrelas(back, estrelas, scrollY, ponteiro, LIGHT, dark);
 
     /* passe 1: o traço em si */
     for (const body of bodies) {
       if (body.kind !== 'trace') continue;
-      const alvo = posicao(body, back, front, time, scrollY);
+      const alvo = posicao(body, back, front, time, scrollY, ponteiro);
       if (!alvo) continue;
 
       const { ctx, x, y } = alvo;
@@ -250,7 +253,7 @@
       ctx.stroke(body.path);
       ctx.restore();
 
-      if (body.no) fillCircle(ctx, x + body.fim[0], y + body.fim[1], 2.2, cor(body.alpha * boost * 2.4));
+      if (body.no) fillCircle(ctx, x + body.fim[0], y + body.fim[1], 1.8, cor(body.alpha * boost * 2.0));
     }
 
     /* passe 2: o sinal correndo — o tracejado é configurado uma vez por camada */
@@ -260,11 +263,11 @@
     }
     for (const body of bodies) {
       if (body.kind !== 'trace' || body.alpha < 0.08) continue;
-      const alvo = posicao(body, back, front, time, scrollY);
+      const alvo = posicao(body, back, front, time, scrollY, ponteiro);
       if (!alvo) continue;
 
       const { ctx, x, y } = alvo;
-      ctx.strokeStyle = cor(body.alpha * boost * 2.1);
+      ctx.strokeStyle = cor(body.alpha * boost * 1.7);
       ctx.save();
       ctx.translate(x, y);
       ctx.stroke(body.path);
@@ -274,7 +277,7 @@
   }
 
   /** Onde o corpo está neste quadro, e em que camada — ou nada, se está fora. */
-  function posicao(body, back, front, time, scrollY) {
+  function posicao(body, back, front, time, scrollY, ponteiro) {
     const alvo = body.plano === 'frente' ? front : back;
     const alcance = 320;
     const span = alvo.height + alcance;
@@ -294,12 +297,6 @@
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
   }
-
-  const mix = (a, b, t) => [
-    Math.round(lerp(a[0], b[0], t)),
-    Math.round(lerp(a[1], b[1], t)),
-    Math.round(lerp(a[2], b[2], t))
-  ];
 
   const rgba = (tone, alpha) => `rgba(${tone[0]},${tone[1]},${tone[2]},${alpha.toFixed(3)})`;
 

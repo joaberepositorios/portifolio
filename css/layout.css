@@ -14,12 +14,15 @@
   position:fixed;top:0;left:0;right:0;z-index:calc(var(--z-front) + 1);
   padding:clamp(12px,1.8vh,18px) 0;
 }
+/* a faixa atrás da barra só aparece quando a página já rolou — na abertura a
+   barra flutua sobre o campo de estrelas */
 .menubar::before{
   content:"";position:absolute;inset:0;pointer-events:none;
-  background:var(--paper);
+  background:rgba(11,14,21,.82);
   border-bottom:1px solid var(--line);
-  opacity:calc(1 - var(--dark-step,1));
+  opacity:0;transition:opacity .4s var(--ease);
 }
+.menubar.is-preso::before{opacity:1}
 .menubar__list{
   position:relative;list-style:none;
   display:flex;justify-content:center;flex-wrap:wrap;
@@ -30,21 +33,17 @@
   display:inline-flex;align-items:center;
   font-family:var(--font-mono);font-size:var(--fs-eyebrow);
   letter-spacing:.16em;text-transform:uppercase;text-decoration:none;
-  color:color-mix(in srgb,var(--on-dark) calc(var(--dark-step,1) * 100%),var(--muted));
+  color:var(--on-dark);
   transition:color .35s var(--ease),opacity .35s var(--ease);
-  opacity:.82;
+  opacity:.72;
 }
 .menubar a:hover,.menubar a:focus-visible,.menubar a.is-current{opacity:1}
-.menubar a:hover,.menubar a:focus-visible{
-  color:color-mix(in srgb,var(--blue-hot) calc(var(--dark-step,1) * 100%),var(--blue-ink));
-}
+.menubar a:hover,.menubar a:focus-visible{color:var(--blue-ink)}
 /* seção em que a leitura está: um traço embaixo, nada de cápsula */
-.menubar a.is-current{
-  color:color-mix(in srgb,var(--on-dark) calc(var(--dark-step,1) * 100%),var(--ink));
-}
+.menubar a.is-current{color:var(--on-dark)}
 .menubar a.is-current::after{
   content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;
-  background:color-mix(in srgb,var(--blue-hot) calc(var(--dark-step,1) * 100%),var(--blue));
+  background:var(--blue);
 }
 .menubar li{position:relative;display:flex}
 .menubar a{position:static}
@@ -54,27 +53,34 @@
 
 .section-head{max-width:62ch;margin-bottom:clamp(28px,4vh,54px)}
 .section h2{font-size:var(--fs-h2);color:var(--ink)}
+.section-head--centro{margin-inline:auto;text-align:center}
+.section-head--centro .section-sub{margin-inline:auto}
 .section-sub{
   margin-top:18px;color:var(--muted);font-size:clamp(13.5px,1.05vw,15.5px);max-width:56ch;
 }
 
 /* ---------- abertura ----------
-   Tela cheia, composição centrada: o nome no meio e a chamada de rolagem presa ao
-   rodapé. A tela inteira é necessária por um motivo prático — o véu escuro só se
-   dissolve ao longo da primeira rolagem, e qualquer conteúdo que subisse antes
-   disso apareceria em tinta escura sobre fundo escuro. */
+   Tela cheia em duas colunas: à esquerda a saudação, o nome, a função e o
+   convite; à direita o retrato. O texto é alinhado à esquerda de propósito —
+   composição centrada pede simetria, e aqui o que manda é a leitura. */
 .section--intro{
   position:relative;
   min-height:100svh;display:flex;flex-direction:column;justify-content:center;
   padding-top:clamp(112px,15vh,168px);padding-bottom:clamp(96px,14vh,160px);
-  text-align:center;
 }
 /* a seção seguinte respira menos no topo: a metade de baixo da abertura já é
    espaço em branco reservado para o robô */
 .section--intro + .section{padding-top:clamp(52px,7vh,104px)}
-.intro-head{
-  position:relative;z-index:2;max-width:min(760px,92%);margin:0 auto;
-  /* claro sobre o escuro: some junto com o véu em vez de trocar de cor */
+
+/* As duas colunas ficam juntas no meio da tela, e não coladas nas margens: com
+   o texto curto, a largura inteira do site deixava um vão no centro. */
+.hero{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.75fr);
+  gap:clamp(26px,4vw,56px);align-items:center;
+  width:min(980px,100%);margin-inline:auto;
+}
+.hero__texto{
   opacity:var(--hero-fade,1);
   /* anda ao contrário dos planos de fundo: o nome fica na frente de um espaço,
      não colado num papel de parede. Só transform — não recalcula layout. */
@@ -82,42 +88,56 @@
   will-change:transform;
 }
 .display{
-  font-size:var(--fs-h1);font-weight:var(--w-display);letter-spacing:-.02em;
-  color:var(--on-dark);
-}
-.hero-rule{
-  width:56px;height:1px;background:var(--blue-hot);margin:22px auto 18px;opacity:.8;
+  font-size:clamp(30px,4.4vw,58px);font-weight:var(--w-display);letter-spacing:-.02em;
+  color:var(--on-dark);line-height:1.06;
 }
 .lead{
-  max-width:44ch;margin:0 auto;font-size:var(--fs-lead);color:var(--on-dark-soft);
-  font-weight:300;
+  max-width:52ch;margin-top:clamp(20px,3vh,32px);
+  font-size:var(--fs-lead);color:var(--on-dark-soft);font-weight:300;
+}
+.hero__acoes{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(20px,3vh,30px)}
+.hero .social{justify-content:flex-start;margin-top:clamp(20px,3vh,30px)}
+
+/* ---------- retrato ----------
+   Círculo com um anel aceso em volta, como no modelo. Sem foto o anel continua:
+   marca o lugar com as iniciais em vez de deixar um vazio. */
+.hero__retrato{display:flex;justify-content:center}
+.retrato{
+  position:relative;width:min(300px,70vw);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;
+  background:radial-gradient(closest-side,rgba(91,138,222,.16),transparent 72%);
+}
+.retrato::before,.retrato::after{
+  content:"";position:absolute;border-radius:50%;pointer-events:none;
+}
+.retrato::before{inset:0;border:1px solid rgba(91,138,222,.35)}
+.retrato::after{
+  inset:9%;border:1px solid rgba(91,138,222,.18);
+}
+.retrato__foto{
+  width:82%;aspect-ratio:1;border-radius:50%;overflow:hidden;
+  background:var(--paper-2);border:1px solid var(--line-strong);
+  display:grid;place-items:center;
+}
+.retrato__foto img{width:100%;height:100%;object-fit:cover}
+.retrato__iniciais{
+  font-family:var(--font-display);font-size:clamp(28px,4vw,44px);font-weight:300;
+  color:var(--muted-2);letter-spacing:.04em;
 }
 
-/* ---------- chamada de rolagem ----------
-   Ancorada no rodapé da abertura, com um traço que desce sem parar: é o que diz,
-   sem texto, que a página continua. */
-.scroll-cue{
-  position:absolute;left:50%;bottom:clamp(26px,4.5vh,54px);transform:translateX(-50%);
-  z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;
-  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:var(--track-eyebrow);
-  text-transform:uppercase;color:var(--on-dark-soft);
-  opacity:var(--hero-fade,1);transition:color .4s var(--ease);
+/* ---------- botões ----------
+   Um cheio e um de contorno: o par que o modelo usa na abertura. */
+.botao{
+  display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+  background:var(--blue);color:#0b0e15;border:1px solid var(--blue);
+  border-radius:var(--r-pill);padding:11px 22px;
+  font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.14em;
+  text-transform:uppercase;
+  transition:background .35s var(--ease),color .35s var(--ease),transform .4s var(--ease);
 }
-.scroll-cue:hover{color:var(--blue-hot)}
-.scroll-cue__line{
-  position:relative;width:1px;height:clamp(38px,6vh,60px);
-  background:color-mix(in srgb,rgba(226,233,246,.22) calc(var(--dark) * 100%),var(--line));
-  overflow:hidden;
-}
-.scroll-cue__line::after{
-  content:"";position:absolute;left:0;top:0;width:100%;height:40%;
-  background:linear-gradient(var(--blue-hot),transparent);
-  animation:scroll-drop 2.4s cubic-bezier(.5,0,.5,1) infinite;
-}
-@keyframes scroll-drop{
-  0%{transform:translateY(-100%)}
-  60%,100%{transform:translateY(250%)}
-}
+.botao:hover{transform:translateY(-2px);background:var(--blue-ink);border-color:var(--blue-ink)}
+.botao--fantasma{background:none;color:var(--on-dark);border-color:var(--line-strong)}
+.botao--fantasma:hover{background:none;color:var(--blue-ink);border-color:var(--blue)}
 
 /* ---------- redes da abertura ---------- */
 .social{display:flex;justify-content:center;gap:clamp(18px,2.4vw,30px);margin-top:clamp(24px,3.4vh,34px)}
@@ -134,39 +154,15 @@
 .portrait{
   width:clamp(76px,8vw,104px);aspect-ratio:1;margin:0 auto clamp(22px,3.5vh,34px);
   border-radius:50%;overflow:hidden;position:relative;
-  border:1px solid color-mix(in srgb,rgba(226,233,246,.3) calc(var(--dark) * 100%),var(--line-strong));
+  border:1px solid var(--line-strong);
 }
 .portrait img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* ---------- véu escuro da abertura ----------
-   A primeira tela nasce escura e vai clareando: esta camada perde opacidade
-   conforme a página rola, e --dark leva a mesma curva para as cores do texto. */
-/* Cor chapada, sem mistura: a profundidade da abertura vem dos planos que se
-   movem por cima dela (js/ui/backdrop.js), não de um degradê pintado no fundo.
-   Degradê achata — todo mundo enxerga a mesma superfície lisa; planos com
-   velocidades diferentes, não. */
-.page-dark{
-  position:fixed;inset:0;z-index:var(--z-veil);pointer-events:none;
-  background:#070a11;
-}
-
-/* Sem color-mix não há como interpolar as cores do texto com segurança:
-   o site cai no tema claro de sempre, sem véu — e a barra fica escura desde o topo. */
-@supports not (color:color-mix(in srgb,red 50%,blue)){
-  .page-dark{display:none}
-  .menubar::before{opacity:1}
-  .menubar a{color:var(--muted)}
-  .menubar a:hover,.menubar a:focus-visible,.menubar a.is-current{color:var(--blue-ink)}
-  .intro-head{opacity:1}
-  .display{color:var(--ink)}
-  .lead{color:var(--muted)}
-  .scroll-cue{color:var(--muted)}
-  .hero-rule{background:var(--blue)}
-}
-
 /* ---------- responsivo ---------- */
 @media (max-width:980px){
-  .intro-head{max-width:100%}
+  .hero{grid-template-columns:1fr;gap:clamp(24px,5vh,44px)}
+  .hero__retrato{order:-1;justify-content:flex-start}
+  .retrato{width:min(216px,52vw)}
 }
 @media (max-width:560px){
   /* uma palavra cabe em qualquer tela; o que aperta é o espaço entre elas */

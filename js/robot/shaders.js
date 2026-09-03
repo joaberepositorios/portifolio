@@ -1,8 +1,9 @@
 /* Shaders da cena.
 
-   Superfície: material fosco, sem lóbulo especular. Três luzes de estúdio — chave
-   morna, preenchimento frio e um contraluz —, difusa com wrap e tonemap ACES, com as
-   cores difusas que vieram dos próprios materiais do URDF.
+   Superfície: desenho chapado em três tons — luz, meia-luz e sombra — a partir de
+   uma direção de luz só. É o acabamento mais simples que ainda descreve o volume:
+   nada de lóbulo especular, nada de tonemap, nada de dither. A geometria é a
+   mesma de sempre; o que mudou foi o quanto ela é sombreada.
 
    Guias: as linhas tracejadas que ligam cada peça solta ao lugar de onde saiu. */
 
@@ -33,59 +34,27 @@
   in vec3 vN, vW;
   uniform vec3 uColor, uEye;
   uniform float uAlpha;
-  uniform float uRoom;    /* 1 = sala escura da abertura, 0 = papel claro */
   out vec4 outColor;
-
-  vec3 aces(vec3 x){
-    return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
-  }
-
-  /* difusa com wrap: a luz contorna a peça em vez de cair a pique, que é o que dá
-     ao material o aspecto de plástico fosco / pó de alumínio */
-  float wrapped(vec3 N, vec3 L, float w){
-    return max(0.0, (dot(N, L) + w) / (1.0 + w));
-  }
-
-  /* ruído de meio nível, para quebrar as faixas que aparecem nos degradês largos
-     de uma superfície fosca (as normais chegam em Int8, o que ajuda a bandar) */
-  float dither(vec2 p){
-    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-  }
 
   void main(){
     vec3 N = normalize(vN);
     vec3 V = normalize(uEye - vW);
-    vec3 L1 = normalize(vec3(-0.50, 0.85, 0.55));   /* chave */
-    vec3 L2 = normalize(vec3( 0.85, 0.12, -0.28));  /* preenchimento */
-    vec3 L3 = normalize(vec3( 0.10, -0.35, -0.92)); /* contraluz */
+    vec3 L = normalize(vec3(-0.42, 0.86, 0.46));
 
-    /* o ambiente é a cor da sala em que o robô está, e a sala muda ao longo da
-       página: quase preta na abertura, papel azulado depois. Sem isso ele fica um
-       vulto branco recortado contra o escuro. */
-    float sky = 0.5 + 0.5 * N.y;
-    vec3 ambPaper = mix(vec3(0.042, 0.050, 0.072), vec3(0.305, 0.335, 0.385), sky);
-    vec3 ambRoom = mix(vec3(0.012, 0.020, 0.040), vec3(0.075, 0.105, 0.165), sky);
-    vec3 amb = mix(ambPaper, ambRoom, uRoom);
+    /* Três tons e nada mais. A quantização é o desenho: em vez de um degradê
+       contínuo, cada face cai num de três patamares, e o volume aparece pelo
+       recorte entre eles — como num desenho técnico sombreado à mão. */
+    float d = dot(N, L) * 0.5 + 0.5;
+    float tom = d > 0.70 ? 1.0 : (d > 0.46 ? 0.82 : 0.63);
 
-    vec3 key  = vec3(1.00, 0.985, 0.960) * wrapped(N, L1, 0.45) * 0.74;
-    vec3 fillL = vec3(0.62, 0.74, 1.00) * wrapped(N, L2, 0.60) * 0.34;
-    vec3 rimL = vec3(0.58, 0.72, 1.00) * wrapped(N, L3, 0.30) * 0.22;
+    /* Contorno: no escuro, sem ele a peça encosta no fundo e some. É largo de
+       propósito — brilho fino viraria o especular que acabamos de tirar. */
+    float borda = pow(1.0 - max(dot(N, V), 0.0), 2.6);
 
-    /* nada de lóbulo especular: o material é fosco. Só um contorno tênue,
-       largo o bastante para não virar brilho — e ele puxa para o azul da sala. */
-    float edge = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+    vec3 base = uColor * vec3(0.92, 0.95, 1.02);
+    vec3 col = base * tom + vec3(0.16, 0.25, 0.42) * borda * 0.55;
 
-    /* o robô não é branco de estúdio: o albedo do URDF é rebaixado e puxado para o
-       azul — mais ainda dentro da sala escura, onde ele precisa perder brilho para
-       pertencer ao fundo em vez de recortar contra ele */
-    vec3 tint = mix(vec3(0.80, 0.86, 0.99), vec3(0.60, 0.71, 0.96), uRoom);
-    vec3 albedo = uColor * tint * mix(0.88, 0.76, uRoom);
-
-    float rim = edge * mix(0.5, 1.15, uRoom);
-    vec3 col = albedo * (amb + key + fillL + rimL) + vec3(0.10, 0.16, 0.26) * rim;
-    vec3 mapped = pow(aces(col * mix(0.88, 0.62, uRoom)), vec3(1.0 / 2.2));
-    mapped += (dither(gl_FragCoord.xy) - 0.5) / 255.0;
-    outColor = vec4(mapped, uAlpha);
+    outColor = vec4(col, uAlpha);
   }`;
 
   const GUIDE_VS = `#version 300 es

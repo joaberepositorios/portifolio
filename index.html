@@ -12,10 +12,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/tokens.css?v=49">
-<link rel="stylesheet" href="css/base.css?v=49">
-<link rel="stylesheet" href="css/layout.css?v=49">
-<link rel="stylesheet" href="css/components.css?v=49">
+<link rel="stylesheet" href="css/tokens.css?v=76">
+<link rel="stylesheet" href="css/base.css?v=76">
+<link rel="stylesheet" href="css/layout.css?v=76">
+<link rel="stylesheet" href="css/components.css?v=76">
 </head>
 <body>
 
@@ -41,23 +41,17 @@
     <circle cx="12" cy="12" r="4"/>
     <circle cx="17.2" cy="6.8" r=".9"/>
   </symbol>
-  <symbol id="i-youtube" viewBox="0 0 24 24">
-    <rect x="2.2" y="5.4" width="19.6" height="13.2" rx="4"/>
-    <path d="M10.2 9.2l5.4 2.8-5.4 2.8z"/>
-  </symbol>
 </svg>
 
-<!-- véu escuro da abertura, o campo de bolas animadas e o robô em WebGL -->
-<div class="page-dark" id="pageDark" aria-hidden="true"></div>
+<!-- o campo de estrelas, o robô em WebGL e a camada da frente -->
 <canvas id="backdrop" aria-hidden="true"></canvas>
 <canvas id="bg" aria-hidden="true"></canvas>
 <canvas id="foreground" aria-hidden="true"></canvas>
 
 <a class="skip-link" href="#curriculo">Pular para o conteúdo</a>
 
-<!-- Barra de seções: fixa no topo. Clara sobre o escuro da abertura e escura
-     sobre o papel — a cor sai de --dark-step, a mesma curva que dissolve o véu,
-     então a troca acontece junto com o fundo e não em cima dele. -->
+<!-- Barra de seções: fixa no topo, clara sobre o escuro. Ganha uma faixa opaca
+     assim que a página sai do lugar; na abertura ela flutua sobre as estrelas. -->
 <nav class="menubar" aria-label="Seções do site">
   <ul class="menubar__list">
     <li><a href="#curriculo">Experiências</a></li>
@@ -70,21 +64,26 @@
 
 <main>
 
-  <!-- 1. INTRODUÇÃO -->
+  <!-- 1. ABERTURA
+       Duas colunas: à esquerda a saudação, o nome, a função e o convite; à
+       direita o retrato. O robô não mora aqui — ele vive nas experiências. -->
   <section id="intro" class="section section--intro">
-    <header class="intro-head">
-      <div id="heroPortrait"></div>
-      <h1 class="display" data-reveal data-reveal-delay="80"><span id="heroName"></span></h1>
-      <p class="hero-rule" aria-hidden="true" data-parallax="0.10"></p>
-      <p class="lead" id="heroLead" data-reveal data-reveal-delay="160"></p>
-      <div id="heroSocial" data-reveal data-reveal-delay="240"></div>
-    </header>
+    <div class="hero">
+      <header class="hero__texto">
+        <h1 class="display" data-reveal>Sou o <span id="heroName"></span></h1>
+        <p class="lead" id="heroLead" data-reveal data-reveal-delay="180"></p>
+        <div class="hero__acoes" data-reveal data-reveal-delay="240">
+          <a class="botao" href="#contato">Contate-me</a>
+          <a class="botao botao--fantasma" href="#projetos">Ver projetos</a>
+        </div>
+        <div id="heroSocial" data-reveal data-reveal-delay="300"></div>
+      </header>
 
-    <!-- Fica preso ao rodapé da primeira tela: é o sinal de que há mais abaixo. -->
-    <a class="scroll-cue" href="#curriculo" data-reveal data-reveal-delay="320">
-      <span class="scroll-cue__label">Role para explorar</span>
-      <span class="scroll-cue__line" aria-hidden="true"></span>
-    </a>
+      <div class="hero__retrato" data-reveal data-reveal-delay="140">
+        <div id="heroPortrait"></div>
+      </div>
+    </div>
+
   </section>
 
   <!-- 2. CURRÍCULO DIGITAL -->
@@ -118,7 +117,15 @@
       <h2 data-reveal>Competências técnicas</h2>
     </div>
     <div class="skills" id="skills"></div>
-    <div class="cv" id="cvCard" data-reveal></div>
+  </section>
+
+  <!-- 6. CONTATO -->
+  <section id="contato" class="section section--contato">
+    <div class="section-head section-head--centro">
+      <h2 data-reveal>Deixe seu recado</h2>
+      <p class="section-sub" data-reveal data-reveal-delay="80" id="contatoNota"></p>
+    </div>
+    <div class="contato" id="contato-corpo"></div>
   </section>
 
 </main>
@@ -138,31 +145,31 @@
      funcionam também abrindo o arquivo direto do disco (file://).
      O `?v=` no fim de cada arquivo é o carimbo de versão: subir esse número obriga
      o navegador a buscar CSS e JS novos em vez de servir os do cache. -->
-<script defer src="js/content.js?v=49"></script>
+<script defer src="js/content.js?v=76"></script>
 
-<script defer src="js/core/ease.js?v=49"></script>
-<script defer src="js/core/dom.js?v=49"></script>
-<script defer src="js/core/ticker.js?v=49"></script>
-<script defer src="js/core/geometry.js?v=49"></script>
-<script defer src="js/core/scroll.js?v=49"></script>
+<script defer src="js/core/ease.js?v=76"></script>
+<script defer src="js/core/dom.js?v=76"></script>
+<script defer src="js/core/ticker.js?v=76"></script>
+<script defer src="js/core/geometry.js?v=76"></script>
+<script defer src="js/core/scroll.js?v=76"></script>
 
-<script defer src="js/ui/modal.js?v=49"></script>
-<script defer src="js/ui/tech-icons.js?v=49"></script>
-<script defer src="js/ui/badges.js?v=49"></script>
-<script defer src="js/ui/sections.js?v=49"></script>
-<script defer src="js/ui/backdrop.js?v=49"></script>
-<script defer src="js/ui/reveal.js?v=49"></script>
-<script defer src="js/ui/parallax.js?v=49"></script>
-<script defer src="js/ui/chrome.js?v=49"></script>
+<script defer src="js/ui/modal.js?v=76"></script>
+<script defer src="js/ui/tech-icons.js?v=76"></script>
+<script defer src="js/ui/badges.js?v=76"></script>
+<script defer src="js/ui/sections.js?v=76"></script>
+<script defer src="js/ui/backdrop.js?v=76"></script>
+<script defer src="js/ui/reveal.js?v=76"></script>
+<script defer src="js/ui/parallax.js?v=76"></script>
+<script defer src="js/ui/chrome.js?v=76"></script>
 
-<script defer src="js/robot/math.js?v=49"></script>
-<script defer src="js/robot/gl.js?v=49"></script>
-<script defer src="js/robot/shaders.js?v=49"></script>
-<script defer src="js/robot/rig.js?v=49"></script>
-<script defer src="js/robot/explode.js?v=49"></script>
-<script defer src="js/robot/guides.js?v=49"></script>
-<script defer src="js/robot/index.js?v=49"></script>
+<script defer src="js/robot/math.js?v=76"></script>
+<script defer src="js/robot/gl.js?v=76"></script>
+<script defer src="js/robot/shaders.js?v=76"></script>
+<script defer src="js/robot/rig.js?v=76"></script>
+<script defer src="js/robot/explode.js?v=76"></script>
+<script defer src="js/robot/guides.js?v=76"></script>
+<script defer src="js/robot/index.js?v=76"></script>
 
-<script defer src="js/main.js?v=49"></script>
+<script defer src="js/main.js?v=76"></script>
 </body>
 </html>

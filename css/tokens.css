@@ -2,43 +2,47 @@
    Tokens — a única fonte de cor, forma e ritmo do site.
    Nenhum valor bruto de cor deve aparecer fora deste arquivo.
 
-   A paleta é papel azulado + tinta grafite, com um acento só: azul escuro.
-   Sobre o papel entra o tom fechado; sobre o escuro da abertura entra o mesmo
-   azul mais claro, que é o único jeito de manter contraste de leitura.
+   O site é **escuro do começo ao fim**: fundo grafite azulado, texto claro e um
+   acento só, o azul. Os nomes das variáveis continuam os mesmos de quando o site
+   era claro — `--paper` é o fundo e `--ink` é o texto, seja qual for o tema —
+   então trocar de tema é trocar este bloco, e nada mais.
 
    A tipografia é pequena e leve: peso 300/400, corpo curto e entrelinha larga —
    leitura de instrumento, não de revista. Números e rótulos vão em monoespaçada
    do sistema, sem baixar fonte nenhuma.
    ============================================================ */
 :root{
-  /* --- cor: papel (branco puxado para o azul) ---
-     Claro o bastante para o texto escuro saltar: a leitura acontece sobre ele, e
-     tudo o que é decoração fica abaixo em valor. */
-  --paper:#eef2fa;
-  --paper-2:#e5ebf6;
-  --paper-3:#d5ddec;
-  --surface:#f7f9fd;        /* usado só onde há mesmo uma superfície: o modal */
+  /* --- cor: fundo --- */
+  --paper:#0b0e15;          /* o chão de tudo */
+  --paper-2:#0f131c;        /* cartões e faixas que precisam se destacar do chão */
+  --paper-3:#151b27;        /* estado ativo, hover de superfície */
+  --surface:#121824;        /* o modal */
 
-  /* --- cor: tinta --- */
-  --ink:#0d1220;
-  --ink-2:#182031;
-  --muted:#4e5768;          /* fechado o suficiente para texto de apoio pequeno */
-  --muted-2:#727b8d;
+  /* --- cor: texto --- */
+  --ink:#eef2fa;
+  --ink-2:#d6ddec;
+  --muted:#939db2;          /* apoio: claro o bastante para corpo pequeno no escuro */
+  --muted-2:#6d7789;
 
   /* --- cor: acento --- */
-  --blue:#1d3a6b;           /* traços, números, rótulos — sobre o papel */
-  --blue-ink:#16305c;       /* o mesmo em texto pequeno */
-  --blue-hot:#5b8ade;       /* sobre o escuro da abertura */
-  --blue-soft:rgba(29,58,107,.07);
+  --blue:#5b8ade;           /* traços, números, rótulos */
+  --blue-ink:#8fb3f5;       /* o mesmo, mais claro, para hover e texto pequeno */
+  --blue-hot:#5b8ade;
+  --blue-soft:rgba(91,138,222,.12);
 
   /* --- fios --- */
-  --line:rgba(15,20,32,.10);
-  --line-soft:rgba(15,20,32,.05);
-  --line-strong:rgba(15,20,32,.24);
+  --line:rgba(238,242,250,.10);
+  --line-soft:rgba(238,242,250,.05);
+  --line-strong:rgba(238,242,250,.22);
 
-  /* --- sobre o escuro da abertura --- */
+  /* --- sobre o escuro (herança dos tempos de tema claro; hoje é tudo escuro) --- */
   --on-dark:#eef2fa;
   --on-dark-soft:rgba(226,233,246,.72);
+
+  /* --- papel de verdade: o currículo e as capas de PDF são folhas brancas --- */
+  --folha:#ffffff;
+  --folha-2:#e9edf6;
+  --folha-tinta:#0e1116;
 
   /* --- forma --- */
   --r-sm:2px;               /* praticamente reto: o site é de fios, não de caixas */
@@ -74,10 +78,8 @@
   --z-front:4;              /* bolas em primeiro plano, por cima do texto */
   --z-modal:60;
 
-  /* --- estado da abertura escura (escrito pelo laço de animação) ---
-     --dark      opacidade do véu
-     --dark-step curva mais fechada, para elementos pequenos trocarem de cor rápido
-     --hero-fade opacidade do conteúdo claro da abertura */
+  /* Sobras do tempo em que a abertura escurecia e clareava: hoje o site é escuro
+     inteiro, e estas ficam fixas em 1 para as regras antigas continuarem válidas. */
   --dark:1;
   --dark-step:1;
   --hero-fade:1;

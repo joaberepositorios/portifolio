@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade do curso — Engenharia de Computação com IA Aplicada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Grade do curso — Engenharia de Computação com IA Aplicada
+     PPC 2026-1 · FEELT / UFU
+
+     Uma página só, sem dependência nenhuma: abre por duplo clique e guarda o
+     que você marcar no próprio navegador (localStorage). Duas abas:
+
+       1. Fluxo do curso — as 59 caixas do PPC, pintáveis por situação.
+       2. Horários       — a grade semanal, onde você monta os retângulos das
+                           aulas com dia, faixa de horário e cor.
+     ============================================================ */
+
+  :root{
+    --papel:#f4f6fb;
+    --carta:#ffffff;
+    --tinta:#0e1116;
+    --tinta-2:#2e343c;
+    --cinza:#5b636e;
+    --linha:#dfe4ee;
+    --linha-forte:#c6cede;
+    --azul:#1d3a6b;
+    --azul-claro:#e8eefb;
+
+    /* situações — as cores que você pinta nas matérias */
+    --feita:#2f8f5b;        --feita-fundo:#e5f5ec;
+    --cursando:#d8a800;     --cursando-fundo:#fdf5da;
+    --prox1:#2563c9;        --prox1-fundo:#e4edfd;
+    --prox2:#7b3fc4;        --prox2-fundo:#f0e8fc;
+    --prox3:#8a5a2b;        --prox3-fundo:#f6ecdf;
+
+    --raio:8px;
+    --sombra:0 10px 30px -24px rgba(14,17,22,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--papel);color:var(--tinta);
+    font-size:14px;line-height:1.5;
+  }
+  h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em;}
+  button{font:inherit;color:inherit;}
+
+  /* ---------- topo e abas ---------- */
+  .topo{
+    background:var(--carta);border-bottom:1px solid var(--linha);
+    padding:18px clamp(14px,3vw,34px) 0;position:sticky;top:0;z-index:20;
+  }
+  .topo h1{font-size:clamp(16px,2vw,21px);}
+  .topo p{
+    margin:5px 0 14px;color:var(--cinza);font-size:12.5px;
+    font-family:'JetBrains Mono',monospace;letter-spacing:.04em;
+  }
+  .abas{display:flex;gap:4px;}
+  .abas button{
+    background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;
+    padding:10px 16px;color:var(--cinza);font-weight:500;
+    transition:color .2s,border-color .2s;
+  }
+  .abas button:hover{color:var(--tinta);}
+  .abas button.is-ativa{color:var(--azul);border-bottom-color:var(--azul);}
+
+  main{padding:clamp(16px,2.4vw,30px);}
+  .aba{display:none;}
+  .aba.is-ativa{display:block;}
+
+  /* ---------- barra de ferramentas ---------- */
+  .ferramentas{
+    display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;
+    background:var(--carta);border:1px solid var(--linha);border-radius:var(--raio);
+    padding:12px 16px;margin-bottom:18px;box-shadow:var(--sombra);
+  }
+  .ferramentas .titulo{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--cinza);
+  }
+  .pinceis{display:flex;flex-wrap:wrap;gap:8px;}
+  .pincel{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+    border:1px solid var(--linha-forte);background:var(--carta);
+    border-radius:999px;padding:6px 13px 6px 9px;font-size:12.5px;
+    transition:border-color .2s,background .2s,transform .2s;
+  }
+  .pincel:hover{transform:translateY(-1px);}
+  .pincel .amostra{
+    width:13px;height:13px;border-radius:4px;flex:none;
+    border:1px solid rgba(14,17,22,.18);
+  }
+  .pincel.is-ativo{border-color:var(--tinta);background:var(--tinta);color:#fff;}
+  .pincel.is-ativo .amostra{border-color:rgba(255,255,255,.5);}
+
+  .btn{
+    border:1px solid var(--linha-forte);background:var(--carta);border-radius:6px;
+    padding:7px 13px;cursor:pointer;font-size:12.5px;
+    transition:border-color .2s,background .2s;
+  }
+  .btn:hover{border-color:var(--azul);color:var(--azul);}
+  .btn.primario{background:var(--azul);border-color:var(--azul);color:#fff;}
+  .btn.primario:hover{background:#16305c;color:#fff;}
+
+  .dica{color:var(--cinza);font-size:12px;}
+
+  /* ---------- resumo de horas ---------- */
+  .resumo{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+  .cartao{
+    background:var(--carta);border:1px solid var(--linha);border-radius:var(--raio);
+    padding:11px 15px;min-width:132px;
+  }
+  .cartao b{display:block;font-size:19px;font-weight:600;}
+  .cartao span{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--cinza);
+  }
+
+  /* ---------- fluxo do curso ---------- */
+  .fluxo{
+    display:flex;gap:14px;align-items:flex-start;
+    overflow-x:auto;padding-bottom:14px;
+  }
+  .periodo{flex:0 0 200px;display:flex;flex-direction:column;gap:9px;}
+  .periodo__cabeca{
+    background:var(--carta);border:1px solid var(--linha-forte);border-radius:var(--raio);
+    padding:9px 10px;text-align:center;
+  }
+  .periodo__cabeca h2{font-size:13px;}
+  .periodo__ch{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:7px;
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;
+  }
+  .periodo__ch span{background:var(--papel);border-radius:3px;padding:3px 0;}
+  .periodo__ch span b{display:block;font-size:11px;color:var(--tinta);}
+  .periodo__ch span i{font-style:normal;color:var(--cinza);}
+
+  .materia{
+    position:relative;text-align:left;width:100%;cursor:pointer;
+    background:var(--carta);border:1px solid var(--linha-forte);border-left:4px solid var(--linha-forte);
+    border-radius:var(--raio);padding:9px 10px 8px;
+    transition:border-color .2s,background .2s,transform .18s,box-shadow .25s;
+  }
+  .materia:hover{transform:translateY(-2px);box-shadow:var(--sombra);}
+  .materia__codigo{
+    font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--cinza);
+    display:flex;justify-content:space-between;gap:8px;
+  }
+  /* cada parte na sua linha: nome, ligações e carga não se misturam */
+  .materia__nome{display:block;font-size:12.5px;line-height:1.35;margin-top:3px;font-weight:500;}
+  .materia__pre{
+    display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--cinza);
+    margin-top:5px;
+  }
+  .materia__ch{
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--cinza);
+    margin-top:6px;display:flex;justify-content:space-between;
+  }
+  .materia__ch b{color:var(--tinta-2);}
+
+  .materia[data-situacao="feita"]{background:var(--feita-fundo);border-color:var(--feita);}
+  .materia[data-situacao="cursando"]{background:var(--cursando-fundo);border-color:var(--cursando);}
+  .materia[data-situacao="prox1"]{background:var(--prox1-fundo);border-color:var(--prox1);}
+  .materia[data-situacao="prox2"]{background:var(--prox2-fundo);border-color:var(--prox2);}
+  .materia[data-situacao="prox3"]{background:var(--prox3-fundo);border-color:var(--prox3);}
+
+  .rodape-fluxo{
+    margin-top:16px;display:flex;flex-wrap:wrap;gap:10px 24px;
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--cinza);
+  }
+  .rodape-fluxo b{color:var(--tinta);}
+
+  /* ---------- horários ---------- */
+  .horarios-corpo{
+    background:var(--carta);border:1px solid var(--linha);border-radius:var(--raio);
+    overflow:auto;box-shadow:var(--sombra);
+  }
+  /* largura fixa: o nome de uma matéria longa não pode esticar a coluna do dia */
+  table{border-collapse:collapse;width:100%;min-width:760px;table-layout:fixed;}
+  th,td{border:1px solid var(--linha);padding:0;}
+  thead th{
+    background:var(--papel);font-size:12px;font-weight:600;padding:9px 8px;
+    position:sticky;top:0;z-index:2;
+  }
+  .col-hora{
+    width:112px;font-family:'JetBrains Mono',monospace;font-size:11px;
+    color:var(--cinza);text-align:center;background:var(--papel);
+    white-space:nowrap;padding:0 6px;
+  }
+  .col-hora button{
+    background:none;border:0;color:var(--linha-forte);cursor:pointer;font-size:13px;
+    padding:0 2px;visibility:hidden;
+  }
+  tr:hover .col-hora button{visibility:visible;}
+  .col-hora button:hover{color:#b3413a;}
+
+  .celula{height:34px;cursor:pointer;position:relative;transition:background .15s;}
+  .celula:hover{background:var(--azul-claro);}
+  .bloco{
+    height:100%;display:flex;align-items:center;gap:7px;
+    padding:0 9px;font-size:12px;font-weight:500;color:var(--tinta);
+    overflow:hidden;
+  }
+  .bloco .nome{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bloco .marca{width:11px;height:11px;border-radius:3px;flex:none;border:1px solid rgba(14,17,22,.2);}
+  /* linhas seguintes do mesmo bloco não repetem nada: viram continuação, e o
+     retângulo se lê como um só em vez de virar uma pilha de repetições */
+  .celula[data-cont="1"] .bloco{visibility:hidden;}
+  .celula[data-cont="1"]{border-top-color:transparent;}
+
+  .materias-lista{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+    border:1px solid var(--linha-forte);border-radius:999px;padding:5px 8px 5px 7px;
+    font-size:12px;background:var(--carta);
+  }
+  .chip .marca{width:12px;height:12px;border-radius:4px;border:1px solid rgba(14,17,22,.2);}
+  .chip.is-ativo{border-color:var(--tinta);box-shadow:inset 0 0 0 1px var(--tinta);}
+  .chip .sair{
+    border:0;background:none;color:var(--cinza);cursor:pointer;font-size:13px;line-height:1;padding:0 1px;
+  }
+  .chip .sair:hover{color:#b3413a;}
+
+  .form-materia{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .form-materia input[type="text"]{
+    border:1px solid var(--linha-forte);border-radius:6px;padding:7px 10px;font:inherit;
+    font-size:12.5px;min-width:190px;
+  }
+  .form-materia input[type="color"]{
+    width:38px;height:32px;border:1px solid var(--linha-forte);border-radius:6px;
+    background:none;cursor:pointer;padding:2px;
+  }
+  .form-materia select{
+    border:1px solid var(--linha-forte);border-radius:6px;padding:7px 10px;font:inherit;
+    font-size:12.5px;max-width:260px;
+  }
+
+  @media (max-width:760px){
+    .periodo{flex-basis:172px;}
+    .ferramentas{gap:10px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <h1>Engenharia de Computação com Inteligência Artificial Aplicada</h1>
+  <p>PPC 2026-1 · Seção 9.4 — Representação Gráfica · FEELT / UFU</p>
+  <nav class="abas">
+    <button type="button" data-aba="fluxo" class="is-ativa">Fluxo do curso</button>
+    <button type="button" data-aba="horarios">Horários</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ================= ABA 1: FLUXO ================= -->
+  <section class="aba is-ativa" id="aba-fluxo">
+    <div class="ferramentas">
+      <span class="titulo">Pincel</span>
+      <div class="pinceis" id="pinceis"></div>
+      <button class="btn" type="button" id="limparFluxo">Limpar tudo</button>
+      <span class="dica">Escolha uma cor e clique nas matérias. Sem cor escolhida, o clique avança para a próxima situação.</span>
+    </div>
+
+    <div class="resumo" id="resumo"></div>
+
+    <div class="fluxo" id="fluxo"></div>
+
+    <div class="rodape-fluxo">
+      <span>Legenda: <b>▸</b> pré-requisito · <b>✱</b> correquisito · <b>×</b> CH definida conforme o componente escolhido</span>
+      <span>CH Extensão: <b>345 horas</b></span>
+      <span>CH Total: <b>3450 horas</b></span>
+    </div>
+  </section>
+
+  <!-- ================= ABA 2: HORÁRIOS ================= -->
+  <section class="aba" id="aba-horarios">
+    <div class="ferramentas">
+      <span class="titulo">Matérias</span>
+      <div class="materias-lista" id="chips"></div>
+    </div>
+
+    <div class="ferramentas">
+      <span class="titulo">Nova</span>
+      <form class="form-materia" id="formMateria">
+        <select id="selectCurso">
+          <option value="">— escolher do fluxo do curso —</option>
+        </select>
+        <input type="text" id="nomeMateria" placeholder="ou digite um nome" autocomplete="off">
+        <input type="color" id="corMateria" value="#2563c9" title="cor do retângulo">
+        <button class="btn primario" type="submit">Adicionar</button>
+      </form>
+    </div>
+
+    <div class="ferramentas">
+      <span class="titulo">Grade</span>
+      <button class="btn" type="button" id="addLinha">+ faixa de horário</button>
+      <button class="btn" type="button" id="addSabado">+ sábado</button>
+      <button class="btn" type="button" id="limparGrade">Limpar grade</button>
+      <span class="dica">Com uma matéria escolhida, clique numa célula para marcar — ou arraste para pegar várias faixas de uma vez. Clique de novo para apagar.</span>
+    </div>
+
+    <div class="horarios-corpo">
+      <table id="grade"></table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     1. O CURSO — transcrito da representação gráfica do PPC 2026-1.
+     `pre` são pré-requisitos e `co` correquisitos, pelos códigos das caixas.
+     ============================================================ */
+  const PERIODOS = [
+    {
+      nome: '1º Período', ch: [255, 60, 0, 0, 315],
+      materias: [
+        { c: '01', n: 'Cálculo Diferencial e Integral I', h: [90, 0, 0, 0, 90] },
+        { c: '02', n: 'Geometria Analítica', h: [60, 0, 0, 0, 60] },
+        { c: '03', n: 'Introdução à Engenharia de Computação', h: [30, 0, 0, 0, 30] },
+        { c: '04', n: 'Introdução à Prototipagem Eletrônica', h: [0, 30, 0, 0, 30] },
+        { c: '05', n: 'Lógica e Matemática Discreta', h: [45, 0, 0, 0, 45] },
+        { c: '06', n: 'Programação Script', h: [30, 30, 0, 0, 60] }
+      ]
+    },
+    {
+      nome: '2º Período', ch: [285, 120, 0, 0, 405],
+      materias: [
+        { c: '07', n: 'Álgebra Linear', h: [45, 0, 0, 0, 45], pre: ['02'] },
+        { c: '08', n: 'Cálculo Diferencial e Integral II', h: [90, 0, 0, 0, 90], pre: ['01'] },
+        { c: '09', n: 'Física Básica: Mecânica', h: [60, 0, 0, 0, 60], pre: ['01'], co: ['10'] },
+        { c: '10', n: 'Física Básica: Mecânica, Experimental de', h: [0, 30, 0, 0, 30], co: ['09'] },
+        { c: '11', n: 'Metrologia', h: [30, 30, 0, 0, 60] },
+        { c: '12', n: 'Programação Procedimental', h: [30, 30, 0, 0, 60], pre: ['06'] },
+        { c: '13', n: 'Sistemas Digitais', h: [30, 0, 0, 0, 30], pre: ['05'], co: ['14'] },
+        { c: '14', n: 'Sistemas Digitais, Experimental de', h: [0, 30, 0, 0, 30], co: ['13'] }
+      ]
+    },
+    {
+      nome: '3º Período', ch: [330, 75, 30, 0, 435],
+      materias: [
+        { c: '15', n: 'Cálculo Diferencial e Integral III', h: [90, 0, 0, 0, 90], pre: ['08'] },
+        { c: '16', n: 'Física Básica: Eletricidade e Magnetismo', h: [60, 0, 0, 0, 60], pre: ['09'], co: ['17'] },
+        { c: '17', n: 'Física Básica: Eletricidade e Magnetismo, Experimental de', h: [0, 30, 0, 0, 30], co: ['16'] },
+        { c: '18', n: 'Elementos de Sistemas Computacionais', h: [30, 0, 30, 0, 60], pre: ['13'] },
+        { c: '19', n: 'Estrutura de Dados', h: [60, 0, 0, 0, 60], pre: ['12'] },
+        { c: '20', n: 'Inteligência Artificial, Ética e Sociedade', h: [30, 0, 0, 0, 30] },
+        { c: '21', n: 'Programação Funcional', h: [30, 15, 0, 0, 45] },
+        { c: '22', n: 'Programação Orientada a Objetos', h: [30, 30, 0, 0, 60], pre: ['12'] }
+      ]
+    },
+    {
+      nome: '4º Período', ch: [345, 60, 0, 90, 495],
+      materias: [
+        { c: '23', n: 'Estatística', h: [60, 0, 0, 0, 60] },
+        { c: '24', n: 'Métodos Matemáticos', h: [75, 0, 0, 0, 75], pre: ['15'] },
+        { c: '25', n: 'Análise de Algoritmos', h: [60, 0, 0, 0, 60], pre: ['19'] },
+        { c: '26', n: 'Arquitetura e Organização de Computadores', h: [60, 0, 0, 0, 60], pre: ['18'] },
+        { c: '27', n: 'Banco de Dados', h: [15, 45, 0, 0, 60], pre: ['19'] },
+        { c: '28', n: 'Circuitos Eletro Elétricos I', h: [75, 0, 0, 0, 75], pre: ['16'], co: ['29'] },
+        { c: '29', n: 'Circuitos Eletro Elétricos I, Experimental de', h: [0, 15, 0, 0, 15], pre: ['11'], co: ['28'] },
+        { c: '30', n: 'Atividades Curriculares de Extensão I', h: [null, null, null, 90, 90], extensao: true }
+      ]
+    },
+    {
+      nome: '5º Período', ch: [270, 45, 0, 90, 405],
+      materias: [
+        { c: '31', n: 'Cálculo Numérico', h: [60, 0, 0, 0, 60], pre: ['07', '15'] },
+        { c: '32', n: 'Empreendedorismo e Inovação', h: [30, 0, 0, 0, 30] },
+        { c: '33', n: 'Eletrônica Analógica I', h: [60, 0, 0, 0, 60], pre: ['28'], co: ['34'] },
+        { c: '34', n: 'Eletrônica Analógica I, Experimental de', h: [0, 30, 0, 0, 30], co: ['33'] },
+        { c: '35', n: 'Engenharia de Software', h: [45, 0, 0, 0, 45], pre: ['22', '27'] },
+        { c: '36', n: 'Fundamentos da Inteligência Artificial', h: [30, 15, 0, 0, 45], pre: ['23'] },
+        { c: '37', n: 'Sistemas Operacionais', h: [45, 0, 0, 0, 45], pre: ['12', '26'] },
+        { c: '38', n: 'Atividades Curriculares de Extensão II', h: [null, null, null, 90, 90], pre: ['30'], extensao: true }
+      ]
+    },
+    {
+      nome: '6º Período', ch: [210, 75, 0, 75, 360],
+      materias: [
+        { c: '39', n: 'Aprendizagem de Máquina', h: [30, 15, 0, 0, 45], pre: ['31', '36'] },
+        { c: '40', n: 'Processamento Digital de Sinais', h: [45, 15, 0, 0, 60], pre: ['24'] },
+        { c: '41', n: 'Redes de Comunicações I', h: [45, 15, 0, 0, 60], pre: ['37'] },
+        { c: '42', n: 'Sistemas Embarcados I', h: [45, 30, 0, 0, 75], pre: ['26', '33', '37'] },
+        { c: '43', n: 'Teoria da Computação', h: [45, 0, 0, 0, 45], pre: ['25'] },
+        { c: '44', n: 'Atividades Curriculares de Extensão III', h: [null, null, null, 75, 75], pre: ['38'], extensao: true }
+      ]
+    },
+    {
+      nome: '7º Período', ch: [135, 75, 30, 60, 300],
+      materias: [
+        { c: '45', n: 'Aprendizagem Profunda e Modelos Generativos', h: [30, 15, 0, 0, 45], pre: ['39'] },
+        { c: '46', n: 'Redes de Comunicações II', h: [45, 15, 0, 0, 60], pre: ['41'] },
+        { c: '47', n: 'Segurança de Sistemas Computacionais', h: [15, 0, 30, 0, 45], pre: ['41'] },
+        { c: '48', n: 'Sistemas Computacionais em Tempo Real', h: [15, 30, 0, 0, 45], pre: ['42'] },
+        { c: '49', n: 'Sistemas e Controle', h: [30, 15, 0, 0, 45], pre: ['40'] },
+        { c: '50', n: 'Atividades Curriculares de Extensão IV', h: [null, null, null, 60, 60], pre: ['44'], extensao: true }
+      ]
+    },
+    {
+      nome: '8º Período', ch: [120, 45, 60, 30, 255],
+      materias: [
+        { c: '51', n: 'Engenharia Econômica', h: [30, 0, 0, 0, 30] },
+        { c: '52', n: 'Arquitetura de Software Aplicada', h: [15, 45, 0, 0, 60], pre: ['35', '41'] },
+        { c: '53', n: 'Engenharia de Contexto em IA Generativa', h: [15, 0, 30, 0, 45], pre: ['45'] },
+        { c: '54', n: 'IA Aplicada à Cibersegurança', h: [15, 0, 30, 0, 45], pre: ['45', '47'] },
+        { c: '55', n: 'Sistemas Distribuídos', h: [45, 0, 0, 0, 45], pre: ['41'] },
+        { c: '56', n: 'Memorial de Atividades Curriculares de Extensão', h: [null, null, null, 30, 30], pre: ['50'], extensao: true }
+      ]
+    },
+    {
+      nome: 'Multi-Período', ch: [0, 0, 0, 0, 480],
+      materias: [
+        { c: '59', n: 'Disciplinas Optativas', h: [null, null, null, null, 90] },
+        { c: '57', n: 'Atividade Acadêmicas Complementares', h: [null, null, null, null, 90] },
+        { c: '58', n: 'Atividade de Conclusão de Curso', h: [null, null, null, null, 300], nota: '1875 horas' }
+      ]
+    }
+  ];
+
+  /* ============================================================
+     2. SITUAÇÕES — as cores que você pinta nas caixas.
+     ============================================================ */
+  const SITUACOES = [
+    { id: '', rotulo: 'Não planejada', cor: '#c6cede' },
+    { id: 'feita', rotulo: 'Feita', cor: '#2f8f5b' },
+    { id: 'cursando', rotulo: 'Este semestre', cor: '#d8a800' },
+    { id: 'prox1', rotulo: 'Próximo semestre', cor: '#2563c9' },
+    { id: 'prox2', rotulo: 'Daqui a dois', cor: '#7b3fc4' },
+    { id: 'prox3', rotulo: 'Daqui a três', cor: '#8a5a2b' }
+  ];
+
+  const CHAVE_FLUXO = 'grade-ecp-situacoes';
+  const CHAVE_HORARIOS = 'grade-ecp-horarios';
+
+  const qs = (sel, raiz) => (raiz || document).querySelector(sel);
+  const qsa = (sel, raiz) => [...(raiz || document).querySelectorAll(sel)];
+
+  function ler(chave, reserva) {
+    try {
+      const bruto = localStorage.getItem(chave);
+      return bruto ? JSON.parse(bruto) : reserva;
+    } catch (e) {
+      return reserva;                    /* navegador sem armazenamento: segue sem salvar */
+    }
+  }
+
+  function gravar(chave, valor) {
+    try { localStorage.setItem(chave, JSON.stringify(valor)); } catch (e) { /* sem espaço: paciência */ }
+  }
+
+  /* ============================================================
+     3. ABAS
+     ============================================================ */
+  qsa('.abas button').forEach((botao) => {
+    botao.addEventListener('click', () => {
+      qsa('.abas button').forEach((b) => b.classList.toggle('is-ativa', b === botao));
+      qsa('.aba').forEach((secao) => {
+        secao.classList.toggle('is-ativa', secao.id === 'aba-' + botao.dataset.aba);
+      });
+    });
+  });
+
+  /* ============================================================
+     4. ABA DO FLUXO
+     ============================================================ */
+  const situacoes = ler(CHAVE_FLUXO, {});
+  let pincel = null;                     /* cor escolhida; sem ela, o clique cicla */
+
+  function montarPinceis() {
+    const caixa = qs('#pinceis');
+    caixa.innerHTML = '';
+    SITUACOES.forEach((s) => {
+      const botao = document.createElement('button');
+      botao.type = 'button';
+      botao.className = 'pincel';
+      botao.dataset.situacao = s.id;
+      botao.innerHTML = '<span class="amostra" style="background:' + s.cor + '"></span>' + s.rotulo;
+      botao.addEventListener('click', () => {
+        pincel = pincel === s.id ? null : s.id;
+        qsa('.pincel').forEach((p) => p.classList.toggle('is-ativo', p.dataset.situacao === pincel && pincel !== null));
+      });
+      caixa.appendChild(botao);
+    });
+  }
+
+  function montarFluxo() {
+    const caixa = qs('#fluxo');
+    caixa.innerHTML = '';
+
+    PERIODOS.forEach((periodo) => {
+      const coluna = document.createElement('div');
+      coluna.className = 'periodo';
+
+      const cabeca = document.createElement('div');
+      cabeca.className = 'periodo__cabeca';
+      const rotulos = ['CHT', 'CHP', 'CHD', 'CHE', 'TOT'];
+      cabeca.innerHTML = '<h2>' + periodo.nome + '</h2><div class="periodo__ch">' +
+        periodo.ch.map((v, i) => '<span><i>' + rotulos[i] + '</i><b>' + v + '</b></span>').join('') +
+        '</div>';
+      coluna.appendChild(cabeca);
+
+      periodo.materias.forEach((m) => {
+        const caixaMateria = document.createElement('button');
+        caixaMateria.type = 'button';
+        caixaMateria.className = 'materia';
+        caixaMateria.dataset.codigo = m.c;
+        if (situacoes[m.c]) caixaMateria.dataset.situacao = situacoes[m.c];
+
+        const ligacoes = [];
+        if (m.pre) ligacoes.push('▸ ' + m.pre.join(' '));
+        if (m.co) ligacoes.push('✱ ' + m.co.join(' '));
+        if (m.nota) ligacoes.push('▸ ' + m.nota);
+
+        const horas = m.h.map((v) => (v === null ? '×' : v));
+
+        caixaMateria.innerHTML =
+          '<span class="materia__codigo"><span>(' + m.c + ')</span>' +
+          (m.extensao ? '<span>extensão</span>' : '') + '</span>' +
+          '<span class="materia__nome">' + m.n + '</span>' +
+          (ligacoes.length ? '<span class="materia__pre">' + ligacoes.join(' · ') + '</span>' : '') +
+          '<span class="materia__ch"><span>' + horas.slice(0, 4).join(' · ') + '</span><b>' + horas[4] + 'h</b></span>';
+
+        caixaMateria.addEventListener('click', () => {
+          if (pincel !== null) {
+            aplicar(m.c, pincel);
+          } else {
+            const atual = situacoes[m.c] || '';
+            const i = SITUACOES.findIndex((s) => s.id === atual);
+            aplicar(m.c, SITUACOES[(i + 1) % SITUACOES.length].id);
+          }
+        });
+
+        coluna.appendChild(caixaMateria);
+      });
+
+      caixa.appendChild(coluna);
+    });
+  }
+
+  function aplicar(codigo, situacao) {
+    if (situacao) situacoes[codigo] = situacao;
+    else delete situacoes[codigo];
+
+    const alvo = qs('.materia[data-codigo="' + codigo + '"]');
+    if (situacao) alvo.dataset.situacao = situacao;
+    else alvo.removeAttribute('data-situacao');
+
+    gravar(CHAVE_FLUXO, situacoes);
+    montarResumo();
+  }
+
+  /** Quanto já foi feito, quanto está em curso, quanto falta — em horas. */
+  function montarResumo() {
+    const total = { todas: 0 };
+    SITUACOES.forEach((s) => { total[s.id || 'vazio'] = 0; });
+
+    PERIODOS.forEach((p) => p.materias.forEach((m) => {
+      const horas = m.h[4] || 0;
+      total.todas += horas;
+      const s = situacoes[m.c] || 'vazio';
+      total[s] += horas;
+    }));
+
+    const cartoes = [
+      { rotulo: 'Carga do fluxo', valor: total.todas + 'h' },
+      { rotulo: 'Feitas', valor: total.feita + 'h', cor: '#2f8f5b' },
+      { rotulo: 'Este semestre', valor: total.cursando + 'h', cor: '#d8a800' },
+      { rotulo: 'Planejadas', valor: (total.prox1 + total.prox2 + total.prox3) + 'h', cor: '#2563c9' },
+      { rotulo: 'Sem plano', valor: total.vazio + 'h' },
+      { rotulo: 'Concluído', valor: Math.round((total.feita / total.todas) * 100) + '%' }
+    ];
+
+    qs('#resumo').innerHTML = cartoes.map((c) =>
+      '<div class="cartao"><b' + (c.cor ? ' style="color:' + c.cor + '"' : '') + '>' + c.valor + '</b>' +
+      '<span>' + c.rotulo + '</span></div>'
+    ).join('');
+  }
+
+  qs('#limparFluxo').addEventListener('click', () => {
+    if (!confirm('Apagar todas as marcações do fluxo?')) return;
+    Object.keys(situacoes).forEach((k) => delete situacoes[k]);
+    gravar(CHAVE_FLUXO, situacoes);
+    montarFluxo();
+    montarResumo();
+  });
+
+  /* ============================================================
+     5. ABA DOS HORÁRIOS
+     ============================================================ */
+  const FAIXAS_PADRAO = [
+    '07:10-08:00', '08:00-08:50', '08:50-09:40', '09:50-10:40', '10:40-11:30', '11:30-12:20',
+    '12:10-13:00', '13:10-14:00', '14:00-14:50', '14:50-15:40', '16:00-16:50', '16:50-17:40',
+    '17:40-18:30', '18:00-18:50', '18:50-19:40', '19:40-20:30', '20:30-21:20'
+  ];
+  const DIAS_PADRAO = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+
+  const horarios = ler(CHAVE_HORARIOS, null) || {
+    faixas: FAIXAS_PADRAO.slice(),
+    dias: DIAS_PADRAO.slice(),
+    materias: [],
+    celulas: {}                          /* "dia|faixa" -> id da matéria */
+  };
+
+  let escolhida = null;                  /* matéria armada para pintar */
+  let pintando = false;
+  let apagando = false;
+
+  const salvarHorarios = () => gravar(CHAVE_HORARIOS, horarios);
+  const chave = (dia, faixa) => dia + '|' + faixa;
+  const acharMateria = (id) => horarios.materias.find((m) => m.id === id);
+
+  function montarChips() {
+    const caixa = qs('#chips');
+    caixa.innerHTML = '';
+
+    if (!horarios.materias.length) {
+      caixa.innerHTML = '<span class="dica">Nenhuma ainda: escolha uma do fluxo do curso ou digite um nome ao lado.</span>';
+      return;
+    }
+
+    horarios.materias.forEach((m) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip' + (escolhida === m.id ? ' is-ativo' : '');
+      chip.innerHTML = '<span class="marca" style="background:' + m.cor + '"></span>' + m.nome;
+
+      chip.addEventListener('click', () => {
+        escolhida = escolhida === m.id ? null : m.id;
+        montarChips();
+      });
+
+      const sair = document.createElement('button');
+      sair.className = 'sair';
+      sair.type = 'button';
+      sair.textContent = '×';
+      sair.title = 'remover a matéria e suas marcações';
+      sair.addEventListener('click', (evento) => {
+        evento.stopPropagation();
+        horarios.materias = horarios.materias.filter((outra) => outra.id !== m.id);
+        Object.keys(horarios.celulas).forEach((k) => {
+          if (horarios.celulas[k] === m.id) delete horarios.celulas[k];
+        });
+        if (escolhida === m.id) escolhida = null;
+        salvarHorarios();
+        montarChips();
+        montarGrade();
+      });
+
+      chip.appendChild(sair);
+      caixa.appendChild(chip);
+    });
+  }
+
+  function montarGrade() {
+    const tabela = qs('#grade');
+    tabela.innerHTML = '';
+
+    const cabeca = tabela.createTHead().insertRow();
+    cabeca.insertCell().outerHTML = '<th class="col-hora">Horário</th>';
+    horarios.dias.forEach((dia) => {
+      const th = document.createElement('th');
+      th.textContent = dia;
+      cabeca.appendChild(th);
+    });
+
+    const corpo = tabela.createTBody();
+
+    horarios.faixas.forEach((faixa, indice) => {
+      const linha = corpo.insertRow();
+
+      const celulaHora = linha.insertCell();
+      celulaHora.className = 'col-hora';
+      celulaHora.innerHTML = faixa + ' <button type="button" title="remover esta faixa">×</button>';
+      qs('button', celulaHora).addEventListener('click', () => {
+        horarios.faixas.splice(indice, 1);
+        horarios.dias.forEach((dia) => delete horarios.celulas[chave(dia, faixa)]);
+        salvarHorarios();
+        montarGrade();
+      });
+
+      horarios.dias.forEach((dia) => {
+        const celula = linha.insertCell();
+        celula.className = 'celula';
+        celula.dataset.dia = dia;
+        celula.dataset.faixa = faixa;
+
+        const id = horarios.celulas[chave(dia, faixa)];
+        const materia = id ? acharMateria(id) : null;
+
+        if (materia) {
+          const anterior = indice > 0 ? horarios.celulas[chave(dia, horarios.faixas[indice - 1])] : null;
+          if (anterior === id) celula.dataset.cont = '1';
+          celula.style.background = materia.cor + '22';
+          celula.innerHTML = '<span class="bloco"><span class="marca" style="background:' + materia.cor +
+            '"></span><span class="nome">' + materia.nome + '</span></span>';
+        }
+
+        celula.addEventListener('mousedown', (evento) => {
+          evento.preventDefault();
+          pintando = true;
+          apagando = !!id && (!escolhida || id === escolhida);
+          marcar(celula);
+        });
+        celula.addEventListener('mouseenter', () => { if (pintando) marcar(celula); });
+
+        linha.appendChild(celula);
+      });
+    });
+  }
+
+  /** Pinta (ou apaga) uma célula com a matéria escolhida. */
+  function marcar(celula) {
+    const k = chave(celula.dataset.dia, celula.dataset.faixa);
+
+    if (apagando) {
+      delete horarios.celulas[k];
+    } else {
+      if (!escolhida) {
+        alert('Escolha uma matéria na lista acima — é a cor dela que vai para a grade.');
+        pintando = false;
+        return;
+      }
+      horarios.celulas[k] = escolhida;
+    }
+
+    salvarHorarios();
+    montarGrade();
+  }
+
+  document.addEventListener('mouseup', () => { pintando = false; });
+
+  /* --- criar matérias --- */
+  function preencherSelect() {
+    const select = qs('#selectCurso');
+    PERIODOS.forEach((p) => {
+      const grupo = document.createElement('optgroup');
+      grupo.label = p.nome;
+      p.materias.forEach((m) => {
+        const opcao = document.createElement('option');
+        opcao.value = m.n;
+        opcao.textContent = '(' + m.c + ') ' + m.n;
+        grupo.appendChild(opcao);
+      });
+      select.appendChild(grupo);
+    });
+  }
+
+  /* cores de partida, para não precisar escolher no seletor toda vez */
+  const CORES = ['#2563c9', '#2f8f5b', '#d8a800', '#7b3fc4', '#8a5a2b', '#c2410c', '#0f766e', '#be123c'];
+
+  qs('#formMateria').addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    const doCurso = qs('#selectCurso').value;
+    const digitado = qs('#nomeMateria').value.trim();
+    const nome = digitado || doCurso;
+    if (!nome) return;
+
+    const materia = {
+      id: 'm' + Date.now().toString(36),
+      nome,
+      cor: qs('#corMateria').value
+    };
+
+    horarios.materias.push(materia);
+    escolhida = materia.id;
+    salvarHorarios();
+
+    qs('#nomeMateria').value = '';
+    qs('#selectCurso').value = '';
+    qs('#corMateria').value = CORES[horarios.materias.length % CORES.length];
+
+    montarChips();
+  });
+
+  qs('#addLinha').addEventListener('click', () => {
+    const faixa = prompt('Faixa de horário (ex.: 21:20-22:10):');
+    if (!faixa) return;
+    horarios.faixas.push(faixa.trim());
+    salvarHorarios();
+    montarGrade();
+  });
+
+  qs('#addSabado').addEventListener('click', () => {
+    if (horarios.dias.includes('Sábado')) return;
+    horarios.dias.push('Sábado');
+    salvarHorarios();
+    montarGrade();
+  });
+
+  qs('#limparGrade').addEventListener('click', () => {
+    if (!confirm('Apagar todos os retângulos da grade? As matérias continuam na lista.')) return;
+    horarios.celulas = {};
+    salvarHorarios();
+    montarGrade();
+  });
+
+  /* ============================================================
+     6. Entrada
+     ============================================================ */
+  montarPinceis();
+  montarFluxo();
+  montarResumo();
+  preencherSelect();
+  montarChips();
+  montarGrade();
+})();
+</script>
+</body>
+</html>

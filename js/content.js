@@ -10,130 +10,157 @@ window.Portfolio.CONTENT = {
   nome: 'Joabe Alves',
   /* retrato da abertura: aponte para um arquivo em assets/img/ (recorte quadrado,
      ~600 px de lado). Deixe vazio e nada é desenhado — nunca sobra moldura vazia. */
-  foto: '',
+  foto: 'assets/img/retrato.jpg',
   lead: 'Este portifólio porta minhas experiências acadêmicas e profissionais, segue abaixo em sequências minhas habilidades desenvolvidas durante meu percurso profissional e demonstrações de eficiência produtiva.',
   sobre: 'Graduando na Universidade Federal de Uberlândia (UFU) e pesquisador no GRVA — Grupo de Realidade Virtual e Aumentada.',
 
   /* Redes da abertura. Cole o endereço completo (https://...) — o ícone só vira
      link quando há endereço; vazio, ele fica apagado, marcando o lugar. */
   redes: {
-    linkedin: '',
-    github: '',
-    instagram: '',
-    youtube: ''
+    linkedin: 'https://www.linkedin.com/in/joabe-alves-pereira/',
+    github: 'https://github.com/joaberepositorios',
+    instagram: 'https://www.instagram.com/joabeengc/'
   },
 
-  /* O currículo é a própria página `curr.html` — editável, e com botão de exportar
-     em uma folha A4. `arquivo` só é usado se você preferir apontar para um PDF. */
-  cv: {
-    pagina: 'curr.html',
-    arquivo: '',
-    nota: 'Versão consolidada, leitura direta no navegador.'
+  /* Seção de contato. O botão monta a mensagem e abre o programa de e-mail de
+     quem escreveu — sem servidor, sem cadastro, sem serviço de terceiro.
+     Enquanto `email` estiver vazio o formulário avisa, em vez de fingir enviar. */
+  contato: {
+    email: 'joabepereira.adm@gmail.com',
+    nota: 'Escreva por aqui: o botão abre seu programa de e-mail com a mensagem pronta.'
   },
 
-  /* Experiências acadêmicas: a instituição é o tópico maior e cada lugar onde
-     você trabalhou é uma frente, com uma linha de descrição e tópicos curtos.
-     Para acrescentar outra, some um item em `frentes`. */
+
+  /* Experiências: um lugar por bloco. O rótulo curto fica em `periodo`, o nome
+     completo em `titulo`, a função e o período em `papel`, e a frente carrega a
+     descrição e os tópicos. Para acrescentar outro lugar, some um item. */
   timeline: [
     {
-      periodo: 'UFU',
-      titulo: 'Universidade Federal de Uberlândia',
-      papel: 'Onde trabalho e pesquiso',
+      periodo: 'UFU · GRVA',
+      titulo: 'GRVA — Grupo de Realidade Virtual e Aumentada',
+      papel: 'Pesquisa e desenvolvimento · desde 2026',
       frentes: [
         {
-          titulo: 'GRVA — Grupo de Realidade Virtual e Aumentada',
-          papel: 'Pesquisa e desenvolvimento · desde 2026',
           descricao: 'Treinamento de robótica com aprendizado de máquina, dentro do grupo de realidade virtual e aumentada da UFU.',
           topicos: [
             'Treinamento de agentes de robótica com aprendizado de máquina',
             'Python e bibliotecas de IA aplicadas a simulação',
             'Apoio a novos integrantes e documentação técnica'
           ]
-        },
+        }
+      ]
+    },
+    {
+      periodo: 'IBI',
+      titulo: 'Instituto Brasileiro de Infraestrutura',
+      papel: 'Projeto · abril de 2026 · São Paulo, SP',
+      frentes: [
         {
-          titulo: '[Segundo lugar onde você trabalhou]',
-          papel: '[Função · período]',
-          descricao: '[Uma linha dizendo o que era o lugar e o que você fazia lá.]',
+          descricao: 'Simulação da terceira via para o transporte rodoviário passando por Cubatão e Santos, com escopo concluído em um mês.',
           topicos: [
-            '[O que você entregou ou construiu]',
-            '[Ferramenta ou tecnologia principal]',
-            '[Resultado, publicação ou aprendizado]'
+            'Python para processar os dados do estudo',
+            'Importação de mapas e de modelos em CSV',
+            'Projeto apresentado na Câmara dos Deputados Federais de São Paulo'
           ]
-        },
+        }
+      ]
+    },
+    {
+      periodo: 'LAB2COD',
+      titulo: 'LAB2COD',
+      papel: 'Processos e inovação para o setor público · Brasília',
+      frentes: [
         {
-          titulo: '[Terceiro lugar onde você trabalhou]',
-          papel: '[Função · período]',
-          descricao: '[Uma linha dizendo o que era o lugar e o que você fazia lá.]',
+          descricao: 'Auxílio na criação de sistemas para soluções, dentro de uma startup em desenvolvimento em Brasília.',
           topicos: [
-            '[O que você entregou ou construiu]',
-            '[Ferramenta ou tecnologia principal]',
-            '[Resultado, publicação ou aprendizado]'
+            'Proposta de melhoria de um sistema de gestão pública',
+            'Objetivo do projeto: conquistar fundos da ANEEL'
           ]
         }
       ]
     }
   ],
 
+  /* Projetos: os repositórios do GitHub que têm Python ou JavaScript, mais a
+     simulação feita no IBI (que não vive num repositório).
+
+     `capa` é a aparência do projeto — uma imagem da tela dele, guardada em
+     assets/img/. Sem capa, vale o `video`; sem os dois, fica o acabamento de
+     espera. As capas foram tiradas dos próprios projetos rodando. */
   projetos: [
     {
-      titulo: 'Projeto 1',
-      video: { src: 'assets/video/projeto-1.mp4' },
-      objetivo: 'Objetivo do projeto.',
-      stack: ['C++', 'OpenGL', 'Unity']
+      titulo: 'Dashboard de aprendizado por reforço',
+      capa: 'assets/img/projeto-mujoco.jpg',
+      objetivo: 'Painel interativo dos dados que o simulador exibe durante o treinamento de um robô: acertos, falhas e o andamento do aprendizado por reforço.',
+      link: 'https://github.com/joaberepositorios/DASHBOARD-MUJOCO',
+      stack: ['Python', 'JavaScript', 'CSS']
     },
     {
-      titulo: 'Projeto 2',
-      video: { src: 'assets/video/projeto-2.mp4' },
-      objetivo: 'Objetivo do projeto.',
-      stack: ['Python', 'ROS', 'OpenCV']
+      titulo: 'Geopsics — ambiente 3D de estudo',
+      capa: 'assets/img/projeto-geopsic.jpg',
+      objetivo: 'Ambiente virtual em 3D para estudar geometria analítica e física mecânica no navegador: pontos, vetores, planos, cônicas e quádricas, com modo AR sobre marcador.',
+      link: 'https://joaberepositorios.github.io/ARTIGO1-GEOPHYSICS/',
+      stack: ['HTML', 'CSS', 'Three.js']
     },
     {
-      titulo: 'Projeto 3',
-      video: { src: 'assets/video/projeto-3.mp4' },
-      objetivo: 'Objetivo do projeto.',
-      stack: ['JavaScript', 'WebGL', 'Three.js']
+      titulo: 'ONVOID — site institucional',
+      capa: 'assets/img/projeto-onvoid.jpg',
+      objetivo: 'Landing page estática da ONVOID, com animações de rolagem, vídeo de fundo e gráficos vetoriais próprios.',
+      link: 'https://github.com/joaberepositorios/onvoid-website',
+      stack: ['JavaScript', 'HTML', 'CSS']
+    },
+    {
+      titulo: 'Simulação de tráfego — Cubatão / Santos',
+      capa: 'assets/img/projeto-cubatao.jpg',
+      objetivo: 'Simulação do tráfego entre a Imigrantes e Santos, com três cenários lado a lado: sem obras, com a terceira pista sem o COPI e com ela. Mostra pontos de congestionamento, nível de serviço HCM e volume por capacidade em tempo real.',
+      link: 'https://ibi-observatorio.github.io/SimulacaoCubataoSantos/',
+      stack: ['HTML', 'JavaScript', 'Simulação']
     }
   ],
 
-  /* Artigos: cada um vira um cartão com a capa do PDF. `autoria` é a sua função
-     no texto (autor principal, coautor, orientando…) e `evento` é onde saiu.
-     `capa` é opcional — uma imagem em assets/img/; sem ela, o próprio PDF é
-     usado como prévia e, sem o arquivo, fica o acabamento de página em branco. */
+  /* Artigos: a capa é a primeira página do PDF, e o cartão diz duas coisas — o
+     título e onde o trabalho saiu. O arquivo abre no modal, sem download.
+     As versões em português dos dois estão em assets/pdf/, fora da vitrine. */
   artigos: [
     {
-      titulo: 'Título do artigo',
-      autoria: 'Autor principal',
-      lingua: 'Português',
-      categoria: 'Realidade Virtual',
-      evento: 'Evento / periódico de publicação',
-      ano: '',
-      descricao: 'Resumo curto do artigo.',
+      titulo: 'Virtual Environment and 3D Simulation for the Visualization of Analytic Geometry and Physics',
+      evento: 'SVR',
       capa: '',
-      pdf: 'assets/pdf/artigo-1.pdf'
+      pdf: 'assets/pdf/geopsics-en.pdf'
     },
     {
-      titulo: 'Paper title',
-      autoria: 'Coautor',
-      lingua: 'Inglês',
-      categoria: 'Computação Gráfica',
-      evento: 'Conference name',
-      ano: '',
-      descricao: 'Short abstract.',
+      titulo: 'Robotics Teaching with Interactive Dashboards: A Visual Machine Learning Methodology for Engineering',
+      evento: 'LatinoWare 2026',
       capa: '',
-      pdf: 'assets/pdf/artigo-2.pdf'
+      pdf: 'assets/pdf/robotica-en.pdf'
     }
   ],
 
-  /* Três frentes. Linguagens e softwares aparecem com o logo oficial da marca
-     (`ui/tech-icons.js`); as competências profissionais não têm logo e nem
-     deveriam ter — vão como texto, marcadas por um traço. */
+  /* Duas frentes: linguagens e softwares. Cada item traz a marca (o logo vem de
+     `ui/tech-icons.js`) e o seu nível, de 0 a 100 — a autoavaliação é sua, e
+     enquanto `nivel` for null o cartão diz "a definir" em vez de inventar um
+     número. */
   competencias: [
-    { grupo: 'Linguagens', itens: ['HTML', 'CSS', 'Python', 'C', 'Haskell', 'JavaScript'] },
-    { grupo: 'Softwares', itens: ['VS Code', 'Adobe Illustrator', 'IntelliJ IDEA', 'Sony Vegas', 'GitHub'] },
     {
-      grupo: 'Profissionais',
-      tipo: 'texto',
-      itens: ['Organização', 'Gestão de pessoas', 'Comunicação', 'Eficiência produtiva']
+      grupo: 'Linguagens',
+      itens: [
+        { nome: 'HTML', nivel: 85 },
+        { nome: 'CSS', nivel: 70 },
+        { nome: 'Python', nivel: 30 },
+        { nome: 'C', nivel: 30 },
+        { nome: 'Haskell', nivel: 5 },
+        { nome: 'JavaScript', nivel: 0 }
+      ]
+    },
+    {
+      grupo: 'Softwares',
+      itens: [
+        { nome: 'VS Code', nivel: null },
+        { nome: 'Adobe Illustrator', nivel: 100 },
+        { nome: 'IntelliJ IDEA', nivel: null },
+        { nome: 'Sony Vegas', nivel: 100 },
+        { nome: 'GitHub', nivel: null }
+      ]
     }
   ]
 };

@@ -9,7 +9,7 @@
   const { onFrame } = P.ticker;
   const { scroll, scrollToElement } = P.scroll;
   const { page, watch } = P.geometry;
-  const { clamp, opening, smoothstep } = P.ease;
+  const { clamp, opening } = P.ease;
   const { prefersReducedMotion } = P.ticker;
 
   /* quanto o nome anda contra o fundo, em pixels — pouco de propósito: é para
@@ -17,19 +17,18 @@
   const CONTRA = 3;
 
   function init() {
-    const root = document.documentElement;
-    const veil = qs('#pageDark');
+    const barra = qs('.menubar');
     const railFill = qs('.timeline__fill');
     const timeline = watch(qs('#timeline'));
 
-    const cabeca = qs('.intro-head');
+    const cabeca = qs('.hero__texto');
     const ponteiro = seguirPonteiro();
 
     bindAnchors();
     marcarSecaoAtual();
 
     onFrame(() => {
-      paintDark(root, veil, scroll.y / page.viewport);
+      marcarBarra(barra);
       paintRail(railFill, timeline);
       paintCabeca(cabeca, ponteiro);
     });
@@ -65,26 +64,16 @@
     cabeca.style.setProperty('--hero-ty', `${y.toFixed(2)}px`);
   }
 
-  /* Véu escuro: uma curva única alimenta três variáveis de CSS.
-     --dark      opacidade do véu
-     --dark-step curva mais fechada, para o menu trocar de cor sem passar por um
-                 cinza sem contraste
-     --hero-fade some com o conteúdo claro da abertura junto com o fundo que o sustenta */
-  /* Escrever no DOM a cada quadro custa recálculo de estilo mesmo quando o valor
-     não mudou — daí os guardas. Abaixo de meio milésimo ninguém vê diferença. */
-  let ultimoEscuro = -1;
+  /* A barra do topo ganha uma faixa opaca assim que a página sai do lugar: na
+     abertura ela flutua sobre o campo de estrelas, e no resto precisa de base. */
+  let presa = null;
 
-  function paintDark(root, veil, screens) {
-    if (!veil) return;
-
-    const dark = opening(screens);
-    if (Math.abs(dark - ultimoEscuro) < 0.0015) return;
-    ultimoEscuro = dark;
-
-    veil.style.opacity = dark.toFixed(3);
-    root.style.setProperty('--dark', dark.toFixed(3));
-    root.style.setProperty('--dark-step', smoothstep(0.38, 0.62, dark).toFixed(3));
-    root.style.setProperty('--hero-fade', smoothstep(0.45, 0.75, dark).toFixed(3));
+  function marcarBarra(barra) {
+    if (!barra) return;
+    const deve = scroll.y > 24;
+    if (deve === presa) return;
+    presa = deve;
+    barra.classList.toggle('is-preso', deve);
   }
 
   let ultimoTrilho = -1;
