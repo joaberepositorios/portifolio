@@ -130,9 +130,12 @@ window.Portfolio.CONTENT = {
     },
     {
       titulo: 'Robotics Teaching with Interactive Dashboards: A Visual Machine Learning Methodology for Engineering',
-      evento: 'LatinoWare 2026',
+      evento: 'LatinoWare 2026 — em avaliação',
       capa: '',
-      pdf: 'assets/pdf/robotica-en.pdf'
+      /* Sem arquivo de propósito: o trabalho está em avaliação às cegas, e
+         hospedar a versão anônima numa página que identifica o autor derruba o
+         anonimato. O PDF volta quando o resultado sair. */
+      pdf: ''
     }
   ],
 
