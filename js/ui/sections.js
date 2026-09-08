@@ -18,20 +18,6 @@
     qs('#aboutText').textContent = content.sobre;
 
     renderSocial(content.redes);
-
-    /* O anel do retrato existe sempre — é ele que equilibra a abertura. Sem
-       arquivo de foto, no lugar dela ficam as iniciais: marca o espaço em vez de
-       deixar um buraco redondo. */
-    const iniciais = content.nome.split(/\s+/).map((parte) => parte[0]).join('').slice(0, 2).toUpperCase();
-    const dentro = el('div.retrato__foto', null, el('span.retrato__iniciais', { text: iniciais }));
-
-    if (content.foto) {
-      const imagem = el('img', { src: content.foto, alt: `Retrato de ${content.nome}`, loading: 'eager' });
-      imagem.addEventListener('error', () => imagem.remove());
-      fill(dentro, imagem);
-    }
-
-    fill(qs('#heroPortrait'), el('figure.retrato', null, dentro));
   }
 
   /* ---------- redes ---------- */

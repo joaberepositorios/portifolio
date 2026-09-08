@@ -304,9 +304,39 @@
 @media (max-width:980px){
   .projects,.papers{grid-template-columns:repeat(2,1fr)}
 }
+/* ---------- telefone ----------
+   Uma coluna só, e tudo no eixo do meio. As marcas de lateral — o fio da linha
+   do tempo, os pontos das instituições, os traços das listas — existem para
+   ancorar um texto alinhado à esquerda; com o texto centrado elas ficariam
+   soltas na margem, então saem. O corte acompanha o da abertura
+   (layout.css). */
 @media (max-width:680px){
   .projects,.papers{grid-template-columns:1fr}
   .skill__items{gap:12px 20px}
+
+  /* linha do tempo: sem o fio e sem os pontos, sobra a coluna centrada */
+  .timeline{padding-left:0}
+  .timeline__rail,.tl-item__node{display:none}
+  .tl-item{text-align:center}
+  .tl-frente{padding-left:0;text-align:center}
+  .tl-frente::before{display:none}
+  .tl-frente__desc,.tl-frente ul{margin-inline:auto}
+  .tl-frente .tl-topico{padding-left:0}
+  .tl-frente .tl-topico::before{display:none}
+  .tl-group{padding-right:0;text-align:center}
+  .tl-group li{padding-left:0}
+  .tl-group li::before{display:none}
+
+  /* projetos e artigos: título, fio, resumo, etiquetas e chamada no mesmo eixo */
+  .project__info,.paper__info{text-align:center}
+  .project__info h3::after{left:50%;transform:translateX(-50%)}
+  .project__goal,.paper__desc{margin-inline:auto}
+  .tags{justify-content:center}
+
+  /* competências: o selo, o nome e a nota deixam de ir para os cantos */
+  .skill__grupo{text-align:center}
+  .nivel__topo{justify-content:center}
+  .nivel__rotulo{justify-content:center;gap:12px}
 }
 
 /* ---------- contato ----------
