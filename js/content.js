@@ -8,9 +8,6 @@ window.Portfolio = window.Portfolio || {};
 
 window.Portfolio.CONTENT = {
   nome: 'Joabe Alves',
-  /* retrato da abertura: aponte para um arquivo em assets/img/ (recorte quadrado,
-     ~600 px de lado). Deixe vazio e nada é desenhado — nunca sobra moldura vazia. */
-  foto: 'assets/img/retrato.jpg',
   lead: 'Este portifólio porta minhas experiências acadêmicas e profissionais, segue abaixo em sequências minhas habilidades desenvolvidas durante meu percurso profissional e demonstrações de eficiência produtiva.',
   sobre: 'Graduando na Universidade Federal de Uberlândia (UFU) e pesquisador no GRVA — Grupo de Realidade Virtual e Aumentada.',
 

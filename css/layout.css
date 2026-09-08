@@ -60,9 +60,10 @@
 }
 
 /* ---------- abertura ----------
-   Tela cheia em duas colunas: à esquerda a saudação, o nome, a função e o
-   convite; à direita o retrato. O texto é alinhado à esquerda de propósito —
-   composição centrada pede simetria, e aqui o que manda é a leitura. */
+   Tela cheia, coluna única: a saudação, o nome, a função e o convite. No
+   computador o texto continua alinhado à esquerda — composição centrada pede
+   simetria, e ali o que manda é a leitura corrida. No telefone o bloco inteiro
+   vai para o eixo do meio (ver "telefone", no fim do arquivo). */
 .section--intro{
   position:relative;
   min-height:100svh;display:flex;flex-direction:column;justify-content:center;
@@ -72,13 +73,13 @@
    espaço em branco reservado para o robô */
 .section--intro + .section{padding-top:clamp(52px,7vh,104px)}
 
-/* As duas colunas ficam juntas no meio da tela, e não coladas nas margens: com
-   o texto curto, a largura inteira do site deixava um vão no centro. */
+/* A coluna fica no meio da tela, e não colada na margem: com o texto curto, a
+   largura inteira do site deixava um vão de um lado só. */
 .hero{
   position:relative;z-index:2;
-  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.75fr);
+  display:grid;grid-template-columns:minmax(0,1fr);
   gap:clamp(26px,4vw,56px);align-items:center;
-  width:min(980px,100%);margin-inline:auto;
+  width:min(720px,100%);margin-inline:auto;
 }
 .hero__texto{
   opacity:var(--hero-fade,1);
@@ -97,33 +98,6 @@
 }
 .hero__acoes{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(20px,3vh,30px)}
 .hero .social{justify-content:flex-start;margin-top:clamp(20px,3vh,30px)}
-
-/* ---------- retrato ----------
-   Círculo com um anel aceso em volta, como no modelo. Sem foto o anel continua:
-   marca o lugar com as iniciais em vez de deixar um vazio. */
-.hero__retrato{display:flex;justify-content:center}
-.retrato{
-  position:relative;width:min(300px,70vw);aspect-ratio:1;border-radius:50%;
-  display:grid;place-items:center;
-  background:radial-gradient(closest-side,rgba(91,138,222,.16),transparent 72%);
-}
-.retrato::before,.retrato::after{
-  content:"";position:absolute;border-radius:50%;pointer-events:none;
-}
-.retrato::before{inset:0;border:1px solid rgba(91,138,222,.35)}
-.retrato::after{
-  inset:9%;border:1px solid rgba(91,138,222,.18);
-}
-.retrato__foto{
-  width:82%;aspect-ratio:1;border-radius:50%;overflow:hidden;
-  background:var(--paper-2);border:1px solid var(--line-strong);
-  display:grid;place-items:center;
-}
-.retrato__foto img{width:100%;height:100%;object-fit:cover}
-.retrato__iniciais{
-  font-family:var(--font-display);font-size:clamp(28px,4vw,44px);font-weight:300;
-  color:var(--muted-2);letter-spacing:.04em;
-}
 
 /* ---------- botões ----------
    Um cheio e um de contorno: o par que o modelo usa na abertura. */
@@ -150,19 +124,9 @@
 /* sem endereço: fica marcado, mas apagado e fora do foco do teclado */
 .social__link.is-empty{opacity:.3;cursor:default}
 
-/* ---------- retrato (opcional: definido em js/content.js) ---------- */
-.portrait{
-  width:clamp(76px,8vw,104px);aspect-ratio:1;margin:0 auto clamp(22px,3.5vh,34px);
-  border-radius:50%;overflow:hidden;position:relative;
-  border:1px solid var(--line-strong);
-}
-.portrait img{width:100%;height:100%;object-fit:cover;display:block}
-
 /* ---------- responsivo ---------- */
 @media (max-width:980px){
-  .hero{grid-template-columns:1fr;gap:clamp(24px,5vh,44px)}
-  .hero__retrato{order:-1;justify-content:flex-start}
-  .retrato{width:min(216px,52vw)}
+  .hero{gap:clamp(24px,5vh,44px)}
 }
 @media (max-width:560px){
   /* uma palavra cabe em qualquer tela; o que aperta é o espaço entre elas */
@@ -170,4 +134,22 @@
 }
 @media (max-width:760px){
   .section--intro{min-height:auto;padding-top:clamp(110px,18vh,160px)}
+}
+
+/* ---------- telefone ----------
+   Numa coluna estreita o alinhamento à esquerda deixa o texto encostado na
+   margem e a linha do olho salta de um lado para o outro a cada bloco. Aqui
+   tudo passa para o eixo do meio — título, texto, botões, redes e as chamadas
+   de cada seção. O corte é o mesmo em que projetos e artigos viram uma coluna
+   só (components.css), para a página inteira mudar de forma de uma vez. */
+@media (max-width:680px){
+  /* só text-align: centrar por grid/flex encolheria o parágrafo para uma linha
+     só, e aí o texto sairia pela lateral em vez de quebrar */
+  .hero{text-align:center}
+  .lead{margin-inline:auto}
+  .hero__acoes{justify-content:center}
+  .hero .social{justify-content:center}
+
+  .section-head{margin-inline:auto;text-align:center}
+  .section-sub{margin-inline:auto}
 }
