@@ -12,6 +12,8 @@ interface Point {
 
 const CURVE_HEIGHT = 120
 const NODE_INSET = 7
+/** Repouso extra no primeiro lugar, em frações da altura da tela. */
+const LEAD = 0.3
 
 /** Um nó por lugar, a um "passo" de distância do anterior, subindo e descendo suavemente. */
 function nodes(count: number, step: number): Point[] {
@@ -78,7 +80,9 @@ export function Journey() {
         data-scrub-end="0.4"
         data-scrub-span={pinned ? 'pin' : undefined}
         data-scrub-steps={pinned ? count : undefined}
-        style={{ '--n': count, '--step': `${step}px`, '--offset': `${offset}px` } as CSSProperties}
+        // O primeiro lugar ganha um trecho extra de repouso (o mesmo valor entra na altura, no CSS).
+        data-scrub-lead={pinned ? LEAD : undefined}
+        style={{ '--n': count, '--lead': LEAD, '--step': `${step}px`, '--offset': `${offset}px` } as CSSProperties}
       >
         <div className="journey__sticky">
           <div className="container">

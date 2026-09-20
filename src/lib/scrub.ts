@@ -13,6 +13,9 @@
  *                                até o fim dele no fim da tela)
  *   data-scrub-steps="4"       → com "pin": o progresso repousa em 4 paradas (0, ⅓, ⅔, 1) e desliza
  *                                entre elas — cada trecho de rolagem leva à parada seguinte
+ *   data-scrub-lead="0.3"      → com "pin": os primeiros 30% de uma tela de rolagem ficam em --p = 0.
+ *                                A primeira parada só tem repouso de um lado; isto lhe dá o outro —
+ *                                sem ele, quem volta rolando para cima passa por ela rápido demais
  *   data-scrub-touch="step"    → em telas de toque, --p só vale 0 ou 1 (vira 1 quando o elemento
  *                                entra na tela) e o CSS anima com `transition`. No celular a rolagem
  *                                roda na GPU; uma transição também, enquanto escrever --p a cada
@@ -56,6 +59,7 @@ export function initScrub(): () => void {
     height: 0,
     pin: false,
     stops: 0,
+    lead: 0,
     current: 0,
     target: 0,
   }))
@@ -70,7 +74,8 @@ export function initScrub(): () => void {
     for (const item of items) {
       const top = item.top - scroll
       if (item.pin) {
-        const raw = Math.min(Math.max(-top / Math.max(item.height - vh, 1), 0), 1)
+        const lead = item.lead * vh
+        const raw = Math.min(Math.max((-top - lead) / Math.max(item.height - vh - lead, 1), 0), 1)
         item.target = item.stops > 1 ? rest(raw, item.stops) : raw
         continue
       }
@@ -119,6 +124,7 @@ export function initScrub(): () => void {
       Object.assign(item, measureBox(item.el))
       item.pin = item.el.dataset.scrubSpan === 'pin'
       item.stops = Number(item.el.dataset.scrubSteps ?? 0)
+      item.lead = Number(item.el.dataset.scrubLead ?? 0)
     }
   }
   const stopMeasuring = onLayoutChange(() => {

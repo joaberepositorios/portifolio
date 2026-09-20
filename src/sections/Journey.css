@@ -116,8 +116,8 @@
 
 .journey[data-pin] .journey__pin {
   position: relative; /* referência de medida para o que está dentro do bloco sticky */
-  /* Uma tela para chegar + 70% de tela de rolagem por lugar seguinte. */
-  height: calc(100vh + (var(--n) - 1) * 70vh);
+  /* Uma tela para chegar + o repouso extra do primeiro lugar + 70% de tela por lugar seguinte. */
+  height: calc(100vh + var(--lead, 0) * 100vh + (var(--n) - 1) * 70vh);
   /* Em que lugar se está, em número: 0 no primeiro, 1 no segundo… com frações no caminho. */
   --f: calc(var(--p, 0) * (var(--n) - 1));
   --drawn: var(--p, 0);
