@@ -19,6 +19,10 @@ export interface Milestone {
   title: string
   organization: string
   summary?: string
+  /** Logo da instituição (import de uma imagem, de preferência PNG/SVG com fundo transparente). */
+  logo?: string
+  /** Sem logo, este texto aparece no lugar dela (padrão: `period`). */
+  wordmark?: string
 }
 
 export interface JourneyContent {

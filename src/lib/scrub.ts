@@ -8,6 +8,11 @@
  *   data-scrub                 → participa
  *   data-scrub-start="0.92"    → --p = 0 quando o topo do elemento está a 92% da altura da tela
  *   data-scrub-end="0.45"      → --p = 1 quando o topo chega a 45%
+ *   data-scrub-span="pin"      → para um bloco alto com um filho `position: sticky`: --p vai de 0 a 1
+ *                                enquanto o bloco atravessa a tela preso (do topo dele no topo da tela
+ *                                até o fim dele no fim da tela)
+ *   data-scrub-steps="4"       → com "pin": o progresso repousa em 4 paradas (0, ⅓, ⅔, 1) e desliza
+ *                                entre elas — cada trecho de rolagem leva à parada seguinte
  *   data-scrub-touch="step"    → em telas de toque, --p só vale 0 ou 1 (vira 1 quando o elemento
  *                                entra na tela) e o CSS anima com `transition`. No celular a rolagem
  *                                roda na GPU; uma transição também, enquanto escrever --p a cada
@@ -20,6 +25,17 @@
  * aparece pronto.
  */
 import { measureBox, onLayoutChange, scrollTop } from './measure'
+
+/**
+ * Progresso com paradas: em cada trecho entre duas paradas, o primeiro e o último quinto da
+ * rolagem ficam em repouso e o miolo desliza (suavemente) até a próxima.
+ */
+function rest(raw: number, stops: number): number {
+  const position = raw * (stops - 1)
+  const index = Math.min(Math.floor(position), stops - 2)
+  const t = Math.min(Math.max((position - index - 0.2) / 0.6, 0), 1)
+  return (index + t * t * (3 - 2 * t)) / (stops - 1)
+}
 
 export function initScrub(): () => void {
   const elements = [...document.querySelectorAll<HTMLElement>('[data-scrub]')]
@@ -37,6 +53,9 @@ export function initScrub(): () => void {
     start: Number(el.dataset.scrubStart ?? 0.92),
     end: Number(el.dataset.scrubEnd ?? 0.45),
     top: 0,
+    height: 0,
+    pin: false,
+    stops: 0,
     current: 0,
     target: 0,
   }))
@@ -50,6 +69,11 @@ export function initScrub(): () => void {
     const scroll = scrollTop()
     for (const item of items) {
       const top = item.top - scroll
+      if (item.pin) {
+        const raw = Math.min(Math.max(-top / Math.max(item.height - vh, 1), 0), 1)
+        item.target = item.stops > 1 ? rest(raw, item.stops) : raw
+        continue
+      }
       item.target = Math.min(Math.max((item.start * vh - top) / ((item.start - item.end) * vh), 0), 1)
     }
   }
@@ -87,12 +111,21 @@ export function initScrub(): () => void {
     if (!raf) raf = requestAnimationFrame(tick)
   }
 
-  const stopMeasuring = onLayoutChange(() => {
+  // Os atributos são relidos a cada medição: um bloco pode passar a ser (ou deixar de ser) "pin"
+  // quando a tela muda de tamanho.
+  const measure = () => {
     vh = window.innerHeight
-    for (const item of items) item.top = measureBox(item.el).top
+    for (const item of items) {
+      Object.assign(item, measureBox(item.el))
+      item.pin = item.el.dataset.scrubSpan === 'pin'
+      item.stops = Number(item.el.dataset.scrubSteps ?? 0)
+    }
+  }
+  const stopMeasuring = onLayoutChange(() => {
+    measure()
     request()
   })
-  for (const item of items) item.top = measureBox(item.el).top
+  measure()
 
   window.addEventListener('scroll', request, { passive: true })
   request()

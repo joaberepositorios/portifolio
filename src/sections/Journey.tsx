@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { SectionHead } from '../components/SectionHead'
 import { journey } from '../content/journey'
+import type { Milestone } from '../content/types'
+import { useMediaQuery, useReducedMotion } from '../hooks/useMediaQuery'
 import './Journey.css'
 
 interface Point {
@@ -9,14 +11,14 @@ interface Point {
 }
 
 const CURVE_HEIGHT = 120
-const LEAD_IN = 140
+const LEAD_IN = 160
+const NODE_INSET = 7
 
-/** Um nó por etapa, no início de cada coluna, subindo e descendo suavemente. */
-function nodes(count: number, width: number): Point[] {
-  const column = width / count
+/** Um nó por lugar, a um "passo" de distância do anterior, subindo e descendo suavemente. */
+function nodes(count: number, step: number): Point[] {
   return Array.from({ length: count }, (_, i) => ({
-    x: i * column + 7,
-    y: (i % 2 === 0 ? 72 : 34) - i * 3,
+    x: i * step + NODE_INSET,
+    y: i % 2 === 0 ? 74 : 38,
   }))
 }
 
@@ -31,75 +33,116 @@ function curve(points: Point[]): string {
 }
 
 /**
- * Telas largas: a rolagem desenha uma linha curva através da seção; um ponto
- * viaja sobre ela e cada etapa acende quando ele chega ao seu nó.
- * Telas estreitas: a mesma lista vira uma linha do tempo vertical, que também
- * cresce com a rolagem.
+ * Telas largas: a seção fica presa na tela e a rolagem percorre os lugares, um por vez — o
+ * caminho desliza sob um ponto fixo, a linha se desenha até o lugar atual e o cartão dele acende.
+ * Cada lugar é uma parada (ver `data-scrub-steps` em lib/scrub.ts), então a lista pode crescer.
+ *
+ * Telas estreitas, janelas baixas ou "movimento reduzido": linha do tempo vertical, sem prender.
  */
 export function Journey() {
   const { milestones, lead } = journey
   const count = milestones.length
-  const boxRef = useRef<HTMLDivElement>(null)
+  const roomy = useMediaQuery('(min-width: 900px) and (min-height: 620px)')
+  const reducedMotion = useReducedMotion()
+  const pinned = roomy && !reducedMotion && count > 1
+
+  const railRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
 
   useEffect(() => {
-    const box = boxRef.current
-    if (!box) return
-    const resize = new ResizeObserver(() => setWidth(box.clientWidth))
-    resize.observe(box)
+    const rail = railRef.current
+    if (!rail) return
+    const resize = new ResizeObserver(() => setWidth(rail.clientWidth))
+    resize.observe(rail)
     return () => resize.disconnect()
   }, [])
 
-  const points = width ? nodes(count, width) : []
+  // Distância entre um lugar e o seguinte: o próximo já aparece, apagado, à direita.
+  const step = Math.round(Math.min(Math.max(width * 0.58, 440), 680))
+  const points = pinned && width ? nodes(count, step) : []
+  const first = points[0]
   const last = points[points.length - 1]
-  const path = last ? curve([{ x: -LEAD_IN, y: points[0].y + 16 }, ...points]) : ''
-  const ahead = last ? curve([last, { x: width + 40, y: last.y - 22 }]) : ''
 
-  /**
-   * Em que ponto do progresso (0–1) cada etapa começa a acender — aproximado pela posição
-   * horizontal do nó. O teto é 0,8: a etapa leva ~0,11 de progresso para acender por completo,
-   * então a última fica 100% visível bem antes do fim da rolagem (com 0,94 ela parava pela metade).
-   */
-  const reach = (i: number) => (last ? ((LEAD_IN + points[i].x) / (LEAD_IN + last.x)) * 0.8 : ((i + 0.5) / (count + 1)) * 0.8)
+  // Limiar da linha do tempo vertical: em que ponto do progresso cada etapa acende (teto 0,8).
+  const reach = (i: number) => ((i + 0.5) / (count + 1)) * 0.8
 
   return (
-    <section id="jornada" className="section journey" aria-labelledby="jornada-title">
-      <div className="container">
-        <SectionHead titleId="jornada-title" title="Trabalho" lead={lead} />
+    <section id="jornada" className="section journey" aria-labelledby="jornada-title" data-pin={pinned || undefined}>
+      <div
+        className="journey__pin"
+        data-scrub
+        data-scrub-start="0.88"
+        data-scrub-end="0.4"
+        data-scrub-span={pinned ? 'pin' : undefined}
+        data-scrub-steps={pinned ? count : undefined}
+        style={{ '--n': count, '--step': `${step}px` } as CSSProperties}
+      >
+        <div className="journey__sticky">
+          <div className="container">
+            <SectionHead titleId="jornada-title" title="Trabalho" lead={lead} />
 
-        <div className="journey__stage" data-scrub data-scrub-start="0.88" data-scrub-end="0.4">
-          <div ref={boxRef} className="journey__curve" aria-hidden="true">
-            {points.length > 0 && (
-              <>
-                <svg width={width} height={CURVE_HEIGHT} viewBox={`0 0 ${width} ${CURVE_HEIGHT}`}>
-                  <path d={path} className="journey__line journey__line--ghost" />
-                  <path d={path} pathLength={1} className="journey__line" />
-                  <path d={ahead} className="journey__line journey__line--ahead" />
-                  {points.map((p, i) => (
-                    <g key={i} className="journey__node" style={{ '--t': reach(i).toFixed(3) } as CSSProperties}>
-                      <line x1={p.x} y1={p.y} x2={p.x} y2={CURVE_HEIGHT} />
-                      <circle cx={p.x} cy={p.y} r="4" />
-                    </g>
+            <div ref={railRef} className="journey__rail">
+              <div className="journey__track">
+                {first && last && (
+                  <div className="journey__curve" aria-hidden="true">
+                    <svg width={last.x + NODE_INSET} height={CURVE_HEIGHT}>
+                      {/* De onde a linha vem, o caminho todo (apagado), o trecho já percorrido e o que vem depois. */}
+                      <path d={curve([{ x: -LEAD_IN, y: first.y + 18 }, first])} className="journey__line journey__line--lead" />
+                      <path d={curve(points)} className="journey__line journey__line--ghost" />
+                      <path d={curve(points)} pathLength={1} className="journey__line" />
+                      <path d={curve([last, { x: last.x + step * 0.7, y: last.y - 24 }])} className="journey__line journey__line--ahead" />
+                      {points.map((p, i) => (
+                        <g key={i} className="journey__node" style={{ '--i': i } as CSSProperties}>
+                          <line x1={p.x} y1={p.y} x2={p.x} y2={CURVE_HEIGHT} />
+                          <circle cx={p.x} cy={p.y} r="4.5" />
+                        </g>
+                      ))}
+                    </svg>
+                    {/* O ponto que viaja sobre a curva (na tela ele fica parado: é o caminho que desliza). */}
+                    <span className="journey__traveller" style={{ offsetPath: `path('${curve(points)}')` }} />
+                  </div>
+                )}
+
+                <ol className="journey__list">
+                  {milestones.map((milestone, i) => (
+                    <li key={i} className="journey__item" style={{ '--i': i, '--t': reach(i).toFixed(3) } as CSSProperties}>
+                      <Place milestone={milestone} />
+                    </li>
                   ))}
-                </svg>
-                {/* O ponto que viaja sobre a curva. */}
-                <span className="journey__traveller" style={{ offsetPath: `path('${path}')` }} />
-              </>
+                </ol>
+              </div>
+            </div>
+
+            {/* Um traço por lugar: mostra quantos são e em qual se está. */}
+            {pinned && (
+              <div className="journey__pager" aria-hidden="true">
+                {milestones.map((_, i) => (
+                  <span key={i} style={{ '--i': i } as CSSProperties} />
+                ))}
+              </div>
             )}
           </div>
-
-          <ol className="journey__list" style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}>
-            {milestones.map((milestone, i) => (
-              <li key={i} className="journey__item" style={{ '--t': reach(i).toFixed(3) } as CSSProperties}>
-                <p className="journey__period">{milestone.period}</p>
-                <h3 className="journey__title">{milestone.title}</h3>
-                <p className="journey__org">{milestone.organization}</p>
-                {milestone.summary && <p className="journey__summary">{milestone.summary}</p>}
-              </li>
-            ))}
-          </ol>
         </div>
       </div>
     </section>
+  )
+}
+
+function Place({ milestone }: { milestone: Milestone }) {
+  return (
+    <>
+      <div className="journey__logo">
+        {milestone.logo ? (
+          <img src={milestone.logo} alt="" decoding="async" />
+        ) : (
+          <span className="journey__wordmark">{milestone.wordmark ?? milestone.period}</span>
+        )}
+      </div>
+      {/* A sigla só aparece quando acrescenta algo ao título. */}
+      {milestone.period !== milestone.title && <p className="journey__period">{milestone.period}</p>}
+      <h3 className="journey__title">{milestone.title}</h3>
+      <p className="journey__org">{milestone.organization}</p>
+      {milestone.summary && <p className="journey__summary">{milestone.summary}</p>}
+    </>
   )
 }

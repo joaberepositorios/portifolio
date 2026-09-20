@@ -31,7 +31,12 @@ export interface Box {
 
 export function measureBox(el: HTMLElement): Box {
   let top = 0
-  for (let node: HTMLElement | null = el; node; node = node.offsetParent as HTMLElement | null) top += node.offsetTop
+  for (let node: HTMLElement | null = el; node; node = node.offsetParent as HTMLElement | null) {
+    // O `offsetTop` de um elemento sticky muda conforme a rolagem. Vale a posição de repouso: o topo
+    // do bloco que o contém (que precisa ser `position: relative`, para ser o seu offsetParent).
+    if (node !== el && getComputedStyle(node).position === 'sticky') continue
+    top += node.offsetTop
+  }
   return { top, height: el.offsetHeight }
 }
 

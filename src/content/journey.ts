@@ -1,12 +1,16 @@
+import logoGrva from '../assets/images/logo-grva.png'
+import logoIbi from '../assets/images/logo-ibi.png'
 import type { JourneyContent } from './types'
 
 // Experiências trazidas do outro portfólio, na mesma ordem em que estavam lá.
-// Para acrescentar um lugar, some um item (3 a 5 funciona melhor).
+// Para acrescentar um lugar, some um item: cada um vira uma parada da rolagem, então pode haver
+// quantos forem. `logo` é opcional — sem ela aparece o nome (`wordmark` ou `period`).
 export const journey: JourneyContent = {
   lead: 'Os lugares por onde passei e o que fiz em cada um.',
   milestones: [
     {
       period: 'UFU · GRVA',
+      logo: logoGrva,
       title: 'GRVA — Grupo de Realidade Virtual e Aumentada',
       organization: 'Pesquisa e desenvolvimento · desde 2026',
       summary:
@@ -14,6 +18,7 @@ export const journey: JourneyContent = {
     },
     {
       period: 'IBI',
+      logo: logoIbi,
       title: 'Instituto Brasileiro de Infraestrutura',
       organization: 'Projeto · abril de 2026 · São Paulo, SP',
       summary:

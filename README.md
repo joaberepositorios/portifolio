@@ -60,8 +60,8 @@ enquanto atravessa a tela, e o CSS decide o que fazer com ela; rolar para cima d
   página rola, com um marco para cada seção. No fim da página, o botão do WhatsApp pulsa duas vezes.
 - **Hero:** a rolagem ergue a câmera da simulação até a vista aérea.
 - **Títulos** se montam letra a letra.
-- **Jornada:** a rolagem desenha a curva; um ponto viaja sobre ela e cada etapa
-  acende quando ele chega (no celular, a linha vertical cresce).
+- **Trabalho:** seção presa, com paradas — `data-scrub-span="pin"` e `data-scrub-steps="N"` (N lugares):
+  o progresso repousa em cada lugar e desliza até o seguinte.
 - **Projetos:** a moldura abre como uma cortina e o texto entra em cascata. No celular a mesma
   entrada acontece de uma vez, por transição (`data-scrub-touch="step"`), para a rolagem ficar lisa.
 - **Artigos & certificados:** cada linha é riscada da esquerda para a direita.
@@ -77,9 +77,11 @@ são decodificadas de antemão, com o navegador ocioso, e no toque nada usa `cli
 ## As cinco seções
 
 1. **Home** — o nome (em caixa alta), a frase "Engenharia de Computação com Inteligência Artificial", o botão "Ver projetos" e a simulação do robô. (`eyebrow` e `intro` são opcionais em `site.ts`.)
-2. **Trabalho** (a jornada profissional; `src/sections/Journey.tsx`) — uma linha curva atravessa a seção e cada etapa pende de um nó;
-   o trecho pontilhado no fim aponta para o que vem depois. No celular vira uma
-   linha do tempo vertical.
+2. **Trabalho** (`src/sections/Journey.tsx`) — em telas largas a seção **fica presa na tela** e a rolagem percorre
+   os lugares, um por vez: o caminho desliza sob um ponto fixo, a linha se desenha até o lugar atual e o
+   cartão dele acende (logo, título, texto); o próximo já aparece, apagado, à direita. Cada lugar é uma
+   parada, então a lista pode crescer à vontade. No celular, em janelas baixas e com movimento reduzido
+   vira uma linha do tempo vertical, sem prender.
 3. **Projetos** — uma vitrine: imagem, categoria, título e descrição (sem tecnologias nem links). O primeiro projeto em destaque, os demais em duas colunas. Sem imagem, uma capa desenhada (painel escuro) é exibida.
 4. **Artigos & Certificados** — em "L": os artigos à esquerda; os certificados descem pela direita e, quando os artigos acabam, ocupam também o espaço de baixo. Artigos abrem no leitor interno
    (`#/article/<slug>`, Esc/Voltar fecha) ou no site original (`externalUrl`).
@@ -93,7 +95,7 @@ Um único botão circular verde do WhatsApp (46 px) fica fixo no canto inferior 
 | Arquivo | Conteúdo |
 | --- | --- |
 | `src/content/site.ts` | Nome, sobrelinha, frase, apresentação, **número do WhatsApp**, links do rodapé |
-| `src/content/journey.ts` | Etapas da jornada (3 a 5 funciona melhor) |
+| `src/content/journey.ts` | Lugares da seção Trabalho — quantos quiser; cada um aceita `logo` (imagem importada) |
 | `src/content/projects.ts` | Projetos (a categoria aparece como rótulo acima do título) |
 | `src/content/records.ts` | Artigos (com capa; viram link se tiverem `externalUrl` ou `body`) e certificados (a coluna só aparece quando há algum) |
 | `src/content/skills.ts` | Skills (só ícones) |
@@ -105,6 +107,11 @@ Um único botão circular verde do WhatsApp (46 px) fica fixo no canto inferior 
 **Imagens** (projetos): coloque em `src/assets/images/`, faça `import` no
 arquivo de conteúdo e mantenha cada uma abaixo de ~300 KB — elas são embutidas
 no HTML único.
+
+**Logos das instituições:** PNG ou SVG com fundo transparente, ~144 px de altura, em `src/assets/images/`;
+faça `import` em `journey.ts` e passe em `logo`. Sem logo, aparece o nome (`wordmark` ou `period`) —
+é o caso do LAB2COD, cuja logo não está disponível online. A do GRVA veio do site do CIAEM/UFU e a do IBI,
+do Observatório do IBI; são marcas das próprias instituições, usadas só para identificá-las.
 
 **Ícones:** as skills usam `techIcons` (extraídos do outro portfólio, que já tinha VS Code,
 Illustrator e Vegas). Para outras tecnologias: `import { siDocker } from 'simple-icons'`

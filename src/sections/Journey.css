@@ -1,68 +1,32 @@
-/* `--p` (0→1) vem da rolagem (lib/scrub.ts); `--t` é o ponto do progresso em que a linha
-   alcança cada etapa. `--on` vale 0 antes disso e sobe a 1 logo depois.                    */
+/* `--p` (0→1) vem da rolagem (lib/scrub.ts).
+   Há dois modos — o atributo `data-pin` da seção diz qual está valendo:
+   · padrão (telas estreitas, janelas baixas, movimento reduzido): linha do tempo vertical;
+   · `data-pin` (telas largas): a seção fica presa e a rolagem percorre os lugares, um por vez. */
 
-.journey__item,
-.journey__node {
-  --on: clamp(0, (var(--p, 1) - var(--t, 0)) * 9, 1);
+/* --- Comum ------------------------------------------------------------------------------------ */
+
+.journey__logo {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  margin-bottom: 0.875rem;
 }
 
-/* A linha chega ao último nó em p = 0,8 (o mesmo teto dos limiares `--t`), não em p = 1. */
-.journey__stage {
-  /* (Não pode se chamar --line: esse é o nome da cor das linhas do tema.) */
-  --drawn: clamp(0, var(--p, 1) / 0.8, 1);
+.journey__logo img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
 }
 
-/* --- Padrão (telas estreitas): linha do tempo vertical que cresce com a rolagem ---------- */
-
-.journey__curve {
-  display: none;
-}
-
-.journey__list {
-  display: block !important;
-  position: relative;
-  padding-left: 1.75rem;
-}
-
-.journey__list::before,
-.journey__list::after {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  width: 1px;
-  background: var(--line);
-}
-
-.journey__list::after {
-  background: var(--text);
-  transform: scaleY(var(--drawn, 1));
-  transform-origin: top;
-}
-
-.journey__item {
-  position: relative;
-  padding-bottom: 2rem;
-  opacity: calc(0.25 + var(--on) * 0.75);
-}
-
-.journey__item:last-child {
-  padding-bottom: 0;
-}
-
-.journey__item::before {
-  content: '';
-  position: absolute;
-  left: calc(-1.75rem + 0.5px);
-  top: 0.4rem;
-  z-index: 1;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text);
-  box-shadow: 0 0 0 4px var(--bg);
-  transform: scale(calc(0.4 + var(--on) * 0.6));
+/* Sem logo: o nome da instituição, como uma marca. */
+.journey__wordmark {
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
 }
 
 .journey__period {
@@ -87,93 +51,252 @@
   color: var(--text-muted);
 }
 
-/* --- Telas largas: a curva horizontal ------------------------------------------------------ */
+/* --- Padrão: linha do tempo vertical que cresce com a rolagem ------------------------------- */
 
-@media (min-width: 900px) {
-  .journey__curve {
-    position: relative;
-    display: block;
-    height: 120px;
-  }
+.journey__pin {
+  /* A linha chega ao fim em p = 0,8 (o mesmo teto dos limiares `--t`), não em p = 1.
+     (Não pode se chamar --line: esse é o nome da cor das linhas do tema.) */
+  --drawn: clamp(0, var(--p, 1) / 0.8, 1);
+}
 
-  .journey__curve svg {
-    overflow: visible;
-  }
+.journey__curve,
+.journey__pager {
+  display: none;
+}
 
-  .journey__line {
-    fill: none;
-    stroke: var(--text);
-    stroke-width: 1.4;
-    stroke-dasharray: 1;
-    stroke-dashoffset: calc(1 - var(--drawn, 1));
-  }
+.journey__list {
+  position: relative;
+  padding-left: 1.75rem;
+}
 
-  /* O caminho inteiro, bem apagado, fica visível desde o início: mostra para onde a linha vai. */
-  .journey__line--ghost {
-    stroke: var(--line);
-    stroke-dasharray: none;
-    stroke-dashoffset: 0;
-  }
+.journey__list::before,
+.journey__list::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 1px;
+  background: var(--line);
+}
 
-  .journey__line--ahead {
-    stroke: var(--line-strong);
-    stroke-dasharray: 3 6;
-    stroke-dashoffset: 0;
-    opacity: clamp(0, (var(--p, 1) - 0.8) * 8, 1);
-  }
+.journey__list::after {
+  background: var(--text);
+  transform: scaleY(var(--drawn, 1));
+  transform-origin: top;
+}
 
-  .journey__node {
-    opacity: var(--on);
-  }
+/* `--t` é o ponto do progresso em que a linha alcança a etapa; `--on` sobe de 0 a 1 logo depois. */
+.journey__item {
+  --on: clamp(0, (var(--p, 1) - var(--t, 0)) * 9, 1);
+  position: relative;
+  padding-bottom: 2.5rem;
+  opacity: calc(0.25 + var(--on) * 0.75);
+}
 
-  .journey__node line {
-    stroke: var(--line);
-    stroke-width: 1;
-  }
+.journey__item:last-child {
+  padding-bottom: 0;
+}
 
-  .journey__node circle {
-    fill: var(--text);
-    stroke: var(--bg);
-    stroke-width: 3;
-    paint-order: stroke;
-    transform-box: fill-box;
-    transform-origin: center;
-    transform: scale(calc(0.3 + var(--on) * 0.7));
-  }
+.journey__item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1.75rem + 0.5px);
+  top: 1.125rem;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 4px var(--bg);
+  transform: scale(calc(0.4 + var(--on) * 0.6));
+}
 
-  .journey__traveller {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 16%, transparent);
-    offset-anchor: center; /* o centro do ponto anda sobre a curva */
-    offset-rotate: 0deg;
-    offset-distance: calc(var(--drawn, 1) * 100%);
-    /* some ao chegar ao fim, quando a linha já está toda desenhada */
-    opacity: clamp(0, (0.985 - var(--drawn, 1)) * 40, 1);
-  }
+/* --- `data-pin`: presa na tela, um lugar por trecho de rolagem ------------------------------- */
 
-  .journey__list {
-    display: grid !important;
-    padding-left: 0;
-  }
+.journey[data-pin] .journey__pin {
+  position: relative; /* referência de medida para o que está dentro do bloco sticky */
+  /* Uma tela para chegar + 70% de tela de rolagem por lugar seguinte. */
+  height: calc(100vh + (var(--n) - 1) * 70vh);
+  /* Em que lugar se está, em número: 0 no primeiro, 1 no segundo… com frações no caminho. */
+  --f: calc(var(--p, 0) * (var(--n) - 1));
+  --drawn: var(--p, 0);
+}
 
-  .journey__list::before,
-  .journey__list::after,
-  .journey__item::before {
-    display: none;
-  }
+.journey[data-pin] .journey__sticky {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  padding-top: var(--header);
+  overflow-x: clip; /* os próximos lugares esperam fora da tela, à direita */
+}
 
-  /* A haste que desce de cada nó continua como a borda esquerda da etapa. */
-  .journey__item {
-    margin-left: 6.5px;
-    padding: 0.25rem 2rem 0.25rem 1.125rem;
-    border-left: 1px solid var(--line);
-    opacity: var(--on);
-    transform: translateY(calc((1 - var(--on)) * 14px));
-  }
+/* O título fica parado enquanto a seção está presa (o parallax o arrastaria para baixo). */
+.journey[data-pin] .section__head > div {
+  transform: none !important;
+}
+
+.journey[data-pin] .section__head {
+  margin-bottom: clamp(1rem, 3vh, 2.5rem);
+}
+
+/* O caminho desliza para a esquerda: o lugar atual fica sempre no mesmo ponto da tela. */
+.journey[data-pin] .journey__track {
+  width: max-content;
+  transform: translate3d(calc(var(--f) * -1 * var(--step)), 0, 0);
+  will-change: transform;
+}
+
+.journey[data-pin] .journey__curve {
+  position: relative;
+  display: block;
+  height: 120px;
+}
+
+.journey__curve svg {
+  display: block;
+  overflow: visible;
+}
+
+.journey__line {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--drawn, 1));
+}
+
+/* O caminho inteiro, bem apagado, fica visível desde o início: mostra para onde a linha vai. */
+.journey__line--ghost,
+.journey__line--lead {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+}
+
+.journey__line--ghost {
+  stroke: var(--line);
+}
+
+.journey__line--ahead {
+  stroke: var(--line-strong);
+  stroke-dasharray: 3 6;
+  stroke-dashoffset: 0;
+  opacity: clamp(0, (var(--p, 1) - 0.85) * 7, 1);
+}
+
+/* Distância de cada lugar ao lugar atual: `--near` vale 1 nele e cai a 0 nos vizinhos;
+   `--past` sobe a 1 quando ele já ficou para trás. */
+.journey[data-pin] .journey__node,
+.journey[data-pin] .journey__item,
+.journey__pager span {
+  --d: calc(var(--f) - var(--i));
+  --near: clamp(0, 1 - max(var(--d), var(--d) * -1) * 1.5, 1);
+  --past: clamp(0, var(--d) * 1.5 - 0.2, 1);
+  --reached: clamp(0, var(--d) * 8 + 1, 1);
+}
+
+.journey__node line {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.journey__node circle {
+  fill: var(--text);
+  stroke: var(--bg);
+  stroke-width: 3;
+  paint-order: stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(0.45 + var(--reached) * 0.55));
+  opacity: calc(0.3 + var(--reached) * 0.7);
+}
+
+.journey[data-pin] .journey__node {
+  opacity: calc(1 - var(--past));
+}
+
+.journey__traveller {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 16%, transparent);
+  offset-anchor: center; /* o centro do ponto anda sobre a curva */
+  offset-rotate: 0deg;
+  offset-distance: calc(var(--drawn, 1) * 100%);
+}
+
+.journey[data-pin] .journey__list {
+  display: flex;
+  padding-left: 0;
+}
+
+.journey[data-pin] .journey__list::before,
+.journey[data-pin] .journey__list::after,
+.journey[data-pin] .journey__item::before {
+  display: none;
+}
+
+/* A haste que desce de cada nó continua como a borda esquerda do lugar. */
+.journey[data-pin] .journey__item {
+  flex: 0 0 var(--step);
+  margin-left: 6.5px;
+  margin-right: -6.5px;
+  padding: 0.5rem 3.5rem 0.5rem 1.5rem;
+  border-left: 1px solid var(--line);
+  opacity: calc((0.3 + var(--near) * 0.7) * (1 - var(--past)));
+}
+
+.journey[data-pin] .journey__logo {
+  height: 60px;
+  margin-bottom: 1.25rem;
+  transform-origin: left center;
+  transform: scale(calc(0.86 + var(--near) * 0.14));
+}
+
+.journey[data-pin] .journey__wordmark {
+  font-size: 1.5rem;
+}
+
+.journey[data-pin] .journey__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+  font-weight: var(--heading-weight);
+  line-height: 1.25;
+  letter-spacing: var(--heading-tracking);
+  text-wrap: balance;
+}
+
+.journey[data-pin] .journey__org {
+  margin-top: 0.5rem;
+}
+
+/* O texto do lugar só se abre quando se chega nele. */
+.journey[data-pin] .journey__summary {
+  max-width: 48ch;
+  margin-top: 0.75rem;
+  font-size: var(--fs-base);
+  color: var(--text-soft);
+  opacity: var(--near);
+  transform: translateY(calc((1 - var(--near)) * 10px));
+}
+
+.journey[data-pin] .journey__pager {
+  display: flex;
+  gap: 6px;
+  margin-top: clamp(1.25rem, 4vh, 2.5rem);
+}
+
+.journey__pager span {
+  width: 28px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--text);
+  opacity: calc(0.14 + var(--near) * 0.86);
 }
