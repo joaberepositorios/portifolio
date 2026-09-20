@@ -31,8 +31,8 @@ export default function App() {
         <ScrollProgress />
         <main id="main">
           <Home />
-          <Journey />
           <Projects />
+          <Journey />
           <Records onOpenArticle={reader.open} />
           <Skills />
         </main>

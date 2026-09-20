@@ -29,8 +29,8 @@ export function whatsappHref(): string {
 /** As cinco — e apenas cinco — seções, em ordem. */
 export const SECTIONS = [
   { id: 'home', label: 'Home' },
-  { id: 'jornada', label: 'Jornada' },
   { id: 'projetos', label: 'Projetos' },
+  { id: 'jornada', label: 'Jornada' },
   { id: 'artigos', label: 'Artigos & Certificados' },
   { id: 'skills', label: 'Skills' },
 ] as const

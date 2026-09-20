@@ -71,10 +71,10 @@ Com `prefers-reduced-motion`, `--p` vale 1 desde o início: tudo aparece pronto.
 ## As cinco seções
 
 1. **Home** — o nome (em caixa alta), a frase "Engenharia de Computação com Inteligência Artificial", o botão "Ver projetos" e a simulação do robô. (`eyebrow` e `intro` são opcionais em `site.ts`.)
-2. **Jornada** — uma linha curva atravessa a seção e cada etapa pende de um nó;
+2. **Projetos** — uma vitrine: imagem, categoria, título e descrição (sem tecnologias nem links). O primeiro projeto em destaque, os demais em duas colunas. Sem imagem, uma capa desenhada (painel escuro) é exibida.
+3. **Jornada** — uma linha curva atravessa a seção e cada etapa pende de um nó;
    o trecho pontilhado no fim aponta para o que vem depois. No celular vira uma
    linha do tempo vertical.
-3. **Projetos** — uma vitrine: imagem, categoria, título e descrição (sem tecnologias nem links). O primeiro projeto em destaque, os demais em duas colunas. Sem imagem, uma capa desenhada (painel escuro) é exibida.
 4. **Artigos & Certificados** — em "L": os artigos à esquerda; os certificados descem pela direita e, quando os artigos acabam, ocupam também o espaço de baixo. Artigos abrem no leitor interno
    (`#/article/<slug>`, Esc/Voltar fecha) ou no site original (`externalUrl`).
 5. **Skills** — só os ícones, nas cores das marcas, em grade. O nome aparece ao
