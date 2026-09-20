@@ -146,6 +146,7 @@
 /* O caminho desliza para a esquerda: o lugar atual fica sempre no mesmo ponto da tela. */
 .journey[data-pin] .journey__track {
   width: max-content;
+  margin-left: var(--offset); /* o lugar atual fica mais ao centro da tela */
   transform: translate3d(calc(var(--f) * -1 * var(--step)), 0, 0);
   will-change: transform;
 }
@@ -289,6 +290,7 @@
 
 .journey[data-pin] .journey__pager {
   display: flex;
+  margin-left: calc(var(--offset) + 1.5rem + 7px); /* alinhado ao texto do lugar */
   gap: 6px;
   margin-top: clamp(1.25rem, 4vh, 2.5rem);
 }

@@ -109,9 +109,9 @@ arquivo de conteúdo e mantenha cada uma abaixo de ~300 KB — elas são embutid
 no HTML único.
 
 **Logos das instituições:** PNG ou SVG com fundo transparente, ~144 px de altura, em `src/assets/images/`;
-faça `import` em `journey.ts` e passe em `logo`. Sem logo, aparece o nome (`wordmark` ou `period`) —
-é o caso do LAB2COD, cuja logo não está disponível online. A do GRVA veio do site do CIAEM/UFU e a do IBI,
-do Observatório do IBI; são marcas das próprias instituições, usadas só para identificá-las.
+faça `import` em `journey.ts` e passe em `logo`. Sem logo, aparece o nome (`wordmark` ou `period`).
+A do GRVA veio do site do CIAEM/UFU; a do IBI, do Observatório do IBI; a do Lab2Code (`~/Lab2Code_`) foi
+gerada a partir da página de marca `lab2code-logos.html`; são marcas das próprias instituições, usadas só para identificá-las.
 
 **Ícones:** as skills usam `techIcons` (extraídos do outro portfólio, que já tinha VS Code,
 Illustrator e Vegas). Para outras tecnologias: `import { siDocker } from 'simple-icons'`

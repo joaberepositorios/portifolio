@@ -1,5 +1,6 @@
 import logoGrva from '../assets/images/logo-grva.png'
 import logoIbi from '../assets/images/logo-ibi.png'
+import logoLab2Code from '../assets/images/logo-lab2code.png'
 import type { JourneyContent } from './types'
 
 // Experiências trazidas do outro portfólio, na mesma ordem em que estavam lá.
@@ -25,8 +26,9 @@ export const journey: JourneyContent = {
         'Simulação da terceira via para o transporte rodoviário por Cubatão e Santos, concluída em um mês e apresentada na Câmara dos Deputados Federais de São Paulo.',
     },
     {
-      period: 'LAB2COD',
-      title: 'LAB2COD',
+      period: 'Lab2Code',
+      logo: logoLab2Code,
+      title: 'Lab2Code',
       organization: 'Processos e inovação para o setor público · Brasília',
       summary:
         'Colaborador em projetos e pesquisas para o setor elétrico e em problemas de instituições e agências nacionais.',

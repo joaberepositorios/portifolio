@@ -11,7 +11,6 @@ interface Point {
 }
 
 const CURVE_HEIGHT = 120
-const LEAD_IN = 160
 const NODE_INSET = 7
 
 /** Um nó por lugar, a um "passo" de distância do anterior, subindo e descendo suavemente. */
@@ -57,8 +56,12 @@ export function Journey() {
     return () => resize.disconnect()
   }, [])
 
+  // O lugar atual não fica colado à margem: entra um quarto da largura para dentro, mais ao centro.
+  const offset = Math.round(width * 0.24)
   // Distância entre um lugar e o seguinte: o próximo já aparece, apagado, à direita.
-  const step = Math.round(Math.min(Math.max(width * 0.58, 440), 680))
+  const step = Math.round(Math.min(Math.max(width * 0.56, 440), 680))
+  // A linha chega de fora da tela, pela esquerda.
+  const leadIn = offset + 480
   const points = pinned && width ? nodes(count, step) : []
   const first = points[0]
   const last = points[points.length - 1]
@@ -75,7 +78,7 @@ export function Journey() {
         data-scrub-end="0.4"
         data-scrub-span={pinned ? 'pin' : undefined}
         data-scrub-steps={pinned ? count : undefined}
-        style={{ '--n': count, '--step': `${step}px` } as CSSProperties}
+        style={{ '--n': count, '--step': `${step}px`, '--offset': `${offset}px` } as CSSProperties}
       >
         <div className="journey__sticky">
           <div className="container">
@@ -87,7 +90,7 @@ export function Journey() {
                   <div className="journey__curve" aria-hidden="true">
                     <svg width={last.x + NODE_INSET} height={CURVE_HEIGHT}>
                       {/* De onde a linha vem, o caminho todo (apagado), o trecho já percorrido e o que vem depois. */}
-                      <path d={curve([{ x: -LEAD_IN, y: first.y + 18 }, first])} className="journey__line journey__line--lead" />
+                      <path d={curve([{ x: -leadIn, y: first.y + 26 }, first])} className="journey__line journey__line--lead" />
                       <path d={curve(points)} className="journey__line journey__line--ghost" />
                       <path d={curve(points)} pathLength={1} className="journey__line" />
                       <path d={curve([last, { x: last.x + step * 0.7, y: last.y - 24 }])} className="journey__line journey__line--ahead" />
