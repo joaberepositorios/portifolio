@@ -8,7 +8,7 @@ export function Projects() {
   return (
     <section id="projetos" className="section projects" aria-labelledby="projetos-title">
       <div className="container">
-        <SectionHead titleId="projetos-title" title="Projetos" lead="Soluções reais para problemas reais." />
+        <SectionHead titleId="projetos-title" title="Projetos" />
 
         {/* Vitrine: imagem, categoria, título e descrição — sem tecnologias nem links.
             O primeiro projeto aparece em destaque; os demais, em duas colunas.
