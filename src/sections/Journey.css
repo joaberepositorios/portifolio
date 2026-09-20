@@ -8,7 +8,8 @@
 
 /* A linha chega ao último nó em p = 0,8 (o mesmo teto dos limiares `--t`), não em p = 1. */
 .journey__stage {
-  --line: clamp(0, var(--p, 1) / 0.8, 1);
+  /* (Não pode se chamar --line: esse é o nome da cor das linhas do tema.) */
+  --drawn: clamp(0, var(--p, 1) / 0.8, 1);
 }
 
 /* --- Padrão (telas estreitas): linha do tempo vertical que cresce com a rolagem ---------- */
@@ -36,7 +37,7 @@
 
 .journey__list::after {
   background: var(--text);
-  transform: scaleY(var(--line, 1));
+  transform: scaleY(var(--drawn, 1));
   transform-origin: top;
 }
 
@@ -104,7 +105,7 @@
     stroke: var(--text);
     stroke-width: 1.4;
     stroke-dasharray: 1;
-    stroke-dashoffset: calc(1 - var(--line, 1));
+    stroke-dashoffset: calc(1 - var(--drawn, 1));
   }
 
   /* O caminho inteiro, bem apagado, fica visível desde o início: mostra para onde a linha vai. */
@@ -146,14 +147,14 @@
     left: 0;
     width: 11px;
     height: 11px;
-    margin: -5.5px 0 0 -5.5px;
     border-radius: 50%;
     background: var(--accent);
     box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 16%, transparent);
+    offset-anchor: center; /* o centro do ponto anda sobre a curva */
     offset-rotate: 0deg;
-    offset-distance: calc(var(--line, 1) * 100%);
+    offset-distance: calc(var(--drawn, 1) * 100%);
     /* some ao chegar ao fim, quando a linha já está toda desenhada */
-    opacity: clamp(0, (0.985 - var(--line, 1)) * 40, 1);
+    opacity: clamp(0, (0.985 - var(--drawn, 1)) * 40, 1);
   }
 
   .journey__list {
