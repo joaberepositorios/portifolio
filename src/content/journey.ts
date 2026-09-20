@@ -15,7 +15,7 @@ export const journey: JourneyContent = {
       title: 'GRVA — Grupo de Realidade Virtual e Aumentada',
       organization: 'Pesquisa e desenvolvimento · desde 2026',
       summary:
-        'Treinamento de agentes de robótica com aprendizado de máquina, Python e bibliotecas de IA aplicadas a simulação, apoio a novos integrantes e documentação técnica.',
+        'Adquirindo expertise nas áreas de treinamento de robôs por aprendizagem por reforço, usando NVIDIA Isaac Sim, Isaac Lab e MuJoCo.',
     },
     {
       period: 'IBI',
