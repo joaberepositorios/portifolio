@@ -65,7 +65,7 @@ export function Journey() {
   return (
     <section id="jornada" className="section journey" aria-labelledby="jornada-title">
       <div className="container">
-        <SectionHead titleId="jornada-title" title="Minha jornada" lead={lead} />
+        <SectionHead titleId="jornada-title" title="Trabalho" lead={lead} />
 
         <div className="journey__stage" data-scrub data-scrub-start="0.88" data-scrub-end="0.4">
           <div ref={boxRef} className="journey__curve" aria-hidden="true">

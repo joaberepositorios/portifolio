@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { SECTIONS, SECTION_IDS, site } from '../content/site'
 import { useActiveSection } from '../hooks/useActiveSection'
+import { scrollTop } from '../lib/measure'
 import { onScrollFrame } from '../lib/scroll'
 import './Header.css'
 
@@ -13,7 +14,8 @@ export function Header() {
     const header = headerRef.current
     if (!header) return
     return onScrollFrame(() => {
-      header.dataset.scrolled = window.scrollY > 8 ? 'true' : 'false'
+      const scrolled = scrollTop() > 8 ? 'true' : 'false'
+      if (header.dataset.scrolled !== scrolled) header.dataset.scrolled = scrolled
     })
   }, [])
 

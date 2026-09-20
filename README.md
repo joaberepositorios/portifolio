@@ -62,17 +62,23 @@ enquanto atravessa a tela, e o CSS decide o que fazer com ela; rolar para cima d
 - **Títulos** se montam letra a letra.
 - **Jornada:** a rolagem desenha a curva; um ponto viaja sobre ela e cada etapa
   acende quando ele chega (no celular, a linha vertical cresce).
-- **Projetos:** a moldura abre como uma cortina e o texto entra em cascata.
+- **Projetos:** a moldura abre como uma cortina e o texto entra em cascata. No celular a mesma
+  entrada acontece de uma vez, por transição (`data-scrub-touch="step"`), para a rolagem ficar lisa.
 - **Artigos & certificados:** cada linha é riscada da esquerda para a direita.
 - **Skills:** os ícones chegam espalhados e girando, e se encaixam na grade.
 
 Com `prefers-reduced-motion`, `--p` vale 1 desde o início: tudo aparece pronto.
 
+**Fluidez no celular.** Durante a rolagem o código não lê o layout: as posições são medidas
+fora dela (`src/lib/measure.ts`) e `scrollY` é lido uma vez por quadro. As imagens dos projetos
+são decodificadas de antemão, com o navegador ocioso, e no toque nada usa `clip-path` animado
+(ele repinta a imagem a cada quadro) — só `opacity` e `transform`, que rodam na GPU.
+
 ## As cinco seções
 
 1. **Home** — o nome (em caixa alta), a frase "Engenharia de Computação com Inteligência Artificial", o botão "Ver projetos" e a simulação do robô. (`eyebrow` e `intro` são opcionais em `site.ts`.)
 2. **Projetos** — uma vitrine: imagem, categoria, título e descrição (sem tecnologias nem links). O primeiro projeto em destaque, os demais em duas colunas. Sem imagem, uma capa desenhada (painel escuro) é exibida.
-3. **Jornada** — uma linha curva atravessa a seção e cada etapa pende de um nó;
+3. **Trabalho** (a jornada profissional; `src/sections/Journey.tsx`) — uma linha curva atravessa a seção e cada etapa pende de um nó;
    o trecho pontilhado no fim aponta para o que vem depois. No celular vira uma
    linha do tempo vertical.
 4. **Artigos & Certificados** — em "L": os artigos à esquerda; os certificados descem pela direita e, quando os artigos acabam, ocupam também o espaço de baixo. Artigos abrem no leitor interno

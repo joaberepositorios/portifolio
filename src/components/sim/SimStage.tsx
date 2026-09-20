@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { scrollTop } from '../../lib/measure'
 import { useReducedMotion } from '../../hooks/useMediaQuery'
 import { HeroScene } from '../HeroScene'
 import type { SimHandle } from './simulation'
@@ -30,7 +31,7 @@ export function SimStage() {
     const onPointer = (e: PointerEvent) => {
       if (e.pointerType !== 'touch') handle?.setPointer((e.clientX / window.innerWidth) * 2 - 1)
     }
-    const onScroll = () => handle?.setScroll(Math.min(Math.max(window.scrollY / (window.innerHeight * 0.8), 0), 1))
+    const onScroll = () => handle?.setScroll(Math.min(Math.max(scrollTop() / (window.innerHeight * 0.8), 0), 1))
     const visibility = new IntersectionObserver(([entry]) => handle?.setVisible(entry.isIntersecting))
 
     import('./simulation')

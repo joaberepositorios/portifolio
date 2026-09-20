@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SECTION_IDS } from '../content/site'
+import { scrollTop } from '../lib/measure'
 import { onScrollFrame } from '../lib/scroll'
 import './ScrollProgress.css'
 
@@ -11,11 +12,14 @@ import './ScrollProgress.css'
 export function ScrollProgress() {
   const rootRef = useRef<HTMLDivElement>(null)
   const [marks, setMarks] = useState<number[]>([])
+  // Altura rolável da página: medida fora da rolagem (`scrollHeight` a cada quadro força o layout).
+  const maxRef = useRef(0)
 
   // Onde cada seção começa, como fração da rolagem total.
   useEffect(() => {
     const measure = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight
+      maxRef.current = max
       if (max <= 0) return
       setMarks(
         SECTION_IDS.map((id) => {
@@ -27,17 +31,23 @@ export function ScrollProgress() {
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(document.body)
-    return () => observer.disconnect()
+    window.addEventListener('resize', measure)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+    }
   }, [])
 
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
+    const page = document.documentElement
     return onScrollFrame(() => {
-      const max = document.documentElement.scrollHeight - window.innerHeight
-      const progress = max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0
+      const max = maxRef.current
+      const progress = max > 0 ? Math.min(Math.max(scrollTop() / max, 0), 1) : 0
       root.style.setProperty('--progress', progress.toFixed(4))
-      document.documentElement.dataset.pageEnd = progress > 0.985 ? 'true' : 'false'
+      const pageEnd = progress > 0.985 ? 'true' : 'false'
+      if (page.dataset.pageEnd !== pageEnd) page.dataset.pageEnd = pageEnd
     })
   }, [])
 

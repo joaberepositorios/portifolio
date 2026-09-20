@@ -30,7 +30,7 @@ export function whatsappHref(): string {
 export const SECTIONS = [
   { id: 'home', label: 'Home' },
   { id: 'projetos', label: 'Projetos' },
-  { id: 'jornada', label: 'Jornada' },
+  { id: 'jornada', label: 'Trabalho' },
   { id: 'artigos', label: 'Artigos & Certificados' },
   { id: 'skills', label: 'Skills' },
 ] as const
