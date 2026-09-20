@@ -1,0 +1,36 @@
+.progress {
+  position: fixed;
+  top: var(--header);
+  left: 0;
+  right: 0;
+  z-index: 61;
+  height: 0;
+  padding-inline: var(--gutter);
+  pointer-events: none;
+}
+
+.progress__track {
+  position: relative;
+  max-width: var(--max);
+  margin-inline: auto;
+  height: 0;
+}
+
+.progress__fill {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 100%;
+  height: 1.5px;
+  background: var(--accent);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+}
+
+.progress__mark {
+  position: absolute;
+  top: -4px;
+  width: 1px;
+  height: 7px;
+  background: var(--line-strong);
+}

@@ -1,425 +1,148 @@
-# Portfólio
+# Portfólio de engenharia
 
-Site estático de página única — sem framework, sem build, sem dependência em runtime.
-O fundo é um **Unitree Go2 renderizado em WebGL** que **se desmonta conforme a página desce**:
-a malha e as cores vêm do URDF oficial, e cada grupo de material do modelo é uma peça
-independente na vista explodida.
+Site pessoal de cinco seções. Vite + React + TypeScript, CSS puro.
+O conteúdo (nome, jornada, projetos com capturas de tela, artigos, skills e links) veio
+do outro portfólio, em `Pessoais Projetos/Portifóilio`; edite em `src/content/`.
+Os certificados (AEB — Programação de Algoritmos em Python; ONC 2025 — ouro; OBLI 2025.1 — bronze; OBA 2024 e 2025) saíram dos PDFs `Python AEB` e `certificados`. A OBA (2024 e 2025) é uma entrada só, com o certificado empilhado e a marca "2×" (`count: 2`). Ainda falta o **número do WhatsApp**.
 
-## Como o código está organizado
+## Como abrir — sem servidor
 
-Cada arquivo é um script clássico que se registra em `window.Portfolio` e é carregado com
-`defer`, na ordem declarada no `index.html`. Nada de bundler: **basta abrir o `index.html`**,
-inclusive por duplo clique — módulos ES seriam bloqueados por `file://`.
+**Dê dois cliques em `Portfolio.html`.** É um arquivo único e autossuficiente
+(~1,4 MB): código, estilos, fontes, ícones e a simulação 3D estão embutidos.
+Funciona direto do disco, offline, e pode ser enviado a qualquer hospedagem.
 
-```
-index.html
-curr.html           currículo: editável na página e exportável em uma folha A4
-css/
-  tokens.css        variáveis de cor, forma, tipografia e ritmo — a única fonte desses valores
-  base.css          reset, tipografia e peças reutilizadas (chips, botões, revelação)
-  layout.css        barra de seções, abertura, botões e o esqueleto das seções
-  components.css    linha do tempo, projetos, artigos, competências e modal
-js/
-  content.js        todo o conteúdo editável do site
-  main.js           ponto de entrada: monta o conteúdo e liga os efeitos
-  core/
-    dom.js          construção de DOM sem concatenar HTML
-    ease.js         clamp, smoothstep, amortecimento e ruído determinístico
-    ticker.js       um único requestAnimationFrame para o site inteiro
-    geometry.js     medidas da página em cache, refeitas fora do laço de animação
-    scroll.js       estado de rolagem compartilhado e deslize amortecido
-  ui/
-    sections.js     monta experiências, projetos, artigos, competências e currículo
-    backdrop.js     campo de bolas e bolinhas azuis à deriva, em canvas 2D
-    badges.js       selo de cada tecnologia: logo, cor de fundo e contraste
-    tech-icons.js   logos oficiais (GERADO por tools/gera-icones.mjs)
-    reveal.js       revelação dos blocos ao entrar em tela
-    modal.js        vídeo e PDF dentro do site, com foco preso e rolagem travada
-    chrome.js       barra do topo, trilho da linha do tempo e a câmera do ponteiro
-  robot/
-    index.js        cena: câmera, laço de desenho e a coreografia ligada à rolagem
-    rig.js          esqueleto e marcha, direto do URDF
-    explode.js      a desmontagem: quem sai, quando, para onde e girando quanto
-    guides.js       as linhas tracejadas que ligam cada peça ao encaixe
-    gl.js           contexto, programas e envio das malhas para a GPU
-    math.js         matrizes 4x4 com pool de rascunho (o laço não aloca)
-    shaders.js      GLSL da superfície e das guias
-  model/go2-mesh.js malhas geradas por tools/dae2web.py (1,1 MB)
-tools/
-  dae2web.py        conversor Collada -> pacote binário das malhas
-  gera-icones.mjs   baixa os logos das tecnologias e grava js/ui/tech-icons.js
+`Portfolio.html` é gerado — não edite à mão. Depois de mudar algo em `src/`:
+
+```bash
+npm install       # só na primeira vez
+npm run build     # gera de novo o Portfolio.html
 ```
 
-Três princípios de sustentação:
-
-- **Uma exceção na rolagem, só na descida.** Na abertura, um gesto para baixo leva a página
-  inteira até as Experiências acadêmicas. É o único salto automático do site — **a volta é rolagem
-  comum**, como todo o resto. Um gesto para cima cancela o salto no meio do caminho, e a
-  trava se solta assim que a página chega perto do destino (senão o último pixel de
-  amortecimento engoliria o gesto seguinte).
-- **Rolagem livre, lenta e fluida.** A roda empurra um alvo e a página persegue esse alvo
-  com amortecimento exponencial (τ 0,26; cada volta vale 0,78 da distância). τ é o que
-  separa lento de arrastado: alto demais e a página parece presa ao gesto anterior.
-- **Sem borrão de movimento e sem filtro.** Não há `filter` em lugar nenhum: desfocar
-  camadas de tela cheia por composição era o item que mais travava a página. Não há paradas
-  obrigatórias — houve uma versão com elas, e travava a página enquanto o dedo continuasse
-  na roda. Uma rolagem vinda de fora (barra, teclado, âncora) cancela o deslize, e a
-  distinção entre "fomos nós" e "foi de fora" é por **posição**, não por marcador: os
-  eventos de rolagem são agrupados pelo navegador e um booleano seria consumido pelo
-  primeiro deles, cancelando a própria animação no meio.
-- **Um laço só.** `core/ticker.js` mantém um único `requestAnimationFrame`; rolagem, menu,
-  barra, trilho e robô são assinantes dele. Todo amortecimento é por tempo real
-  (`1 - exp(-dt/τ)`), então a sensação é a mesma em 60, 120 ou 144 Hz e nada acelera
-  quando a taxa cai.
-- **Nada de layout dentro do laço.** As medidas ficam em `core/geometry.js` e são refeitas
-  ao carregar, ao redimensionar e quando o conteúdo muda de altura (`ResizeObserver`).
-  O laço só lê números prontos.
-- **Conteúdo entra como texto.** `core/dom.js` cria nós de DOM; nenhuma string de HTML é
-  montada com dados, então não há o que escapar à mão.
-- **Um namespace só.** Cada arquivo é um IIFE que lê o que precisa de `window.Portfolio` e
-  devolve sua parte no fim (`P.chrome = { init }`). Nada vaza para o escopo global.
+(`npm run dev` dá recarregamento automático enquanto você edita — opcional.
+O `index.html` da raiz é só o molde do código-fonte, não o site.)
 
 ## Desenho
 
-- **Projetos em grade de três.** Cartões compactos, três por linha: mostra o conjunto de
-  uma vez e economiza a altura que o formato anterior gastava com um projeto por tela.
-- **O cartão de projeto é vitrine, não catálogo.** Uma imagem da tela do projeto, o
-  título e uma linha do que ele faz — sem etiqueta de linguagem, sem botão de acesso e
-  **sem link escondido na imagem**, que seria um destino sem aviso nenhum. As capas são
-  tiradas do projeto rodando e guardadas em `assets/img/`; o endereço de cada um continua
-  em `js/content.js`, à espera do dia em que fizer sentido voltar. Um arquivo de imagem
-  que suma devolve o cartão ao acabamento de espera em vez de mostrar imagem quebrada.
-- **Cada tecnologia é um cartão com barra de nível.** A nota vem de `js/content.js` e
-  pode estar vazia: nesse caso o cartão diz **"a definir"** em vez de inventar um número —
-  autoavaliação é sua, não minha.
-- **O contato é um `mailto:`, não um formulário de mentira.** O botão monta assunto e
-  corpo e entrega ao programa de e-mail de quem escreveu. Sem servidor, sem serviço de
-  terceiro, sem promessa de envio que a página não pode cumprir: enquanto
-  `contato.email` estiver vazio, ela diz isso na cara.
-- **Artigos ficam em exibição, e só.** A capa é uma imagem da primeira página em
-  resolução baixa — mostra que o trabalho existe, sem entregar o texto —, e **não há PDF
-  servido**: sem arquivo no site, não há endereço para abrir ou baixar. O cartão não é
-  clicável, não tem botão, e a seção some na impressão.
-- **Isso não é proteção, e o código não finge que é.** Uma imagem que aparece na tela pode
-  ser salva ou fotografada. O que dá para fazer é não servir o documento e não facilitar o
-  resto: sem menu de contexto na capa, sem arrastar, sem seleção.
+Baseado na referência visual fornecida, na versão clara: **fundo branco**, tinta
+azul-marinho, títulos em serifa (Source Serif 4) e texto em Geist. O hero traz uma
+**simulação 3D rodando ao vivo** (three.js, `src/components/sim/`), no traço
+branco-e-azul do site: um quadrúpede nas proporções do Unitree Go2 anda em trote
+por um ambiente virtual em grade que some numa névoa branca.
 
-- **Sem caixa branca com sombra fora dos cartões.** O que separa os blocos são réguas de
-  1px, espaço e tipografia. A navegação continua sendo a rolagem — a barra do topo é atalho,
-  não moldura: sem fundo próprio no escuro, sem sombra, sem borda em volta. As competências
-  viraram linhas e o currículo virou uma faixa de fecho.
-- **Tipografia de instrumento.** Corpo curto (13,5–14,5 px), entrelinha larga e peso leve
-  — 300 no título grande, 400 no resto. Números, rótulos e ações vão em monoespaçada do
-  sistema (`ui-monospace`), sem baixar fonte nenhuma: é o que dá o ar técnico sem pesar
-  no carregamento.
-- **Paleta própria.** Papel azulado e claro (`#eef2fa`), tinta grafite (`#0d1220`) e **um
-  acento só: azul escuro** (`#1d3a6b`). O papel é claro de propósito: a leitura acontece
-  sobre ele, e tudo o que é decoração fica abaixo em valor — inclusive o campo de bolinhas,
-  que perde quase metade da força sobre o papel e só brilha sobre a abertura escura. Sobre o escuro da abertura entra o mesmo azul um passo
-  mais claro (`#5b8ade`) — sem isso não há contraste de leitura. Onde faziam falta dois
-  níveis (as etiquetas dos artigos, por exemplo), a diferença é de tom, não de cor: azul
-  e grafite.
-- **Fundo de linhas tecnológicas.** `ui/backdrop.js` desenha traços de circuito — polilinhas
-  com dobras em ângulo reto, nó na ponta e um tracejado correndo por cima, como sinal
-  passando. Nada de formas circulares soltas. Cada traço tem profundidade própria, que rege
-  velocidade em relação à rolagem, comprimento, opacidade e em que plano ele vive; e o campo
-  se repete sem emenda (cada corpo reentra pela borda oposta enquanto está fora de tela).
-- **O fundo é fundo.** As linhas e as estrelas foram rebaixadas de propósito, para se
-  perceberem pelo canto do olho e não disputarem com o texto. Uma cor só, o azul claro,
-  agora que a página inteira é escura. A
-  curva `opening()` ficou responsável apenas pelo campo de estrelas, que vive na primeira
-  tela e se apaga conforme a leitura desce. Com `prefers-reduced-motion` o campo é pintado
-  uma vez e fica parado.
-- **Parallax por camadas.** `ui/parallax.js` desloca cada camada em relação ao centro da
-  tela conforme o fator em `data-parallax` (título da seção 0,05; mídia do projeto 0,085
-  contra o texto em −0,05; rótulos 0,03; número de fundo 0,26).
-- **Sem numeração e sem substituto.** Nada é contado — saíram os números das seções, dos
-  artigos, dos projetos e das competências — e nada entrou no lugar: nem marca d'água, nem
-  traço. Cada bloco começa direto no título. Quem carrega o parallax na parte clara passou
-  a ser só o campo de bolas nos dois planos, mais os próprios blocos de conteúdo.
-- **Profundidade em três planos.** O campo de bolas e bolinhas é desenhado em **dois
-  canvas**: um atrás do conteúdo e outro **à frente dele**. Os corpos da frente são os mais
-  próximos — grandes, quase transparentes e rápidos; os de trás, pequenos, nítidos e
-  lentos. A profundidade de cada corpo rege velocidade, raio, opacidade e em que plano ele
-  vive. Sem nada passando por cima do texto, todo o movimento aconteceria atrás e a página
-  continuaria achatada. O valor sai como `--py` e o CSS **soma** ao
-  deslocamento da revelação, então um efeito não apaga o outro. Terminada a entrada, o
-  bloco é marcado como assentado e o transform deixa de ser animado — o parallax responde
-  no mesmo quadro, sem arrasto.
-- **O site é escuro do começo ao fim.** Não há mais transição para o papel: o
-  fundo é cor chapada e o texto é claro em toda a página. Os nomes das variáveis em
-  `tokens.css` continuam os de antes — `--paper` é o fundo e `--ink` é o texto, seja qual
-  for o tema —, então trocar de tema é trocar aquele bloco, e nada mais.
-- **A abertura é em duas colunas**, como um cartão de visita: saudação, nome, a função
-  entre `</ >`, o texto curto, dois convites (contato e projetos) e as redes; do outro
-  lado, o retrato num anel aceso. Sem foto o anel fica e as iniciais entram no lugar —
-  marca o espaço em vez de deixar um buraco redondo.
-- **A profundidade vem das linhas e de um campo de estrelas** — as fracas quase paradas,
-  as fortes acompanhando a rolagem. Sem cintilação: piscar atrás do nome deixa a leitura
-  inquieta.
-- **O ponteiro desloca o campo alguns pixels**, o bastante para o fundo não parecer
-  colado no vidro, e o nome anda 3px ao contrário. Um ouvinte de `pointermove` guardando
-  dois números; quem desenha é o laço que já existia.
-- **As estrelas são só da abertura.** Fora da primeira tela elas nem entram no laço. São 90
-  pontos de 1 a 2 pixels, com a cor reaproveitada em 24 faixas de brilho — sem isso
-  seriam noventa strings de `rgba()` por repintura. Custo medido: indistinguível de zero.
-- **Barra de seções, fixa no topo.** Quatro entradas de uma palavra — Experiências,
-  Projetos, Artigos, Competências. Sem ícone e sem caixa: só a palavra.
-  **A cor troca com o fundo, não em cima dele**: `color-mix` interpola branco e
-  clara em toda a página. A faixa opaca atrás dela só entra quando a página sai do lugar:
-  na abertura a barra flutua sobre o campo de estrelas, e no resto ela precisa de base para
-  o texto não disputar com o conteúdo que passa por baixo.
-- **A entrada da seção que está sendo lida acende.** Um `IntersectionObserver` com a janela
-  cortada em 45% em cima e embaixo resolve isso por evento: nada entra no laço de quadro,
-  que é onde o custo apareceria.
-- **Uma palavra cabe em qualquer tela.** Abaixo de 560px o que aperta é o espaço entre
-  elas, não o texto: as quatro continuam numa linha só, sem transbordo horizontal.
-- **A folga do topo subiu para 76px.** É o que faz o título da seção pousar embaixo da
-  barra em vez de atrás dela. A última seção pousa mais abaixo porque a página acaba: o
-  navegador limita a rolagem, e não há como levá-la ao topo sem inventar espaço vazio.
-- **O currículo sai sempre em uma folha.** `curr.html` mede a si mesmo antes de imprimir:
-  as regras do `@media print` são copiadas para uma classe temporária, a folha é medida na
-  largura real do papel (188mm) e, se passar dos 271mm de altura útil, um `zoom` proporcional
-  entra em cena. É `zoom` e não `transform` de propósito — a paginação enxerga zoom, e
-  encolher com `transform` deixaria a segunda página em branco do mesmo jeito. Com o texto
-  atual o fator é 1: o documento ocupa 72% da folha e sai no tamanho projetado.
-- **A última seção exibe o próprio currículo.** Não um cartão falando dele: a folha
-  aparece no centro da seção, grande o bastante para se ler, montada a partir de
-  `curr.html?vitrine=1` — a mesma página, sem a barra de edição. **Uma ação só, abrir**:
-  o documento se lê dentro do site, num modal rolável, e não há caminho de download na
-  vitrine. A prévia só é criada quando chega à tela, e a redução é calculada em JS porque
-  `scale()` exige número puro: `calc(620px / 794)` devolveria pixel e o navegador
-  descartaria a regra sem avisar.
-- **Duas divisórias no currículo, e só duas:** a horizontal que fecha o objetivo e a vertical
-  que separa a coluna lateral. O resto do que separava blocos virou espaço.
-- **Ícones.** Um sprite SVG no `index.html` (traço único, herdando a cor do texto) marca
-  o play dos projetos, o selo de PDF na capa dos artigos e as quatro redes da abertura — a
-  barra do topo não usa nenhum.
-  As seções abrem direto no título: a faixa de ícone e régua que existia acima deles saiu.
-- **Competências em três frentes.** *Linguagens*, *Softwares* e *Profissionais*. Grupo em
-  cima, itens em sequência embaixo — cada tecnologia com o **logo oficial** num quadrado da
-  cor da marca. As competências profissionais não têm logo e não ganham um inventado: vão
-  como texto, com um traço curto no lugar do selo para a coluna continuar alinhada.
-- **Os logos são locais.** `tools/gera-icones.mjs` baixa uma vez (Simple Icons, CC0; e
-  devicon, MIT, para o C#) e grava os
-  caminhos em `ui/tech-icons.js`. Em runtime **nada é buscado**: o site continua abrindo do
-  disco e funcionando sem rede. Para acrescentar tecnologias, some o slug na lista do
-  gerador e rode `node tools/gera-icones.mjs`.
-- **Um caminho só, uma cor só.** O selo pinta um `path` monocromático, então arte em
-  camadas não serve: o VS Code do devicon tem máscara e três formas coloridas e, achatado,
-  virava um borrão azul. O gerador agora **recusa** SVG com máscara, gradiente ou mais de
-  um caminho, e o VS Code vem do Simple Icons v11 — a última versão antes de a marca ser
-  retirada, já desenhada para uma cor só.
-- **Wordmark não vira quadradinho.** Logos largos e baixos (o VEGAS, do Sony Vegas)
-  sumiriam espremidos em 26px. A caixa real deles foi medida no navegador e o `viewBox`
-  vem apertado nela; quando a proporção passa de 2, o selo se alarga em retângulo e o
-  logo continua legível.
-- **Contraste automático.** A cor do logo (claro ou escuro) sai da luminância da própria
-  marca, sem tabela manual: o amarelo do JavaScript recebe traço escuro, o preto do Java
-  recebe traço claro. Marca quase branca (Unity) inverte — quadrado escuro, logo claro. E
-  tecnologia sem logo na tabela vira um selo de iniciais em vez de um buraco.
-- **A abertura ocupa a tela inteira** porque é a composição de entrada: nome, função,
-  convite e retrato lado a lado, sem nada disputando espaço. A tela cheia garante que a próxima seção só chegue
-  quando o papel já clareou.
-- **Sinal de que há mais abaixo.** A chamada de rolagem fica presa ao rodapé da abertura,
-  com um traço que desce sem parar — é o que diz, sem texto, que a página continua. Ela
-  desvanece conforme a leitura desce.
-## Desempenho
+- **Marcha de verdade:** trote com cinemática inversa — as patas de apoio ficam
+  cravadas no chão, as em balanço descrevem um arco até a próxima pegada.
+- **LiDAR:** um feixe gira em torno do robô e acende uma nuvem de pontos nas
+  faces dos obstáculos voltadas para ele; os pontos esmaecem depois.
+- O chão fica limpo: só a grade, os anéis de alcance e o feixe do LiDAR.
+- O ponteiro gira levemente a câmera. A simulação **pausa fora da tela** e com a
+  aba oculta; com `prefers-reduced-motion` mostra um único quadro parado; sem
+  WebGL, cai para um desenho SVG da mesma cena (`HeroScene.tsx`).
 
-O robô é, de longe, o item mais caro da página: 28 chamadas de desenho e 68 mil triângulos
-por quadro. Medindo o tempo de quadro com e sem ele, **ele responde por cerca de 90% do
-custo**. O que o mantém sob controle:
+É honesto dizer o que ela não é: o modelo é **procedural** (caixas e cilindros),
+não o CAD da Unitree, e não há física — é cinemática. Os parâmetros (velocidade,
+período do trote, alcance do LiDAR, trajetória) ficam no topo de `simulation.ts`. Tipografia contida
+(o maior texto é o nome, ~64 px no desktop), uma cor de destaque discreta e
+fora do hero, animações mínimas (rolagem suave, fade curto na entrada, a curva
+da jornada se desenha uma vez). `prefers-reduced-motion` desliga as animações. As variáveis
+ficam no topo de `src/styles/global.css`.
 
-- **Sem MSAA.** Multiplicar amostras por pixel é o item mais caro do desenho, e a
-  suavização já vem do supersampling. Foi a maior economia isolada.
-- **Alvo de render com teto de 2,4 MP**, mais o limite real da GPU (`MAX_RENDERBUFFER_SIZE`).
-- **30 quadros por segundo** para o robô e para o fundo: os dois têm movimento lento, e a
-  metade das repinturas não muda nada na tela.
-- **Vigia adaptativo.** Não dá para saber em que placa o site vai rodar. Se os quadros ficam
-  longos por tempo suficiente, o robô encolhe; insistindo, ele sai de cena — e volta sozinho
-  se a máquina se recuperar. A conta é assimétrica (um quadro bom apaga dois ruins), então
-  um engasgo isolado não derruba a qualidade.
-- **Perda de contexto é reconstruída.** Programas, buffers e VAOs morrem com o contexto;
-  o pacote de malhas fica guardado e tudo é refeito no `webglcontextrestored`. Antes o robô
-  sumia para sempre — era isso que acontecia quando a GPU não aguentava o alvo de render.
-- **Nada de `filter` em camada de tela cheia**, e escritas no DOM por quadro só quando o
-  valor muda de verdade.
-- **Caminhos prontos no fundo.** Cada traço de circuito é um `Path2D` montado uma vez; o
-  quadro só translada e pinta.
+**Parallax** (`src/lib/parallax.ts`): o hero se separa em camadas ao rolar (a
+simulação fica para trás, o texto sobe mais rápido e esmaece), os títulos de
+seção passam um pouco à frente do conteúdo, e as imagens dos projetos deslizam
+dentro das molduras. Qualquer elemento entra com `data-parallax="0.1"`.
+Desligado com `prefers-reduced-motion`.
 
-## O robô
+**Animações conduzidas pela rolagem** (`src/lib/scrub.ts`): quem rola "opera" a
+página. Cada elemento com `data-scrub` recebe uma variável CSS `--p` (0→1)
+enquanto atravessa a tela, e o CSS decide o que fazer com ela; rolar para cima desfaz.
 
-- **Geometria e materiais originais.** As malhas `base`, `hip`, `thigh`, `thigh_mirror`,
-  `calf` e `calf_mirror` vêm dos `.dae` do
-  [go2_description](https://github.com/unitreerobotics/unitree_ros/tree/master/robots/go2_description).
-  As cores são as difusas dos próprios materiais — nada foi estilizado. `foot.dae` não é
-  usado: a ponta preta da pata já faz parte de `calf.dae` (grupo *black foot end*), e é
-  justamente ela que sai primeiro na desmontagem.
-- **Cinemática do URDF.** Quadris em (±0,1934, ±0,0465), coxa e canela de 0,213 m, eixo do
-  quadril em X, coxa e joelho em Y, malhas espelhadas e rotações de visual (`FR` roll π,
-  `RL` pitch π, `RR` ambos) respeitadas. De pé, o quadril fica a 0,278 m do chão.
-- **Acabamento fosco.** Sem lóbulo especular nenhum: a difusa é *wrapped* (a luz contorna
-  a peça em vez de cair a pique), o ambiente tem dois tons — papel morno em cima, sombra
-  fria embaixo — e resta apenas um contorno largo e tênue. É plástico fosco de robô, não
-  plástico polido.
-- **No celular ele é fundo.** Abaixo de 760px o robô continua aparecendo — atrás do
-  texto da seção —, mas com metade da presença e desenhado em **metade dos pixels**, que o
-  navegador estica de volta para a tela. É daí que vem o aspecto macio: nada de
-  `filter: blur` sobre WebGL, que foi o que derrubou o contexto desta página uma vez. A
-  câmera também recua, para o bicho caber inteiro na tela estreita. Menos pixels no
-  telefone é, de quebra, mais barato.
-- **Acabamento chapado, em três tons.** A superfície não tem mais estúdio de três
-  luzes, wrap, tonemap nem dither: uma direção de luz só, quantizada em luz, meia-luz e
-  sombra, mais um contorno largo para a peça não encostar no fundo escuro. A geometria é a
-  mesma — o que ficou mais simples foi o desenho dela, não o modelo.
-- **Chave, preenchimento e contraluz**, todos com wrap, os dois últimos francamente azuis.
-  Um ruído de meio nível (dither) quebra as faixas que apareciam nos degradês largos, já
-  que as normais chegam em `Int8`.
-- **Por que não three.js.** Os ganhos reais da biblioteca (sombras, IBL, pós-processamento)
-  custariam ~600 KB, quebrariam a abertura por duplo clique — o build ESM é bloqueado em
-  `file://` — e exigiriam reescrever rig, desmontagem e guias por cima da cena dela. Com a
-  malha já decimada em 68 mil triângulos e material fosco, o teto de qualidade aqui não
-  está no motor: está na malha e na luz.
-- **Enquadramento.** Vista de 3/4 de frente, lente longa de 24°, perspectiva discreta, de
-  foto de produto. Iluminação de três pontos (chave, preenchimento e contraluz) e
-  tonemap ACES.
-- **Nitidez, com teto.** MSAA mais supersampling: o canvas é renderizado acima da
-  resolução da tela (2,1× em telas 1×, 1,4× em alta densidade) e reduzido pelo navegador.
-  O tamanho é limitado por **6,5 MP de área** e pelo `MAX_RENDERBUFFER_SIZE` da GPU — com
-  MSAA cada pixel custa várias amostras em VRAM, e um alvo grande demais faz placa
-  integrada **perder o contexto**, deixando a tela sem robô e sem erro. Se a perda
-  acontecer mesmo assim, ela é absorvida (`webglcontextlost`) e a cena volta em qualidade
-  mínima, em vez de sumir.
-- **Custo controlado.** O pacote de malhas (1,1 MB, 68 mil triângulos) só é baixado quando
-  há WebGL2, a tela tem pelo menos 760 px e o navegador não está em economia de dados.
-  Fora disso o fundo simplesmente fica limpo.
+- **Linha de progresso** (`ScrollProgress`): uma linha fina sob o cabeçalho cresce conforme a
+  página rola, com um marco para cada seção. No fim da página, o botão do WhatsApp pulsa duas vezes.
+- **Hero:** a rolagem ergue a câmera da simulação até a vista aérea.
+- **Títulos** se montam letra a letra.
+- **Jornada:** a rolagem desenha a curva; um ponto viaja sobre ela e cada etapa
+  acende quando ele chega (no celular, a linha vertical cresce).
+- **Projetos:** a moldura abre como uma cortina e o texto entra em cascata.
+- **Artigos & certificados:** cada linha é riscada da esquerda para a direita.
+- **Skills:** os ícones chegam espalhados e girando, e se encaixam na grade.
 
-### A desmontagem
+Com `prefers-reduced-motion`, `--p` vale 1 desde o início: tudo aparece pronto.
 
-Cada grupo de material vira uma peça própria — 28 no total: 4 patas, 4 canelas, 8 metades de
-coxa, 8 de quadril, 3 módulos internos do corpo e o casco. A inscrição "Go2" é um grupo de
-material à parte no pacote, mas **não é peça**: é pintura sobre o casco, então viaja como
-grupo extra dele, com a mesma matriz. Tratá-la como peça fazia a letra descolar do corpo
-durante a desmontagem. A desmontagem é **função pura da
-rolagem**: subir a página remonta o robô, peça por peça, sem estado escondido.
+## As cinco seções
 
-- **Cascata das extremidades para o centro.** As patas soltam primeiro, depois canelas,
-  coxas, quadris, os módulos internos e, por último, o casco, que sobe abrindo o corpo.
-  Cada peça leva 38% do percurso para completar o caminho, com um atraso por perna, de modo
-  que as quatro não saem em bloco.
-- **A travessia é um arco.** Ele entra montado e trotando, se desmonta até o auge no meio
-  da seção (56% da janela) e **volta a se montar na aproximação de Projetos**: sai de cena
-  inteiro e trotando, não como um monte de peças soltas. Não há platô de "já desmontado" —
-  em qualquer ponto visível ele está montando ou desmontando, então subir a página também
-  nunca começa numa imagem parada.
-  E a peça solta nunca fica imóvel — além de se afastar pelo eixo de encaixe, ela respira
-  na distância, bamboleia de lado e gira devagar sem parar, tudo escalado pelo quanto ela
-  já saiu (peça montada continua firme no lugar).
-- **Direção de encaixe.** Ninguém sai numa direção qualquer: cada peça viaja pelo eixo em
-  que estava montada — a pata para baixo e para fora, a coxa lateralmente, o módulo do
-  corpo no sentido em que estava alojado — com um giro lento sobre o próprio centro.
-- **Guias.** Um traço pontilhado azul liga cada peça solta ao ponto de onde saiu, como num
-  desenho técnico. Tudo cabe em um buffer e uma chamada de desenho.
-- **A marcha para.** Enquanto o robô está inteiro ele trota (trote diagonal, regido pelo
-  tempo e pouco pela rolagem, para as pernas não chicotearem). Assim que a desmontagem
-  começa, a passada se fecha: pernas soltas não andam.
-- **A câmera acompanha.** A vista explodida ocupa mais espaço, então a câmera recua e gira
-  devagar para mostrar o conjunto inteiro, e a peça mais distante fica a menos de 0,8 m do
-  centro — dentro do quadro.
-- **Uma seção só.** O robô pertence às **Experiências acadêmicas** e a mais nada: a janela de
-  vida dele sai da caixa da própria seção — entra quando o topo dela chega a um terço da
-  tela, e some antes de Projetos. O portão de visibilidade é calculado com a rolagem
-  **real**, não com a amortecida, e o valor amortecido é preso à janela: sem isso, numa
-  rolagem rápida ele ficava para trás e o robô aparecia fora da seção. Há um teste que
-  varre a página inteira em passos de meia tela conferindo que isso não volta a acontecer. Na abertura e depois do currículo nada é desenhado (o
-  laço nem chega a desenhar quando a opacidade zera). Ele chega agachado, levanta enquanto
-  entra em cena, trota na faixa livre à direita — em telas largas o conteúdo do currículo
-  ocupa a coluna da esquerda justamente para isso — e se desmonta ao longo da seção.
-- **Ele repara em você.** Com mouse (e sem `prefers-reduced-motion`), o ponteiro gira o robô
-  de leve — ±0,16 rad de guinada e ±0,05 de inclinação, amortecidos, para acompanhar o
-  cursor sem colar nele. No toque isso não existe.
+1. **Home** — o nome (em caixa alta), a frase "Engenharia de Computação com Inteligência Artificial", o botão "Ver projetos" e a simulação do robô. (`eyebrow` e `intro` são opcionais em `site.ts`.)
+2. **Jornada** — uma linha curva atravessa a seção e cada etapa pende de um nó;
+   o trecho pontilhado no fim aponta para o que vem depois. No celular vira uma
+   linha do tempo vertical.
+3. **Projetos** — uma vitrine: imagem, categoria, título e descrição (sem tecnologias nem links). O primeiro projeto em destaque, os demais em duas colunas. Sem imagem, uma capa desenhada (painel escuro) é exibida.
+4. **Artigos & Certificados** — em "L": os artigos à esquerda; os certificados descem pela direita e, quando os artigos acabam, ocupam também o espaço de baixo. Artigos abrem no leitor interno
+   (`#/article/<slug>`, Esc/Voltar fecha) ou no site original (`externalUrl`).
+5. **Skills** — só os ícones, nas cores das marcas, em grade. O nome aparece ao
+   passar o mouse, no foco do teclado ou no toque.
 
-### Regerar o modelo
+Um único botão circular verde do WhatsApp (46 px) fica fixo no canto inferior direito.
+
+## Editando o conteúdo
+
+| Arquivo | Conteúdo |
+| --- | --- |
+| `src/content/site.ts` | Nome, sobrelinha, frase, apresentação, **número do WhatsApp**, links do rodapé |
+| `src/content/journey.ts` | Etapas da jornada (3 a 5 funciona melhor) |
+| `src/content/projects.ts` | Projetos (a categoria aparece como rótulo acima do título) |
+| `src/content/records.ts` | Artigos (com capa; viram link se tiverem `externalUrl` ou `body`) e certificados (a coluna só aparece quando há algum) |
+| `src/content/skills.ts` | Skills (só ícones) |
+| `src/content/techIcons.ts` | Ícones gerados a partir do outro portfólio — não editar à mão |
+
+**WhatsApp:** defina `whatsappNumber` em `site.ts` no formato internacional, ex.
+`'+55 31 91234-5678'`. Até lá, o botão abre o WhatsApp sem destinatário.
+
+**Imagens** (projetos): coloque em `src/assets/images/`, faça `import` no
+arquivo de conteúdo e mantenha cada uma abaixo de ~300 KB — elas são embutidas
+no HTML único.
+
+**Ícones:** as skills usam `techIcons` (extraídos do outro portfólio, que já tinha VS Code,
+Illustrator e Vegas). Para outras tecnologias: `import { siDocker } from 'simple-icons'`
+→ `{ name: 'Docker', icon: siDocker }`.
+
+**Imagens do outro portfólio:** as capturas dos projetos foram copiadas para
+`src/assets/images/` redimensionadas para 1400 px e recomprimidas (de ~700 KB para
+~240 KB no total), porque são embutidas no arquivo único. As capas dos artigos vieram como estavam.
+
+## Privacidade — certificados
+
+Vários certificados trazem **CPF impresso**. Antes de colocar a imagem de um certificado no
+site, cubra o CPF — os da AEB e da OBLI foram cobertos (as imagens em `src/assets/images/`
+já estão sem ele). Os PDFs originais não são embutidos no site e estão no `.gitignore`
+(`*.pdf`), para não irem parar num repositório público por engano; o ideal é guardá-los fora
+da pasta do projeto.
+
+## Publicar
+
+O site está no ar em **https://joaberepositorios.github.io/portifolio/** (GitHub Pages).
 
 ```
-python tools/dae2web.py <pasta com os .dae> js/model/go2-mesh.js
+npm run deploy
 ```
 
-O conversor lê o Collada, aplica as matrizes de nó, agrupa os triângulos por material,
-decima por agrupamento em grade até a meta de cada elo, reconstrói as normais preservando
-arestas vivas e grava posições `Int16` + normais `Int8` + índices `Uint32` em base64.
-Índices de 16 bits quando cabem: de 197 mil triângulos originais para 68 mil, mantendo o
-contorno. **O agrupamento por material é o que define as peças da desmontagem** — mudar os
-grupos muda o que se solta.
+Esse comando compila o projeto e envia o resultado (um único `index.html`) para o
+branch `gh-pages`, que é o que o GitHub Pages serve. Em cerca de um minuto o endereço
+mostra a versão nova.
 
-## Abertura escura
+- `main` guarda o código-fonte; `gh-pages` é só saída gerada (recriado a cada publicação).
+- Publicar não envia o código: depois de editar, faça também `git commit` e `git push`.
+- O portfólio anterior está guardado no branch `portfolio-antigo`
+  (e na tag `portfolio-antigo-2026-09-20`).
 
-O site é escuro do começo ao fim. O que muda ao longo da rolagem não é a cor do fundo,
-e sim o que vive sobre ele:
+Para outra hospedagem estática (Netlify Drop, Cloudflare Pages, Vercel), envie o
+`Portfolio.html` renomeado para `index.html`.
 
-- o **campo de estrelas** existe na primeira tela e se apaga conforme a leitura desce;
-- as **linhas de circuito** atravessam a página inteira, em planos de profundidade
-  diferentes;
-- o **robô** só vive na seção de experiências;
-- a **barra do topo** ganha uma faixa opaca assim que a página sai do lugar.
+## O que foi testado
 
+O `Portfolio.html` gerado, aberto do disco (`file://`) com a rede desligada, no
+Chrome headless em 360, 390, 820, 1366, 1440 e 1920 px: sem rolagem horizontal,
+sem erros no console; fontes carregam; a simulação roda, pausa fora da tela,
+respeita movimento reduzido e cai para o SVG sem WebGL; âncoras do menu param logo abaixo
+do cabeçalho; parallax; curva da jornada; leitor de artigos (foco entra, página de trás fica inerte, Esc fecha,
+foco volta); menu mobile.
 
-## Editar conteúdo
-
-Tudo em `js/content.js`:
-
-- `nome`, `lead`, `sobre`.
-- `redes` — LinkedIn, GitHub, Instagram e YouTube da abertura. Cole o endereço completo
-  (`https://...`); o ícone só vira link quando há endereço. Vazio, ele aparece apagado,
-  marcando o lugar sem fingir um link que não leva a nada.
-- `foto` — retrato da abertura. Aponte para um arquivo em `assets/img/` (recorte quadrado,
-  ~600 px de lado, fundo simples). Deixe vazio e nada é desenhado: nunca sobra uma moldura
-  vazia se o arquivo não existir ou falhar ao carregar.
-- `timeline` — **Experiências acadêmicas**, em dois níveis: a instituição é o tópico maior
-  (`titulo`, `papel`) e cada lugar onde você trabalhou é uma `frente` dentro dela, com
-  `titulo`, `papel` (função e período), `descricao` de uma linha e `topicos` — três a
-  quatro frases curtas, não parágrafos. Para acrescentar outro lugar, some uma frente; para
-  outra instituição, some um item na lista. A forma antiga, com `grupos`/`subtopicos` em
-  colunas, continua sendo desenhada se você preferir voltar a ela.
-- `projetos` — `video` (`src`, `youtubeId` ou `link`), `objetivo` e `stack`. Enquanto o
-  arquivo não existe, a área fica com acabamento de placeholder em vez de quebrar.
-- `artigos` — `titulo`, `autoria` (sua função no texto: autor principal, coautor…),
-  `evento` (onde saiu), `lingua`, `categoria`, `ano`, `descricao` e `pdf`. A capa do
-  cartão é a primeira página do próprio PDF; `capa` (imagem em `assets/img/`) substitui
-  essa prévia quando você preferir uma arte.
-- `competencias` — cada grupo tem `grupo` e `itens`. O nome do item é a chave do logo
-  (`ui/tech-icons.js`), sem diferenciar maiúsculas: "VS Code", "Adobe Illustrator", "Sony
-  Vegas". Marca nova pede o slug no gerador e um `node tools/gera-icones.mjs`. Grupo com
-  `tipo: 'texto'` sai sem selo — é o caso das competências profissionais.
-- `cv`.
-
-PDFs e vídeos abrem em modal dentro do site, sem download.
-
-## Acessibilidade
-
-Atalho para o conteúdo, foco visível, mídia de projeto operável por teclado, modal com
-`aria-modal`, foco preso enquanto aberto e devolvido ao elemento de origem ao fechar.
-Com `prefers-reduced-motion` a rolagem volta a ser a do navegador, as revelações não
-animam, o parallax nem é ligado e o robô para de respirar e de trotar.
-
-## Cache
-
-CSS e JS entram no HTML com um carimbo de versão (`?v=2`). Depois de editar, suba esse
-número no `index.html` para os visitantes buscarem os arquivos novos — sem ele, o
-navegador serve os antigos e a página parece não ter mudado. Em desenvolvimento, um
-Ctrl+Shift+R resolve.
-
-## Rodar
-
-Abrir o `index.html` no navegador já funciona — inclusive com duplo clique, direto do disco:
-conteúdo, robô, PDFs e vídeos carregam por `file://`.
-
-Para desenvolver (ou publicar), um servidor estático qualquer serve:
-
-```
-python -m http.server 8000
-```
-
-## Créditos
-
-Malhas do Go2 © Unitree Robotics, distribuídas em `unitree_ros` sob licença BSD 3-Clause.
+Não testado: aparelhos iOS/Android reais, leitores de tela, Safari/Firefox.

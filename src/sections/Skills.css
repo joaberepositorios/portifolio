@@ -1,0 +1,84 @@
+/* Só os ícones, numa grade regular. O nome aparece ao passar o mouse, no foco ou no toque. */
+.skills__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.75rem 1rem;
+  padding-block: 0.5rem;
+}
+
+.skill {
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--brand, var(--text));
+  border-radius: var(--radius);
+}
+
+/* A "peça": chega deslocada e girada, e se encaixa conforme a rolagem (--p).
+   `--on` aplica o atraso próprio de cada ícone e uma curva de desaceleração.            */
+.skill__piece {
+  --lin: clamp(0, (var(--p, 1) - var(--s, 0)) / 0.55, 1);
+  --on: calc(1 - (1 - var(--lin)) * (1 - var(--lin)));
+  display: block;
+  opacity: var(--lin);
+  transform: translate(calc((1 - var(--on)) * var(--dx, 0px)), calc((1 - var(--on)) * var(--dy, 0px)))
+    rotate(calc((1 - var(--on)) * var(--rot, 0deg))) scale(calc(0.5 + var(--on) * 0.5));
+}
+
+.skill__icon {
+  display: block;
+  width: 40px;
+  height: 40px;
+  transition: transform var(--t-med) var(--ease);
+}
+
+.skill__monogram {
+  display: grid;
+  place-items: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.skill__name {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  font-size: var(--fs-xs);
+  color: var(--text-soft);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  transition:
+    opacity var(--t-fast),
+    transform var(--t-med) var(--ease);
+}
+
+.skill:hover .skill__icon,
+.skill:focus .skill__icon {
+  transform: translateY(-3px);
+}
+
+.skill:hover .skill__name,
+.skill:focus .skill__name {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (min-width: 560px) {
+  .skills__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .skills__grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4.5rem 1rem;
+  }
+
+  .skill__icon {
+    width: 44px;
+    height: 44px;
+  }
+}

@@ -1,0 +1,340 @@
+/* --- Layout em "L" --------------------------------------------------------------------------
+   Telas largas: o bloco de artigos flutua à esquerda, com metade da largura. Cada certificado
+   flutua à direita, também com metade da largura: ao lado dos artigos eles se empilham na coluna
+   da direita; assim que os artigos acabam, o próximo encosta logo abaixo deles, à esquerda — e a
+   lista passa a preencher as duas colunas, formando o "L".
+   Funciona com qualquer quantidade de artigos e certificados, sem JavaScript.               */
+
+.records__flow {
+  --gap: clamp(2.5rem, 6vw, 5rem);
+}
+
+.records__articles {
+  margin-bottom: 3.5rem;
+}
+
+.records__heading--certificates {
+  margin-top: 0;
+}
+
+@media (min-width: 900px) {
+  .records__flow::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .records__articles {
+    float: left;
+    width: 50%;
+    margin-bottom: 0;
+    padding-right: calc(var(--gap) / 2);
+  }
+
+  .records__heading--certificates {
+    margin-left: calc(50% + var(--gap) / 2);
+  }
+
+  /* A lista avança meia-calha para cada lado; cada item devolve essa meia-calha como respiro.
+     Assim os itens da esquerda (sob os artigos) alinham com a margem da página. */
+  .records__certificates {
+    margin-inline: calc(var(--gap) / -2);
+  }
+
+  .records__certificates > li {
+    float: right;
+    width: 50%;
+    padding-inline: calc(var(--gap) / 2);
+  }
+
+  /* Seletor mais específico que o genérico de réguas (.records li::after), definido mais abaixo. */
+  .records .records__certificates > li::after {
+    left: calc(var(--gap) / 2);
+    width: calc(100% - var(--gap));
+  }
+
+  /* Sem certificados: os artigos ocupam a largura toda, lado a lado. */
+  .records__flow[data-single] .records__articles {
+    float: none;
+    width: auto;
+    padding-right: 0;
+  }
+
+  .records__flow[data-single] .records__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--gap);
+  }
+}
+
+.records__heading {
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--line-strong);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+/* A régua sob cada linha é riscada da esquerda para a direita pela rolagem; o texto entra junto. */
+.records li {
+  position: relative;
+}
+
+.records li::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--line-strong);
+  transform: scaleX(var(--p, 1));
+  transform-origin: left;
+}
+
+.record {
+  --e: clamp(0, var(--p, 1) * 1.6 - 0.3, 1);
+  position: relative;
+  display: block;
+  padding: 1.375rem 3rem 1.375rem 0;
+  opacity: var(--e);
+  transform: translateX(calc((1 - var(--e)) * -22px));
+}
+
+.record__meta,
+.record__title,
+.record__text {
+  display: block;
+}
+
+/* Com capa: miniatura da primeira página à esquerda. */
+.record[data-cover] {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  padding-right: 0;
+}
+
+.record--link[data-cover] {
+  padding-right: 3rem;
+}
+
+.record__cover {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  aspect-ratio: 3 / 4;
+  box-shadow: 0 6px 18px -10px rgb(10 23 48 / 0.35);
+}
+
+.record__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.record__main {
+  display: block;
+  min-width: 0;
+}
+
+.record[data-cover] .record__title {
+  font-size: 1.0625rem;
+}
+
+.record__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.record__title {
+  margin-top: 0.375rem;
+  font-family: var(--font-heading);
+  font-size: 1.1875rem;
+  font-weight: var(--heading-weight);
+  line-height: 1.3;
+  letter-spacing: var(--heading-tracking);
+  transition: color var(--t-fast);
+}
+
+.record__title--small {
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.record__text {
+  margin-top: 0.25rem;
+  font-size: 0.9375rem;
+  color: var(--text-soft);
+}
+
+.record__arrow {
+  position: absolute;
+  top: 1.5rem;
+  right: 0;
+  color: var(--text-muted);
+  transition:
+    transform var(--t-med) var(--ease),
+    color var(--t-fast);
+}
+
+.record--link:hover .record__title {
+  color: var(--accent);
+}
+
+.record--link:hover .record__arrow {
+  color: var(--text);
+  transform: translateX(4px);
+}
+
+.record--link[target='_blank']:hover .record__arrow {
+  transform: translate(2px, -2px);
+}
+
+.record__verify {
+  margin-top: 0.625rem;
+  font-size: var(--fs-xs);
+  color: var(--text-soft);
+}
+
+.record__verify:hover .arrow {
+  transform: translate(2px, -2px);
+}
+
+/* --- Certificados: miniatura em paisagem, ampliação ao clicar ------------- */
+
+.record[data-landscape] {
+  grid-template-columns: 120px minmax(0, 1fr);
+}
+
+.record[data-landscape] .record__cover {
+  aspect-ratio: 4 / 3;
+}
+
+.record__cover--button {
+  padding: 0;
+  cursor: zoom-in;
+  transition:
+    transform var(--t-med) var(--ease),
+    box-shadow var(--t-med) var(--ease);
+}
+
+.record__cover--button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -12px rgb(10 23 48 / 0.45);
+}
+
+.viewer {
+  max-width: min(1100px, calc(100vw - 2 * var(--gutter)));
+  max-height: calc(100svh - 3rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 30px 80px -20px rgb(10 23 48 / 0.5);
+  overflow: auto;
+}
+
+.viewer::backdrop {
+  background: rgb(10 23 48 / 0.55);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.viewer[open] {
+  animation: viewer-in 0.35s var(--ease);
+}
+
+.viewer img {
+  width: 100%;
+  height: auto;
+}
+
+.viewer figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  color: var(--text-soft);
+}
+
+.viewer__close {
+  padding: 0.375rem 0.875rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--text);
+  transition:
+    background-color var(--t-fast),
+    color var(--t-fast);
+}
+
+.viewer__close:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+@keyframes viewer-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+}
+
+
+/* Certificado obtido mais de uma vez: a mesma imagem repetida atrás, deslocada, e a marca "2×". */
+.record__stack {
+  position: relative;
+  display: block;
+}
+
+.record__stack[data-stacked] {
+  margin: 8px 8px 0 0; /* espaço para a cópia de trás, que sobe e vai para a direita */
+}
+
+.record__cover--behind {
+  position: absolute;
+  inset: 0;
+  transform: translate(8px, -8px);
+  opacity: 0.75;
+  box-shadow: none;
+  transition: transform var(--t-med) var(--ease);
+}
+
+.record__stack .record__cover--button {
+  position: relative;
+  width: 100%;
+}
+
+/* Ao passar o mouse, as duas folhas se afastam um pouco. */
+.record__stack[data-stacked]:hover .record__cover--behind {
+  transform: translate(12px, -12px);
+}
+
+.record__count {
+  position: absolute;
+  right: -6px;
+  bottom: -8px;
+  z-index: 1;
+  min-width: 30px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}

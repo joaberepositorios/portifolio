@@ -1,0 +1,178 @@
+/* `--p` (0→1) vem da rolagem (lib/scrub.ts); `--t` é o ponto do progresso em que a linha
+   alcança cada etapa. `--on` vale 0 antes disso e sobe a 1 logo depois.                    */
+
+.journey__item,
+.journey__node {
+  --on: clamp(0, (var(--p, 1) - var(--t, 0)) * 9, 1);
+}
+
+/* A linha chega ao último nó em p = 0,8 (o mesmo teto dos limiares `--t`), não em p = 1. */
+.journey__stage {
+  --line: clamp(0, var(--p, 1) / 0.8, 1);
+}
+
+/* --- Padrão (telas estreitas): linha do tempo vertical que cresce com a rolagem ---------- */
+
+.journey__curve {
+  display: none;
+}
+
+.journey__list {
+  display: block !important;
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.journey__list::before,
+.journey__list::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 1px;
+  background: var(--line);
+}
+
+.journey__list::after {
+  background: var(--text);
+  transform: scaleY(var(--line, 1));
+  transform-origin: top;
+}
+
+.journey__item {
+  position: relative;
+  padding-bottom: 2rem;
+  opacity: calc(0.25 + var(--on) * 0.75);
+}
+
+.journey__item:last-child {
+  padding-bottom: 0;
+}
+
+.journey__item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1.75rem + 0.5px);
+  top: 0.4rem;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 4px var(--bg);
+  transform: scale(calc(0.4 + var(--on) * 0.6));
+}
+
+.journey__period {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.journey__title {
+  margin-top: 0.375rem;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.journey__org,
+.journey__summary {
+  margin-top: 0.25rem;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* --- Telas largas: a curva horizontal ------------------------------------------------------ */
+
+@media (min-width: 900px) {
+  .journey__curve {
+    position: relative;
+    display: block;
+    height: 120px;
+  }
+
+  .journey__curve svg {
+    overflow: visible;
+  }
+
+  .journey__line {
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 1.4;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--line, 1));
+  }
+
+  /* O caminho inteiro, bem apagado, fica visível desde o início: mostra para onde a linha vai. */
+  .journey__line--ghost {
+    stroke: var(--line);
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+
+  .journey__line--ahead {
+    stroke: var(--line-strong);
+    stroke-dasharray: 3 6;
+    stroke-dashoffset: 0;
+    opacity: clamp(0, (var(--p, 1) - 0.8) * 8, 1);
+  }
+
+  .journey__node {
+    opacity: var(--on);
+  }
+
+  .journey__node line {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .journey__node circle {
+    fill: var(--text);
+    stroke: var(--bg);
+    stroke-width: 3;
+    paint-order: stroke;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(calc(0.3 + var(--on) * 0.7));
+  }
+
+  .journey__traveller {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 11px;
+    height: 11px;
+    margin: -5.5px 0 0 -5.5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 16%, transparent);
+    offset-rotate: 0deg;
+    offset-distance: calc(var(--line, 1) * 100%);
+    /* some ao chegar ao fim, quando a linha já está toda desenhada */
+    opacity: clamp(0, (0.985 - var(--line, 1)) * 40, 1);
+  }
+
+  .journey__list {
+    display: grid !important;
+    padding-left: 0;
+  }
+
+  .journey__list::before,
+  .journey__list::after,
+  .journey__item::before {
+    display: none;
+  }
+
+  /* A haste que desce de cada nó continua como a borda esquerda da etapa. */
+  .journey__item {
+    margin-left: 6.5px;
+    padding: 0.25rem 2rem 0.25rem 1.125rem;
+    border-left: 1px solid var(--line);
+    opacity: var(--on);
+    transform: translateY(calc((1 - var(--on)) * 14px));
+  }
+}

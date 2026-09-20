@@ -1,0 +1,39 @@
+.footer {
+  margin-top: var(--section-gap);
+}
+
+.footer__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  /* O recuo à direita mantém a última linha livre do botão do WhatsApp. */
+  padding: 1.25rem 64px 1.75rem 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.footer__row {
+  flex-wrap: wrap;
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+
+.footer__links a {
+  display: inline-block;
+  padding-block: 0.5rem;
+  color: var(--text-soft);
+  transition: color var(--t-fast);
+}
+
+.footer__links a:hover {
+  color: var(--accent);
+}
+
+
+

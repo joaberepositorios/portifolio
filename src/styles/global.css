@@ -1,0 +1,286 @@
+/* ============================================================================
+   Sistema visual — fundo branco, tinta azul-marinho, uma cor de destaque.
+   Títulos em serifa (Source Serif 4), texto em Geist.
+   ============================================================================ */
+
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/geist/files/geist-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Source Serif 4 Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+:root {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --surface: #f0f3f8;
+  --text: #0a1730;
+  --text-soft: #45526a;
+  --text-muted: #69758a;
+  --line: rgb(10 23 48 / 0.1);
+  --line-strong: rgb(10 23 48 / 0.24);
+  --accent: #1f4e9a;
+  --cover: #0a1a36; /* capas de projeto são sempre painéis escuros */
+  --whatsapp: #25d366;
+
+  --font: 'Geist Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-heading: 'Source Serif 4 Variable', Georgia, serif;
+  --heading-weight: 500;
+  --heading-tracking: -0.015em;
+
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-h2: clamp(1.75rem, 1.45rem + 1.2vw, 2.25rem);
+  --fs-h1: clamp(2.25rem, 1.5rem + 2.9vw, 3.625rem);
+
+  --gutter: clamp(20px, 5vw, 56px);
+  --max: 1160px;
+  --header: 68px;
+  --section-gap: clamp(5.5rem, 11vw, 9rem);
+
+  --radius: 8px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 150ms;
+  --t-med: 320ms;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: clip;
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header) + 1.5rem);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+body.is-locked {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ol,
+ul,
+figure,
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-size: inherit;
+  font-weight: 500;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--text);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.container {
+  width: 100%;
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: var(--fs-sm);
+  transform: translateY(-300%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform var(--t-med) var(--ease);
+}
+
+/* Link de texto com seta: "Ver projeto →" */
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  transition: color var(--t-fast);
+}
+
+.more:hover {
+  color: var(--accent);
+}
+
+.more:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* --- Seções ------------------------------------------------------------------------ */
+
+.section {
+  margin-top: var(--section-gap);
+}
+
+.section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.section__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h2);
+  font-weight: var(--heading-weight);
+  line-height: 1.15;
+  letter-spacing: var(--heading-tracking);
+}
+
+/* O título se monta letra a letra conforme a rolagem: `--p` vem de lib/scrub.ts e
+   `--s` é o instante (0–0,62) em que cada letra começa a entrar.                       */
+.section__word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.section__word + .section__word {
+  margin-left: 0.26em;
+}
+
+.section__char {
+  --e: clamp(0, (var(--p, 1) - var(--s, 0)) * 2.8, 1);
+  display: inline-block;
+  opacity: var(--e);
+  transform: translateY(calc((1 - var(--e)) * 0.7em)) rotate(calc((1 - var(--e)) * 9deg));
+  transform-origin: 0 100%;
+}
+
+.section__lead {
+  --e: clamp(0, var(--p, 1) * 2.2 - 1.1, 1);
+  max-width: 52ch;
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  opacity: var(--e);
+  transform: translateY(calc((1 - var(--e)) * 10px));
+}
+
+/* --- Entrada: um fade curto e discreto ------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.8s var(--ease) var(--delay, 0ms),
+      transform 0.8s var(--ease) var(--delay, 0ms);
+  }
+
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

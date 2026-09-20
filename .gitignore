@@ -1,8 +1,9 @@
-# Lixo do sistema e do OneDrive
-Thumbs.db
-desktop.ini
-.DS_Store
+node_modules
+dist
+*.local
 
-# Editores
-.vscode/
-.idea/
+# PDFs pessoais (certificados com CPF etc.) não vão para o repositório nem para o site
+*.pdf
+
+# Gerado por `npm run build` (é o mesmo arquivo que vai para o branch gh-pages)
+Portfolio.html
