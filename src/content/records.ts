@@ -30,7 +30,7 @@ export const articles: Article[] = [
 export const certificates: Certificate[] = [
   {
     title: 'Programação de Algoritmos em Python',
-    issuer: 'Agência Espacial Brasileira (AEB) · AEB Escola Virtual',
+    issuer: 'Agência Espacial Brasileira (AEB)',
     date: '2026-09',
     image: aebImage,
   },
