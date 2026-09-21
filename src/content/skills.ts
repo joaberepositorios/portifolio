@@ -9,7 +9,6 @@ export const skills: Skill[] = [
   { name: 'CSS', icon: techIcons.css },
   { name: 'Python', icon: techIcons.python },
   { name: 'C', icon: techIcons.c },
-  { name: 'Haskell', icon: techIcons.haskell },
   { name: 'JavaScript', icon: techIcons.javascript },
   { name: 'VS Code', icon: techIcons.vscode },
   { name: 'Adobe Illustrator', icon: techIcons.illustrator },
