@@ -1,0 +1,80 @@
+{
+  "comprimento-de-arco-parte-3.pdf": {
+    "titulo": "Comprimento de Arco - Parte 3",
+    "paginas": 5,
+    "capa": "capas/comprimento-de-arco-parte-3.webp",
+    "kb": 83
+  },
+  "derivada-direcional-vetor-gradiente-vetornormal-e-plano-tangente.pdf": {
+    "titulo": "Derivada Direcional, vetor gradiente-vetornormal e Plano tangente",
+    "paginas": 3,
+    "capa": "capas/derivada-direcional-vetor-gradiente-vetornormal-e-plano-tangente.webp",
+    "kb": 270
+  },
+  "derivadas-fundamentos.pdf": {
+    "titulo": "Derivadas - Fundamentos",
+    "paginas": 3,
+    "capa": "capas/derivadas-fundamentos.webp",
+    "kb": 184
+  },
+  "derivadas-parciais-diferenciabilidade-a-diferencial-e-regra-da-cadeia.pdf": {
+    "titulo": "Derivadas Parciais, diferenciabilidade , a diferencial e regra da cadeia",
+    "paginas": 3,
+    "capa": "capas/derivadas-parciais-diferenciabilidade-a-diferencial-e-regra-da-cadeia.webp",
+    "kb": 274
+  },
+  "funcoes-seccionalmente-continuas.pdf": {
+    "titulo": "Funções Seccionalmente Contínuas",
+    "paginas": 4,
+    "capa": "capas/funcoes-seccionalmente-continuas.webp",
+    "kb": 261
+  },
+  "funcoes-vetoriais.pdf": {
+    "titulo": "Funções Vetoriais",
+    "paginas": 3,
+    "capa": "capas/funcoes-vetoriais.webp",
+    "kb": 253
+  },
+  "funcoes-de-varias-ou-multiplas-variaveis.pdf": {
+    "titulo": "Funções de Várias ou Multiplas Variaveis",
+    "paginas": 3,
+    "capa": "capas/funcoes-de-varias-ou-multiplas-variaveis.webp",
+    "kb": 285
+  },
+  "integrais-fundamentos.pdf": {
+    "titulo": "Integrais - Fundamentos",
+    "paginas": 3,
+    "capa": "capas/integrais-fundamentos.webp",
+    "kb": 174
+  },
+  "integrais-improprias-parte-1.pdf": {
+    "titulo": "Integrais Impróprias - Parte 1",
+    "paginas": 3,
+    "capa": "capas/integrais-improprias-parte-1.webp",
+    "kb": 172
+  },
+  "integral-dupla-e-definicoes.pdf": {
+    "titulo": "Integral Dupla e Definições",
+    "paginas": 4,
+    "capa": "capas/integral-dupla-e-definicoes.webp",
+    "kb": 289
+  },
+  "integral-tripla-e-definicoes.pdf": {
+    "titulo": "Integral Tripla e Definições",
+    "paginas": 4,
+    "capa": "capas/integral-tripla-e-definicoes.webp",
+    "kb": 289
+  },
+  "solidos-de-revolucao-parte-2.pdf": {
+    "titulo": "Sólidos de Revolução - Parte 2",
+    "paginas": 3,
+    "capa": "capas/solidos-de-revolucao-parte-2.webp",
+    "kb": 143
+  },
+  "area-da-superficie-de-revolucao-parte-4.pdf": {
+    "titulo": "Área da Superfície de Revolução - Parte 4",
+    "paginas": 4,
+    "capa": "capas/area-da-superficie-de-revolucao-parte-4.webp",
+    "kb": 88
+  }
+}
