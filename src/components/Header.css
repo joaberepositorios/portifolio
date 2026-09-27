@@ -41,27 +41,6 @@
   margin-left: auto;
 }
 
-/* Atalho para os materiais da monitoria: um botão discreto, contornado. */
-.header__cta {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 0.85rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-size: var(--fs-sm);
-  color: var(--text);
-  white-space: nowrap;
-  transition:
-    border-color var(--t-fast),
-    background-color var(--t-fast);
-}
-
-.header__cta:hover {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
 .header__menu {
   min-height: 36px;
   padding-left: 0.5rem;

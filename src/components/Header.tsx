@@ -54,13 +54,15 @@ export function Header() {
                 </a>
               </li>
             ))}
+            <li>
+              <a href="monitoria/" className="header__link" onClick={() => setOpen(false)}>
+                Monitorias e materiais
+              </a>
+            </li>
           </ul>
         </nav>
 
         <div className="header__tools">
-          <a href="monitoria/" className="header__cta">
-            Materiais disponíveis
-          </a>
           <button
             type="button"
             className="header__menu"

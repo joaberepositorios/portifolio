@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <meta http-equiv="Cache-Control" content="no-cache" />
-  <title>Monitoria — Cálculo 2</title>
+  <title>Monitorias e materiais</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet" />
@@ -79,8 +79,7 @@
   <main class="wrap" id="catalogo">
     <header class="head">
       <div>
-        <h1>Monitoria — Cálculo 2</h1>
-        <p>Cálculo Diferencial e Integral II · Engenharia Ambiental e Sanitária · UFU</p>
+        <h1>Monitorias e materiais</h1>
       </div>
       <div class="head-right">
         <small>Material de apoio, uso para monitoria.</small>
@@ -126,7 +125,7 @@
       const it = itens[i]; if (!it) return;
       const url = "pdf/" + it.arquivo;
       frame.src = url + "#toolbar=0&navpanes=0&view=FitH";
-      title.textContent = it.titulo; document.title = it.titulo + " — Monitoria";
+      title.textContent = it.titulo; document.title = it.titulo + " — Monitorias e materiais";
       $("open").href = url; $("download").href = url; $("download").download = it.titulo + ".pdf";
       catalogo.hidden = true; reader.hidden = false;
       if (push) history.pushState({ i }, "", "#" + it.arquivo.replace(/\.pdf$/, ""));
@@ -134,7 +133,7 @@
     function fechar(push = true) {
       if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
       reader.hidden = true; catalogo.hidden = false; frame.src = "about:blank";
-      document.title = "Monitoria — Cálculo 2";
+      document.title = "Monitorias e materiais";
       if (push) history.pushState(null, "", location.pathname);
     }
 
