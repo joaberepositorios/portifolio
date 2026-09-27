@@ -7,3 +7,6 @@ dist
 
 # Gerado por `npm run build` (é o mesmo arquivo que vai para o branch gh-pages)
 Portfolio.html
+
+# Exceção: apostilas da monitoria (material didático, sem dados pessoais)
+!public/monitoria/pdf/*.pdf
