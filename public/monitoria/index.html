@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
+  <meta http-equiv="Cache-Control" content="no-cache" />
   <title>Monitoria — Cálculo 2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -128,8 +129,10 @@
       if (push) history.pushState(null, "", location.pathname);
     }
 
-    fetch("lista.json").then((r) => r.json()).then((mapa) => {
-      itens = Object.entries(mapa).map(([arquivo, m]) => ({ arquivo, ...m }));
+    fetch("lista.json?v=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((mapa) => {
+      itens = Array.isArray(mapa)
+        ? mapa.map((m) => (typeof m === "string" ? { arquivo: m, titulo: m.replace(/\.pdf$/, ""), paginas: 0, kb: 0, capa: "" } : m))
+        : Object.entries(mapa).map(([arquivo, m]) => ({ arquivo, ...m }));
       const peso = (t) => /fundamentos/i.test(t) ? 0 : 1;
       itens.sort((a, b) => peso(a.titulo) - peso(b.titulo) || a.titulo.localeCompare(b.titulo, "pt-BR"));
       grid.innerHTML = itens.map((it, i) => `
@@ -142,6 +145,8 @@
       const hash = location.hash.slice(1);
       const idx = itens.findIndex((it) => it.arquivo.replace(/\.pdf$/, "") === hash);
       if (idx >= 0) abrir(idx, false);
+    }).catch(() => {
+      grid.innerHTML = '<p style="color:var(--muted)">Não foi possível carregar a lista de materiais. Atualize a página (Ctrl + F5).</p>';
     });
 
     $("back").addEventListener("click", () => fechar());
