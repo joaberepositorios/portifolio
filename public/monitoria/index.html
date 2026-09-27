@@ -63,6 +63,9 @@
     .btn--accent:hover { background: #17407f; border-color: #17407f; }
     .btn svg { width: 16px; height: 16px; flex: none; }
     .frame { flex: 1; border: 0; width: 100%; }
+    .pages { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 12px; }
+    .pages canvas { display: block; width: 100%; height: auto; margin: 0 auto 12px; background: #fff; box-shadow: 0 1px 4px rgba(17, 19, 24, 0.12); }
+    .pages .status { padding: 24px; text-align: center; color: var(--muted); font-size: 0.9rem; }
     .reader:fullscreen { background: var(--bg); }
 
     @media (max-width: 600px) {
@@ -113,18 +116,59 @@
         <span class="label">Tela cheia</span>
       </button>
     </div>
-    <iframe class="frame" id="frame" title="Material em PDF"></iframe>
+    <iframe class="frame" id="frame" title="Material em PDF" hidden></iframe>
+    <div class="pages" id="pages" hidden></div>
   </section>
 
   <script>
     const $ = (id) => document.getElementById(id);
-    const catalogo = $("catalogo"), grid = $("grid"), reader = $("reader"), frame = $("frame"), title = $("title");
+    const catalogo = $("catalogo"), grid = $("grid"), reader = $("reader"), frame = $("frame"), pages = $("pages"), title = $("title");
     let itens = [];
+
+    // Celulares (Chrome Android, Safari iOS) não exibem PDF dentro de iframe.
+    // Nesses casos as páginas são desenhadas na tela com o PDF.js.
+    const nativo = navigator.pdfViewerEnabled === true && !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/";
+    let pdfjs = null, docAtual = null, geracao = 0;
+
+    async function renderizar(url) {
+      const g = ++geracao;
+      pages.innerHTML = '<p class="status">Carregando…</p>';
+      pages.scrollTop = 0;
+      try {
+        if (!pdfjs) {
+          pdfjs = await import(PDFJS + "pdf.min.mjs");
+          pdfjs.GlobalWorkerOptions.workerSrc = PDFJS + "pdf.worker.min.mjs";
+        }
+        if (docAtual) { docAtual.destroy(); docAtual = null; }
+        const doc = await pdfjs.getDocument(url).promise;
+        if (g !== geracao) { doc.destroy(); return; }
+        docAtual = doc;
+        pages.innerHTML = "";
+        const largura = pages.clientWidth - 24;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        for (let n = 1; n <= doc.numPages; n++) {
+          if (g !== geracao) return;
+          const page = await doc.getPage(n);
+          const base = page.getViewport({ scale: 1 });
+          const escala = largura / base.width;
+          const vp = page.getViewport({ scale: escala * dpr });
+          const c = document.createElement("canvas");
+          c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+          c.style.width = largura + "px";
+          pages.appendChild(c);
+          await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+        }
+      } catch (e) {
+        if (g === geracao) pages.innerHTML = '<p class="status">Não foi possível exibir o PDF aqui. Use "Nova aba" ou "Baixar".</p>';
+      }
+    }
 
     function abrir(i, push = true) {
       const it = itens[i]; if (!it) return;
       const url = "pdf/" + it.arquivo;
-      frame.src = url + "#toolbar=0&navpanes=0&view=FitH";
+      if (nativo) { frame.hidden = false; pages.hidden = true; frame.src = url + "#toolbar=0&navpanes=0&view=FitH"; }
+      else { frame.hidden = true; pages.hidden = false; renderizar(url); }
       title.textContent = it.titulo; document.title = it.titulo + " — Monitorias e materiais";
       $("open").href = url; $("download").href = url; $("download").download = it.titulo + ".pdf";
       catalogo.hidden = true; reader.hidden = false;
@@ -133,6 +177,7 @@
     function fechar(push = true) {
       if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
       reader.hidden = true; catalogo.hidden = false; frame.src = "about:blank";
+      geracao++; pages.innerHTML = ""; if (docAtual) { docAtual.destroy(); docAtual = null; }
       document.title = "Monitorias e materiais";
       if (push) history.pushState(null, "", location.pathname);
     }
