@@ -58,6 +58,9 @@ export function Header() {
         </nav>
 
         <div className="header__tools">
+          <a href="monitoria/" className="header__cta">
+            Materiais disponíveis
+          </a>
           <button
             type="button"
             className="header__menu"
