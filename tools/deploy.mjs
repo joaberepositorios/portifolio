@@ -7,7 +7,7 @@
 //
 // O branch `gh-pages` é só saída gerada — por isso é recriado a cada publicação (push forçado).
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, cpSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -22,6 +22,8 @@ run(npm, ['run', 'build'], { shell: process.platform === 'win32' })
 const work = mkdtempSync(join(tmpdir(), 'portfolio-deploy-'))
 try {
   copyFileSync('dist/index.html', join(work, 'index.html'))
+  // Páginas avulsas (ex.: /monitoria, acessível só pelo link) vão junto, sem entrar no bundle.
+  if (existsSync('public/monitoria')) cpSync('public/monitoria', join(work, 'monitoria'), { recursive: true })
   // Sem Jekyll: o GitHub serve os arquivos como estão.
   writeFileSync(join(work, '.nojekyll'), '')
 
