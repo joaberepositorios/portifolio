@@ -1,16 +1,547 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Portfólio de Joabe Alves — Engenharia de Computação com Inteligência Artificial: jornada, projetos, artigos, certificados e skills." />
-    <meta name="theme-color" content="#ffffff" />
-    <meta name="color-scheme" content="light" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cstyle%3Eg{fill:%231f4e9a;stroke:%231f4e9a}@media(prefers-color-scheme:dark){g{fill:%238fb4f0;stroke:%238fb4f0}}%3C/style%3E%3Cg%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(0 16 16)'/%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(45 16 16)'/%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(90 16 16)'/%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(135 16 16)'/%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(180 16 16)'/%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(225 16 16)'/%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(270 16 16)'/%3E%3Crect stroke='none' x='13.4' y='1.5' width='5.2' height='7' rx='1.2' transform='rotate(315 16 16)'/%3E%3Ccircle cx='16' cy='16' r='7.6' fill='none' stroke-width='5.2'/%3E%3C/g%3E%3C/svg%3E" />
-    <title>Joabe Alves — Portfólio</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joabe Alves · Engenharia de Computação</title>
+<meta name="description" content="Portfólio de Joabe Alves: engenharia de computação, inteligência artificial, robótica e simulação.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070c; --paper:#e8edf6; --ink:#05070c;
+  --cyan:#22d3ee; --violet:#a78bfa; --soft:#9fb0c8;
+  --line:rgba(232,237,246,.16);
+  --gutter:clamp(24px,8vw,128px);
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --display:'Michroma',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{background:var(--bg);color:var(--paper);font-family:'Space Grotesk',system-ui,sans-serif;font-weight:300;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+::selection{background:var(--cyan);color:var(--ink)}
+h1,h2{font-weight:400}
+
+/* cenário: desenhado nítido; o véu por cima desfoca (backdrop-filter, um passe só do compositor — não é filter no canvas, que gerava placas) e escurece */
+#scene{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:0;opacity:0;transition:opacity 1.2s var(--ease)}
+#scene.on{opacity:1}
+#scene.on+#veil{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(2,4,10,.5) 0%,rgba(2,4,10,.72) 70%,rgba(2,4,10,.86) 100%)}
+
+/* carregador: barra fina e porcentagem; some depois do primeiro quadro desenhado */
+#loader{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#03050a;transition:opacity .9s var(--ease),visibility .9s}
+#loader.done{opacity:0;visibility:hidden}
+#loader .bar{width:min(240px,60vw);height:1px;background:rgba(232,237,246,.12);overflow:hidden}
+#loader .bar i{display:block;height:100%;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+#loader .pct{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--soft);font-variant-numeric:tabular-nums}
+
+/* nav: só os itens, centralizados */
+.nav{position:fixed;top:18px;left:var(--gutter);right:var(--gutter);z-index:20;display:flex;justify-content:center;align-items:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.nav ul{display:flex;gap:clamp(12px,2.4vw,30px);list-style:none}
+.nav a{position:relative;padding:6px 0;white-space:nowrap}
+.nav a::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--cyan);transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
+
+/* aviso de rolagem */
+.scroll-hint{position:fixed;left:50%;bottom:clamp(22px,4vh,40px);transform:translateX(-50%);z-index:15;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--soft);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.scroll-hint.gone{opacity:0;transform:translate(-50%,12px);pointer-events:none}
+.mouse{width:24px;height:38px;border:1.5px solid currentColor;border-radius:14px;position:relative}
+.mouse::after{content:'';position:absolute;left:50%;top:7px;width:3px;height:7px;margin-left:-1.5px;border-radius:2px;background:var(--cyan);animation:wheel 1.8s var(--ease) infinite}
+@keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(10px);opacity:0}100%{opacity:0}}
+@media (hover:none){.mouse{display:none}}
+
+/* seções: cada uma é um trecho do percurso. O texto é fixo na tela e se dissolve no seguinte */
+main{position:relative;z-index:2}
+.room{position:relative}
+.stick{position:fixed;inset:0;height:100vh;height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:96px var(--gutter) 72px;pointer-events:none;opacity:0;visibility:hidden}
+.hero .stick{opacity:1;visibility:visible}
+.stick>*{pointer-events:auto}
+.block{width:min(820px,100%);text-align:left;text-shadow:0 1px 18px rgba(0,0,0,.55)}
+#topo{height:130vh}
+#sobre{height:170vh}
+#trabalho{height:330vh}
+#projetos{height:420vh}
+#registros{height:170vh}
+#skills{height:170vh}
+#contato{height:170vh}
+
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan);margin-bottom:18px}
+.title{font-family:var(--display);font-size:clamp(24px,3.4vw,42px);line-height:1.15;letter-spacing:.02em;color:#fff}
+
+/* abertura: só o nome, no centro */
+.hero .stick{justify-content:center;align-items:center;text-align:center}
+.hero h1{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2.4vh,26px);font-family:var(--display);font-size:clamp(24px,4.6vw,64px);line-height:1;letter-spacing:.28em;text-transform:uppercase;color:#fff;text-shadow:0 0 40px rgba(34,211,238,.25),0 2px 24px rgba(0,0,0,.6)}
+.hero h1 span{display:block;padding-left:.28em}
+.hero h1 i{display:block;width:clamp(36px,5vw,64px);height:1px;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+.hero .sub{margin-top:clamp(20px,3vh,30px);font-family:var(--mono);font-size:clamp(11px,1.1vw,14px);letter-spacing:.2em;text-transform:uppercase;color:var(--soft);text-shadow:0 1px 14px rgba(0,0,0,.7)}
+
+/* quem sou */
+.bio{font-size:clamp(16px,1.5vw,20px);line-height:1.6;max-width:62ch}
+.bio em{font-style:normal;color:var(--cyan)}
+.topics{display:flex;flex-wrap:wrap;gap:clamp(18px,3vw,44px);margin-top:clamp(20px,3vh,30px);padding-top:18px;border-top:1px solid var(--line)}
+.topic small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);margin-bottom:4px}
+.topic b{font-weight:500;font-size:clamp(14px,1.25vw,17px)}
+.topic b i{font-style:normal;color:var(--cyan)}
+
+/* trabalho e projetos: um item por parada; os itens ficam empilhados e só o atual aparece */
+.stack{position:relative;width:min(760px,100%)}
+.item{position:absolute;left:0;top:0;width:100%;opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .8s var(--ease);pointer-events:none}
+.item.on{opacity:1;transform:none;pointer-events:auto;position:relative}
+.job{display:grid;grid-template-columns:clamp(120px,14vw,170px) minmax(0,1fr);gap:clamp(18px,3vw,36px);align-items:center}
+.job .logo{background:#fff;border-radius:12px;padding:12px 14px;display:grid;place-items:center;aspect-ratio:1.6}
+.job .logo img{max-width:100%;max-height:100%;display:block}
+.job .org{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+.job .what{font-family:var(--display);font-size:clamp(16px,1.9vw,24px);line-height:1.25;margin:8px 0 10px}
+.job .how{font-size:clamp(14px,1.25vw,17px);max-width:56ch}
+.proj{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(18px,3vw,40px);align-items:center}
+.proj img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;border-radius:14px;box-shadow:0 30px 60px -28px rgba(0,0,0,.9),0 0 0 1px rgba(34,211,238,.25)}
+.proj .cat{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--violet)}
+.proj .what{font-family:var(--display);font-size:clamp(15px,1.7vw,22px);line-height:1.25;margin:8px 0 10px}
+.proj .how{font-size:clamp(13.5px,1.15vw,16px);max-width:48ch}
+.steps{display:flex;gap:7px;margin-top:clamp(22px,3.6vh,34px)}
+.steps i{width:7px;height:7px;border-radius:50%;background:rgba(232,237,246,.25);transition:background .4s,transform .4s,box-shadow .4s}
+.steps i.on{background:var(--cyan);transform:scale(1.3);box-shadow:0 0 10px var(--cyan)}
+
+/* artigos e certificados */
+.records{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);margin-top:clamp(18px,3vh,26px)}
+.rec h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);margin-bottom:12px;font-weight:400}
+.rec-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.rec-item img{width:44px;height:44px;object-fit:cover;border-radius:6px;flex:none;box-shadow:0 0 0 1px rgba(232,237,246,.1)}
+.rec-item b{display:block;font-weight:500;font-size:14px;line-height:1.3}
+.rec-item small{display:block;font-size:12px;color:var(--soft);margin-top:2px}
+
+/* skills */
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,2vw,22px);margin-top:clamp(18px,3vh,28px);max-width:720px}
+.sk{display:flex;flex-direction:column;align-items:center;gap:10px;font-size:12px;letter-spacing:.04em;color:var(--soft)}
+.sk i{width:40px;height:40px;background:var(--c);-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;filter:drop-shadow(0 0 10px color-mix(in srgb,var(--c) 45%,transparent))}
+
+/* contato: só os links */
+.links{width:min(620px,100%)}
+.link{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:clamp(12px,2vh,16px) 0;border-top:1px solid var(--line)}
+.link:last-child{border-bottom:1px solid var(--line)}
+.link small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);margin-bottom:2px}
+.link .v{display:block;font-size:clamp(15px,1.5vw,20px);transition:transform .5s var(--ease)}
+.link:hover .v{transform:translateX(8px)}
+.link .arrow{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none;transition:transform .5s var(--ease),background .5s,color .5s,border-color .5s}
+.link:hover .arrow{background:var(--cyan);color:var(--ink);border-color:var(--cyan);transform:rotate(-45deg)}
+.foot{margin-top:clamp(20px,3vh,30px);font-family:var(--mono);font-size:11px;color:var(--soft);letter-spacing:.06em;line-height:1.7}
+.foot a{text-decoration:underline;text-underline-offset:3px}
+.cred-btn{background:none;border:0;padding:0;font:inherit;opacity:.8;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.cred{display:block;margin-top:4px;font-size:10.5px}
+.cred[hidden]{display:none}
+
+@media (max-width:760px){
+  .stick{padding:76px var(--gutter) 48px}
+  .job{grid-template-columns:1fr;gap:14px}
+  .job .logo{width:150px}
+  .proj{grid-template-columns:1fr;gap:14px}
+  .proj .how{font-size:13px}
+  .records{grid-template-columns:1fr;gap:12px}
+  .rec-item{padding:7px 0}
+  .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .sk i{width:32px;height:32px}
+  .nav ul{gap:10px}
+  .nav{font-size:10px}
+}
+@media (max-width:420px){.hero h1{letter-spacing:.2em}}
+@media (prefers-reduced-motion:reduce){.mouse::after{animation:none}}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<canvas id="scene" aria-hidden="true"></canvas>
+<div id="veil" aria-hidden="true"></div>
+<div id="loader" role="status" aria-live="polite"><span class="bar"><i id="barFill"></i></span><span class="pct" id="pct">0%</span></div>
+
+<nav class="nav">
+  <ul>
+    <li><a href="#sobre">Quem sou</a></li>
+    <li><a href="#trabalho">Trabalho</a></li>
+    <li><a href="#projetos">Projetos</a></li>
+    <li><a href="#registros">Artigos</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+</nav>
+
+<div class="scroll-hint" id="hint"><span class="mouse"></span><span>Role para entrar</span></div>
+
+<main>
+  <section class="room hero" id="topo">
+    <div class="stick">
+      <h1><span>Joabe</span><i aria-hidden="true"></i><span>Alves</span></h1>
+      <p class="sub">Engenharia de Computação com Inteligência Artificial</p>
+    </div>
+  </section>
+
+  <section class="room" id="sobre">
+    <div class="stick">
+      <div class="block">
+        <h2 class="title">Quem sou</h2>
+        <p class="bio" style="margin-top:18px">Estudante de Engenharia de Computação na UFU, em Uberlândia. Trabalho com <em>simulação</em>, realidade virtual e aprendizagem de máquina: do treinamento de robôs por reforço a ambientes 3D para o ensino. Desde o ensino médio, também com desenvolvimento web e design.</p>
+        <div class="topics">
+          <div class="topic"><small>Curso</small><b>Engenharia de Computação</b></div>
+          <div class="topic"><small>Onde</small><b>UFU · Uberlândia</b></div>
+          <div class="topic"><small>Foco</small><b><i>IA</i>, robótica e simulação</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="room" id="trabalho">
+    <div class="stick">
+      <div class="block">
+        <p class="label">Trabalho</p>
+        <div class="stack" id="jobs">
+          <article class="item job on">
+            <div class="logo"><img src="img/logo-grva.png" alt="GRVA"></div>
+            <div><p class="org">UFU · GRVA · pesquisa e desenvolvimento · desde 2026</p><p class="what">GRVA — Grupo de Realidade Virtual e Aumentada</p><p class="how">Adquirindo expertise nas áreas de treinamento de robôs por aprendizagem por reforço, usando NVIDIA Isaac Sim, Isaac Lab e MuJoCo.</p></div>
+          </article>
+          <article class="item job">
+            <div class="logo"><img src="img/logo-ibi.png" alt="IBI"></div>
+            <div><p class="org">IBI · projeto · abril de 2026 · São Paulo, SP</p><p class="what">Instituto Brasileiro de Infraestrutura</p><p class="how">Simulação da terceira via para o transporte rodoviário por Cubatão e Santos, concluída em um mês e apresentada na Câmara dos Deputados Federais de São Paulo.</p></div>
+          </article>
+          <article class="item job">
+            <div class="logo"><img src="img/logo-lab2code.png" alt="Lab2Code"></div>
+            <div><p class="org">Lab2Code · processos e inovação para o setor público · Brasília</p><p class="what">Lab2Code</p><p class="how">Colaborador em projetos e pesquisas para o setor elétrico e em problemas de instituições e agências nacionais.</p></div>
+          </article>
+        </div>
+        <span class="steps" id="jobSteps"><i class="on"></i><i></i><i></i></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="room" id="projetos">
+    <div class="stick">
+      <div class="block">
+        <p class="label">Projetos</p>
+        <div class="stack" id="projs">
+          <article class="item proj on"><img src="img/projeto-mujoco.jpg" alt="Painel com telemetria de uma pata e o modelo 3D de um robô quadrúpede"><div><p class="cat">Robótica · IA</p><p class="what">Dashboard de aprendizado por reforço</p><p class="how">Painel interativo dos dados que o simulador exibe durante o treinamento de um robô: acertos, falhas e o andamento do aprendizado por reforço.</p></div></article>
+          <article class="item proj"><img src="img/projeto-geopsic.jpg" alt="Plano 3D em grade com eixos X, Y e Z"><div><p class="cat">Educação · 3D</p><p class="what">Geopsics — ambiente 3D de estudo</p><p class="how">Ambiente virtual em 3D para estudar geometria analítica e física mecânica no navegador: pontos, vetores, planos, cônicas e quádricas, com modo AR sobre marcador.</p></div></article>
+          <article class="item proj"><img src="img/projeto-cubatao.jpg" alt="Mapa escuro da região de Cubatão com rotas e congestionamentos"><div><p class="cat">Simulação</p><p class="what">Simulação de tráfego — Cubatão / Santos</p><p class="how">Tráfego entre a Imigrantes e Santos em três cenários lado a lado: sem obras, com a terceira pista sem o COPI e com ela. Congestionamento, nível de serviço HCM e volume por capacidade em tempo real.</p></div></article>
+          <article class="item proj"><img src="img/projeto-onvoid.jpg" alt="Página inicial da ONVOID"><div><p class="cat">Web</p><p class="what">ONVOID — site institucional</p><p class="how">Landing page estática da ONVOID, com animações de rolagem, vídeo de fundo e gráficos vetoriais próprios.</p></div></article>
+        </div>
+        <span class="steps" id="projSteps"><i class="on"></i><i></i><i></i><i></i></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="room" id="registros">
+    <div class="stick">
+      <div class="block">
+        <h2 class="title">Artigos e certificados</h2>
+        <div class="records">
+          <div class="rec"><h3>Artigos</h3>
+            <div class="rec-item"><img src="img/artigo-geopsics.jpg" alt=""><span><b>Virtual Environment and 3D Simulation for the Visualization of Analytic Geometry and Physics</b><small>SVR</small></span></div>
+            <div class="rec-item"><img src="img/artigo-robotica.jpg" alt=""><span><b>Robotics Teaching with Interactive Dashboards: A Visual Machine Learning Methodology for Engineering</b><small>LatinoWare 2026 — em avaliação</small></span></div>
+          </div>
+          <div class="rec"><h3>Certificados</h3>
+            <div class="rec-item"><img src="img/certificado-aeb-python.jpg" alt=""><span><b>Programação de Algoritmos em Python</b><small>Agência Espacial Brasileira (AEB) · 2026</small></span></div>
+            <div class="rec-item"><img src="img/certificado-onc.jpg" alt=""><span><b>Olimpíada Nacional de Ciências 2025 — Medalha de ouro</b><small>ONC · MCTI e UFPI</small></span></div>
+            <div class="rec-item"><img src="img/certificado-obli.jpg" alt=""><span><b>Olimpíada Brasileira de Língua Inglesa 2025.1 — Bronze</b><small>Seleta Educação</small></span></div>
+            <div class="rec-item"><img src="img/certificado-oba-2024.jpg" alt=""><span><b>Olimpíada Brasileira de Astronomia e Astronáutica · 2×</b><small>SAB e AEB · 2024 e 2025</small></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="room" id="skills">
+    <div class="stick">
+      <div class="block">
+        <h2 class="title">Com o que trabalho</h2>
+        <div class="grid">
+          <div class="sk"><i style="--ico:url(img/icons/html.svg);--c:#E34F26"></i>HTML</div>
+          <div class="sk"><i style="--ico:url(img/icons/css.svg);--c:#1572B6"></i>CSS</div>
+          <div class="sk"><i style="--ico:url(img/icons/python.svg);--c:#3776AB"></i>Python</div>
+          <div class="sk"><i style="--ico:url(img/icons/c.svg);--c:#A8B9CC"></i>C</div>
+          <div class="sk"><i style="--ico:url(img/icons/javascript.svg);--c:#F7DF1E"></i>JavaScript</div>
+          <div class="sk"><i style="--ico:url(img/icons/vscode.svg);--c:#3b9ee8"></i>VS Code</div>
+          <div class="sk"><i style="--ico:url(img/icons/illustrator.svg);--c:#FF9A00"></i>Illustrator</div>
+          <div class="sk"><i style="--ico:url(img/icons/intellij.svg);--c:#e8edf6"></i>IntelliJ IDEA</div>
+          <div class="sk"><i style="--ico:url(img/icons/vegas.svg);--c:#e8edf6"></i>Sony Vegas</div>
+          <div class="sk"><i style="--ico:url(img/icons/github.svg);--c:#e8edf6"></i>GitHub</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="room" id="contato">
+    <div class="stick">
+      <div class="block">
+        <div class="links">
+          <a class="link" href="https://wa.me/5534997727210?text=Ol%C3%A1%2C%20Joabe!%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar." target="_blank" rel="noopener"><span><small>WhatsApp</small><span class="v">+55 34 9 9772-7210</span></span><span class="arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <a class="link" href="https://www.linkedin.com/in/joabe-alves-pereira/" target="_blank" rel="noopener"><span><small>LinkedIn</small><span class="v">joabe-alves-pereira</span></span><span class="arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <a class="link" href="https://github.com/joaberepositorios" target="_blank" rel="noopener"><span><small>GitHub</small><span class="v">joaberepositorios</span></span><span class="arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <a class="link" href="https://www.instagram.com/joabeengc/" target="_blank" rel="noopener"><span><small>Instagram</small><span class="v">@joabeengc</span></span><span class="arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <a class="link" href="mailto:joabepereira.adm@gmail.com"><span><small>E-mail</small><span class="v">joabepereira.adm@gmail.com</span></span><span class="arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        </div>
+        <p class="foot">© 2026 Joabe Alves · Uberlândia · <button class="cred-btn" id="credBtn" aria-expanded="false">créditos</button><span class="cred" id="cred" hidden>Cenários 3D: <a href="https://sketchfab.com/3d-models/sci-fi-spacestation-corridor-b61116abbd7d4684bc3b6df6f5cf717e" target="_blank" rel="noopener">“Sci Fi Spacestation Corridor”</a>, de <a href="https://sketchfab.com/payamtavakoli" target="_blank" rel="noopener">Siamak Tavakoli</a>, e <a href="https://sketchfab.com/3d-models/free-skybox-sci-fi-space-room-interior-46d3b9844e024c3db45962861aaafbea" target="_blank" rel="noopener">“Sci-Fi Space Room Interior”</a>, de <a href="https://sketchfab.com/paul_paul_paul" target="_blank" rel="noopener">Paul</a> (CC BY 4.0)</span></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script type="module">
+/* =====================================================================
+   Portfólio 3D · Joabe Alves
+   Estrutura: 1) ajustes  2) renderizador  3) carregamento  4) cenário
+              5) percurso da câmera  6) rolagem e textos  7) laço de desenho
+   Regras: render direto (sem pós-processamento), desenha só quando algo muda,
+   poucas luzes, resolução automática (sem controle pelo usuário).
+   ===================================================================== */
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ---------- 1) ajustes ---------- */
+const CFG = {
+  eye: 1.45,                 // altura dos olhos no corredor
+  tiles: 3, tile: 8.3155,    // módulos do corredor (8,3 m cada, no eixo x)
+  roomRadius: 10,            // raio da esfera do panorama
+  maxDpr: 2,                 // resolução máxima (pixels reais da tela)
+  minDpr: .75,               // piso do ajuste automático
+  slowFrameMs: 24,           // acima disso (mediana), a resolução cai um degrau
+  idleFps: 24                // cadência da animação dos hologramas quando parado
+};
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const smooth = t => t * t * (3 - 2 * t);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const small = matchMedia('(max-width: 760px)').matches;
+const SNAP = location.search.includes('snap'); // modo de teste: sem suavização temporal
+$('#credBtn').addEventListener('click', () => { const c = $('#cred'); c.hidden = !c.hidden; $('#credBtn').setAttribute('aria-expanded', String(!c.hidden)); });
+
+/* ---------- 2) renderizador: direto para a tela, anti-serrilhado nativo ---------- */
+const canvas = $('#scene');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', stencil: false }); }
+catch (e) { canvas.remove(); $('#loader').classList.add('done'); throw e; }
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+let dpr = Math.min(devicePixelRatio || 1, CFG.maxDpr);
+const applySize = () => { renderer.setPixelRatio(dpr); renderer.setSize(innerWidth, innerHeight, false); };
+applySize();
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x04060b);
+scene.fog = new THREE.Fog(0x04060b, 14, 48);
+const camera = new THREE.PerspectiveCamera(small ? 66 : 56, innerWidth / innerHeight, 0.05, 200);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = 1.3;  // o corredor é metálico: é o ambiente refletido que o ilumina, sem custo por luz
+scene.add(new THREE.AmbientLight(0x6f86b8, .4));
+
+/* ---------- 3) carregamento, com progresso ---------- */
+const manager = new THREE.LoadingManager();
+manager.onProgress = (_, done, total) => { const p = done / total; $('#barFill').style.transform = `scaleX(${p})`; $('#pct').textContent = Math.round(p * 100) + '%'; };
+const texLoader = new THREE.TextureLoader(manager);
+const gltf = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder);
+const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+const loadTex = url => texLoader.loadAsync(url).then(t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t; });
+const [logoTex, projTex, recTex, corridorSrc, roomSrc] = await Promise.all([
+  Promise.all(['grva', 'ibi', 'lab2code'].map(n => loadTex(`img/logo-${n}.png`))),
+  Promise.all(['mujoco', 'geopsic', 'cubatao', 'onvoid'].map(n => loadTex(`img/projeto-${n}.jpg`))),
+  Promise.all(['artigo-geopsics', 'artigo-robotica', 'certificado-aeb-python', 'certificado-onc', 'certificado-obli', 'certificado-oba-2024'].map(n => loadTex(`img/${n}.jpg`))),
+  gltf.loadAsync('3d/corredor.glb').then(r => r.scene),
+  gltf.loadAsync('3d/sala.glb').then(r => r.scene)
+]);
+
+/* ---------- 4) cenário ---------- */
+// corredor: "Sci Fi Spacestation Corridor" (Siamak Tavakoli, CC BY 4.0). Módulo aberto nas pontas, repetido 3×.
+corridorSrc.traverse(o => { if (o.isMesh) { const m = o.material; m.envMapIntensity = 1.2; for (const k of ['map', 'normalMap', 'metalnessMap', 'roughnessMap']) if (m[k]) { m[k].anisotropy = aniso; } } });
+for (let k = 0; k < CFG.tiles; k++) {
+  const t = corridorSrc.clone(); t.position.x = k * CFG.tile;
+  t.traverse(o => { if (o.isMesh && o.material.name === 'Stars-Space') o.visible = false; }); // o quadro de "espaço" da ponta sai: o corredor abre na sala
+  scene.add(t);
+}
+const END_X = -1.11 + CFG.tiles * CFG.tile; // ≈ 23,8
+for (const x of [-.5, 6, 12.5, 19]) { const l = new THREE.PointLight(0xaddcff, 5, 12, 2); l.position.set(x, 2.3, 0); scene.add(l); } // 4 luzes: cada uma custa em todo pixel
+
+// sala de comando: panorama "Sci-Fi Space Room Interior" (Paul, CC BY 4.0), numa esfera vista por dentro.
+const ROOM = new THREE.Vector3(END_X + 9.5, 1.5, 0);
+{
+  let mesh = null; roomSrc.traverse(o => { if (o.isMesh) mesh = o; });
+  const tex = mesh.material.emissiveMap || mesh.material.map; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = aniso;
+  mesh.material = new THREE.MeshBasicMaterial({ map: tex, color: 0xb4bac6, side: THREE.FrontSide, fog: false }); // FrontSide: de fora, vê-se através dela até o fundo
+  const b = new THREE.Box3().setFromObject(roomSrc), r0 = (b.max.x - b.min.x) / 2;
+  roomSrc.scale.setScalar(CFG.roomRadius / r0); roomSrc.position.copy(ROOM); roomSrc.rotation.y = Math.PI; // a grande janela fica à frente (+x)
+  scene.add(roomSrc);
+}
+// porta na boca do corredor: portal escuro translúcido com contorno ciano
+{
+  const door = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 2.7), new THREE.MeshBasicMaterial({ color: 0x020408, transparent: true, opacity: .62, side: THREE.DoubleSide, depthWrite: false }));
+  door.position.set(END_X + .05, 1.3, 0); door.rotation.y = Math.PI / 2; scene.add(door);
+  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(4.4, 2.5)), new THREE.LineBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: .9 }));
+  edge.position.set(END_X + .06, 1.3, 0); edge.rotation.y = Math.PI / 2; scene.add(edge);
+}
+// painéis holográficos (logos no corredor, telas na sala, artigos na sala)
+function holoPanel(tex, w, x, y, z, ry, dark = 0x0a1a2a) {
+  const ar = tex.image.width / tex.image.height, h = w / ar, g = new THREE.Group();
+  g.position.set(x, y, z); g.rotation.y = ry;
+  const plate = new THREE.Mesh(new THREE.PlaneGeometry(w + .3, h + .3), new THREE.MeshBasicMaterial({ color: dark, transparent: true, opacity: .85 })); plate.position.z = -.01; g.add(plate);
+  const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(w + .34, h + .34)), new THREE.LineBasicMaterial({ color: 0x7dd3fc })); g.add(frame);
+  const pic = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true })); pic.position.z = .01; g.add(pic);
+  scene.add(g); return g;
+}
+const TOTEMS = [[6.3, -1.55], [12.6, 1.55], [18.9, -1.55]];
+TOTEMS.forEach(([x, z], i) => holoPanel(logoTex[i], 1.25, x, 1.55, z, z < 0 ? 0 : Math.PI));
+const screens = [75, 108, 252, 285].map((deg, i) => {
+  const a = deg * Math.PI / 180, g = holoPanel(projTex[i], 2.2, ROOM.x + Math.cos(a) * 3.3, 1.6, Math.sin(a) * 3.3, 0, 0x06101c);
+  g.lookAt(ROOM.x, 1.6, 0); return g;
+});
+recTex.forEach((t, i) => { const a = (150 + i * 12) * Math.PI / 180, g = holoPanel(t, i < 2 ? 1.0 : 1.3, ROOM.x + Math.cos(a) * 4.2, 1.5 + (i % 2) * .9, Math.sin(a) * 4.2, 0, 0x06101c); g.lookAt(ROOM.x, 1.6, 0); });
+// núcleo das skills: poliedro em arame, esfera e anel de partículas, à direita de quem olha a janela
+const orb = new THREE.Group(); orb.position.set(ROOM.x + 2.6, 1.3, 1.7); scene.add(orb);
+orb.add(new THREE.Mesh(new THREE.IcosahedronGeometry(.8, 1), new THREE.MeshBasicMaterial({ color: 0xa78bfa, wireframe: true, transparent: true, opacity: .45 })));
+orb.add(new THREE.Mesh(new THREE.SphereGeometry(.22, 24, 24), new THREE.MeshBasicMaterial({ color: 0xc8f6ff })));
+const ringPts = (() => { const n = 260, p = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, r = 1.25 + (Math.random() - .5) * .12; p[i * 3] = Math.cos(a) * r; p[i * 3 + 1] = (Math.random() - .5) * .06; p[i * 3 + 2] = Math.sin(a) * r; } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3)); return new THREE.Points(g, new THREE.PointsMaterial({ color: 0x7dd3fc, size: .035, transparent: true, opacity: .9, depthWrite: false })); })();
+ringPts.rotation.x = .5; orb.add(ringPts);
+const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.0, .008, 6, 96), new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: .6 })); ring2.rotation.x = Math.PI / 2 - .3; orb.add(ring2);
+// partículas no ar do corredor
+{
+  const n = 350, p = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { p[i * 3] = -1 + Math.random() * (END_X + 1); p[i * 3 + 1] = .2 + Math.random() * 2.3; p[i * 3 + 2] = (Math.random() - .5) * 4; }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xbfe8ff, size: .025, transparent: true, opacity: .5, depthWrite: false })));
+}
+
+/* ---------- 5) percurso da câmera ----------
+   cada parada é presa a um ponto da rolagem de uma seção (0 = início, 1 = fim).
+   na sala a posição quase não muda: os alvos giram em volta do centro (ângulo a). */
+const v = (x, y, z) => new THREE.Vector3(x, y, z), E = CFG.eye, D = Math.PI / 180;
+const look = (a, y = 1.55) => v(ROOM.x + Math.cos(a) * 5, y, Math.sin(a) * 5);
+const at = (dx = 0, dz = 0) => v(ROOM.x + dx, ROOM.y, dz);
+const STOPS = [
+  ['#topo', 0, v(.2, E, 0), v(10, 1.5, 0)],
+  ['#topo', 1, v(1.4, E, 0), v(12, 1.5, 0)],
+  ['#sobre', 0, v(2.4, E, .3), v(14, 1.5, 0)],
+  ['#sobre', 1, v(3.6, E, .3), v(15, 1.5, -.5)],
+  ['#trabalho', .1, v(4.7, E, .55), v(6.3, 1.65, -1.55)],
+  ['#trabalho', .45, v(11.0, E, -.55), v(12.6, 1.65, 1.55)],
+  ['#trabalho', .8, v(20.4, E, .6), v(18.9, 1.65, -1.55)],   // visto de costas para a sala
+  ['#trabalho', 1, v(21.8, E, 0), v(40, 1.4, -1)],
+  ['#projetos', .06, at(-.2, 0), look(75 * D)],
+  ['#projetos', .31, at(-.1, .1), look(108 * D)],
+  ['#projetos', .56, at(0, -.1), look(252 * D)],
+  ['#projetos', .81, at(.1, 0), look(285 * D)],
+  ['#projetos', 1, at(.2, .1), look(200 * D)],
+  ['#registros', .5, at(.1, .2), look(168 * D, 1.6)],
+  ['#skills', .5, at(0, .3), look(35 * D, 1.6)],
+  ['#contato', 0, at(.3, .1), look(0, 1.5)],
+  ['#contato', 1, at(.6, 0), look(0, 1.1)]
+];
+const SNAPS = { '#trabalho': [.1, .45, .8], '#projetos': [.06, .31, .56, .81] };
+const U_ROOM = (STOPS.findIndex(s => s[0] === '#projetos') - .6) / (STOPS.length - 1);
+const posCurve = new THREE.CatmullRomCurve3(STOPS.map(s => s[2]), false, 'centripetal');
+const tgtCurve = new THREE.CatmullRomCurve3(STOPS.map(s => s[3]), false, 'centripetal');
+let stopY = [];
+const secY = (sel, f) => { const el = $(sel); const top = el.getBoundingClientRect().top + scrollY; return top + f * Math.max(0, el.offsetHeight - innerHeight); };
+const measure = () => { stopY = STOPS.map(([sel, f]) => secY(sel, f)); };
+function pathAt(y) {
+  const n = STOPS.length;
+  let i = 0; while (i < n - 2 && y >= stopY[i + 1]) i++;
+  return (i + smooth(clamp((y - stopY[i]) / Math.max(1, stopY[i + 1] - stopY[i])))) / (n - 1);
+}
+
+/* ---------- 6) rolagem e textos ---------- */
+gsap.registerPlugin(ScrollTrigger);
+const lenis = !reduce && window.Lenis ? new Lenis({ lerp: .09, smoothWheel: true }) : null;
+if (lenis) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
+const goTo = (t, d = 1.6) => lenis ? lenis.scrollTo(t, { duration: d }) : window.scrollTo({ top: typeof t === 'number' ? t : t.getBoundingClientRect().top + scrollY, behavior: 'smooth' });
+$$('a[href^="#"]').forEach(a => a.addEventListener('click', e => { const t = $(a.getAttribute('href')); if (!t) return; e.preventDefault(); goTo(t, 2.2); }));
+// cada bloco aparece um pouco antes da sua seção começar e se dissolve um pouco depois de ela acabar
+$$('.room').forEach(sec => {
+  const el = sec.querySelector('.stick'), hero = sec.id === 'topo';
+  const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: hero ? 'top top' : 'top 62%', end: 'bottom 38%', scrub: .8 } });
+  if (hero) tl.set(el, { autoAlpha: 1 }); else tl.fromTo(el, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .16, ease: 'none' });
+  tl.to({}, { duration: hero ? .82 : .68 }).to(el, { autoAlpha: 0, y: -30, duration: .16, ease: 'none' });
+});
+// trabalho e projetos: um item em destaque por parada
+function stepper(sel, itemsSel, stepsSel, bounds) {
+  const items = $$(itemsSel), steps = $$(stepsSel); let idx = 0;
+  const show = i => { if (i === idx) return; idx = i; items.forEach((c, k) => c.classList.toggle('on', k === i)); steps.forEach((d, k) => d.classList.toggle('on', k === i)); };
+  ScrollTrigger.create({ trigger: sel, start: 'top top', end: 'bottom bottom', onUpdate: st => { let i = 0; while (i < bounds.length && st.progress >= bounds[i]) i++; show(i); } });
+}
+stepper('#trabalho', '#jobs .item', '#jobSteps i', [.3, .62]);
+stepper('#projetos', '#projs .item', '#projSteps i', [.19, .44, .69]);
+// encaixe: ao parar de rolar dentro dessas seções, a página assenta na parada mais próxima
+let settle = 0;
+addEventListener('scroll', () => {
+  if (!lenis || SNAP) return;
+  clearTimeout(settle);
+  settle = setTimeout(() => {
+    const y = scrollY;
+    for (const [sel, fr] of Object.entries(SNAPS)) {
+      const ys = fr.map(f => secY(sel, f));
+      if (y < ys[0] - innerHeight * .3 || y > ys[ys.length - 1] + innerHeight * .3) continue;
+      const near = ys.reduce((a, b) => Math.abs(b - y) < Math.abs(a - y) ? b : a);
+      if (Math.abs(near - y) > 6) lenis.scrollTo(near, { duration: 1.2 });
+      return;
+    }
+  }, 220);
+}, { passive: true });
+
+/* ---------- 7) laço de desenho: só quando algo muda; resolução cai sozinha se travar ---------- */
+let dirty = true, mx = 0, my = 0, tmx = 0, tmy = 0, u = 0, uS = 0, lastAnim = 0;
+const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(), lookAt = new THREE.Vector3(), dir = new THREE.Vector3(), side = new THREE.Vector3();
+const frames = [];
+addEventListener('pointermove', e => { tmx = e.clientX / innerWidth - .5; tmy = e.clientY / innerHeight - .5; }, { passive: true });
+addEventListener('resize', () => { applySize(); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); measure(); dirty = true; });
+ScrollTrigger.addEventListener('refresh', () => { measure(); dirty = true; });
+measure(); uS = u = pathAt(scrollY);
+const render = () => renderer.render(scene, camera);
+
+gsap.ticker.add((time, dtMs) => {
+  const dt = Math.min(dtMs / 1000, .05);
+  u = pathAt(scrollY);
+  const k = reduce || SNAP ? 1 : 1 - Math.exp(-dt * 4.5), km = 1 - Math.exp(-dt * 3.5);
+  const du = u - uS, dm = Math.abs(tmx - mx) + Math.abs(tmy - my);
+  uS += du * k; mx += (tmx - mx) * km; my += (tmy - my) * km;
+  const moving = Math.abs(du) > 1e-5 || dm > 1e-4;
+  // hologramas da sala: animam em cadência baixa quando parado, e junto com o movimento quando rolando
+  if (uS > U_ROOM && document.visibilityState === 'visible' && !reduce && (moving || time - lastAnim > 1 / CFG.idleFps)) {
+    lastAnim = time; const t = time;
+    orb.rotation.y = t * .25; orb.children[0].rotation.x = t * .12; ringPts.rotation.y = -t * .35; ring2.rotation.z = t * .2;
+    screens.forEach((g, i) => { g.position.y = 1.6 + Math.sin(t * 1.1 + i * 1.7) * .05; });
+    dirty = true;
+  }
+  if (moving || dirty) {
+    posCurve.getPoint(uS, camPos); tgtCurve.getPoint(uS, camTgt);
+    dir.subVectors(camTgt, camPos).normalize(); side.crossVectors(dir, camera.up).normalize();
+    lookAt.copy(camTgt).addScaledVector(side, mx * 1.2).addScaledVector(camera.up, -my * .6);
+    camera.position.copy(camPos); camera.lookAt(lookAt);
+    render(); dirty = false;
+    if (moving && !SNAP && dpr > CFG.minDpr) {
+      frames.push(dtMs);
+      if (frames.length >= 40) { frames.sort((a, b) => a - b); if (frames[20] > CFG.slowFrameMs) { dpr = Math.max(CFG.minDpr, dpr - .25); applySize(); } frames.length = 0; }
+    }
+  }
+  $('#hint').classList.toggle('gone', scrollY > 40);
+});
+
+/* pronto: desenha o primeiro quadro, tira o carregador e abre a cena */
+renderer.compile(scene, camera); render();
+$('#barFill').style.transform = 'scaleX(1)'; $('#pct').textContent = '100%';
+ScrollTrigger.refresh();
+requestAnimationFrame(() => { render(); canvas.classList.add('on'); $('#loader').classList.add('done'); });
+for (const ms of [500, 1500, 3000]) setTimeout(() => { dirty = true; }, ms); // redesenha depois que texturas assentam
+</script>
+</body>
 </html>
