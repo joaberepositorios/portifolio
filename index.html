@@ -31,7 +31,7 @@ h1,h2{font-weight:400}
 /* cenário: desenhado nítido; o véu por cima desfoca (backdrop-filter, um passe só do compositor — não é filter no canvas, que gerava placas) e escurece */
 #scene{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:0;opacity:0;transition:opacity 1.2s var(--ease)}
 #scene.on{opacity:1}
-#scene.on+#veil{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#scene.on+#veil{-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
 #veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(2,4,10,.5) 0%,rgba(2,4,10,.72) 70%,rgba(2,4,10,.86) 100%)}
 
 /* carregador: barra fina e porcentagem; some depois do primeiro quadro desenhado */
@@ -315,11 +315,11 @@ const CFG = {
   eye: 1.45,                 // altura dos olhos no corredor
   tiles: 3, tile: 8.3155,    // módulos do corredor (8,3 m cada, no eixo x)
   roomRadius: 10,            // raio da esfera do panorama
-  maxDpr: 1.25,              // teto de pixel ratio (o desfoque do véu esconde o que passar disso)
-  maxWidth: 2048,            // teto absoluto: render em 2K, nunca acima (telas 4K/retina)
-  minScale: .6,              // piso do ajuste automático (fração do teto)
+  maxDpr: .9,                // teto de pixel ratio: abaixo de 1 de propósito, o desfoque do véu esconde
+  maxWidth: 1600,            // teto absoluto de largura do render, em qualquer tela
+  minScale: .5,              // piso do ajuste automático (fração do teto)
   slowFrameMs: 22,           // acima disso (mediana), a resolução cai um degrau
-  idleFps: 24                // cadência da animação dos hologramas quando parado
+  idleFps: 12                // cadência da animação dos hologramas quando parado
 };
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -332,7 +332,7 @@ $('#credBtn').addEventListener('click', () => { const c = $('#cred'); c.hidden =
 /* ---------- 2) renderizador: direto para a tela, anti-serrilhado nativo ---------- */
 const canvas = $('#scene');
 let renderer;
-try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', stencil: false }); }
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance', stencil: false }); }
 catch (e) { canvas.remove(); $('#loader').classList.add('done'); throw e; }
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -354,7 +354,7 @@ const manager = new THREE.LoadingManager();
 manager.onProgress = (_, done, total) => { const p = done / total; $('#barFill').style.transform = `scaleX(${p})`; $('#pct').textContent = Math.round(p * 100) + '%'; };
 const texLoader = new THREE.TextureLoader(manager);
 const gltf = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder);
-const aniso = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+const aniso = Math.min(2, renderer.capabilities.getMaxAnisotropy());
 const loadTex = url => texLoader.loadAsync(url).then(t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t; });
 const [logoTex, projTex, recTex, corridorSrc, roomSrc] = await Promise.all([
   Promise.all(['grva', 'ibi', 'lab2code'].map(n => loadTex(`img/logo-${n}.png`))),
@@ -373,7 +373,7 @@ for (let k = 0; k < CFG.tiles; k++) {
   scene.add(t);
 }
 const END_X = -1.11 + CFG.tiles * CFG.tile; // ≈ 23,8
-for (const x of [-.5, 6, 12.5, 19]) { const l = new THREE.PointLight(0xaddcff, 5, 12, 2); l.position.set(x, 2.3, 0); scene.add(l); } // 4 luzes: cada uma custa em todo pixel
+for (const x of [1, 10.5, 19.5]) { const l = new THREE.PointLight(0xaddcff, 6, 13, 2); l.position.set(x, 2.3, 0); scene.add(l); } // 4 luzes: cada uma custa em todo pixel
 
 // sala de comando: panorama "Sci-Fi Space Room Interior" (Paul, CC BY 4.0), numa esfera vista por dentro.
 const ROOM = new THREE.Vector3(END_X + 9.5, 1.5, 0);
@@ -463,7 +463,7 @@ function pathAt(y) {
 
 /* ---------- 6) rolagem e textos ---------- */
 gsap.registerPlugin(ScrollTrigger);
-const lenis = !reduce && window.Lenis ? new Lenis({ lerp: .09, smoothWheel: true }) : null;
+const lenis = !reduce && window.Lenis ? new Lenis({ lerp: .11, smoothWheel: true }) : null;
 if (lenis) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
 const goTo = (t, d = 1.6) => lenis ? lenis.scrollTo(t, { duration: d }) : window.scrollTo({ top: typeof t === 'number' ? t : t.getBoundingClientRect().top + scrollY, behavior: 'smooth' });
 $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => { const t = $(a.getAttribute('href')); if (!t) return; e.preventDefault(); goTo(t, 2.2); }));
