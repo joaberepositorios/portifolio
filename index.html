@@ -66,7 +66,7 @@ main{position:relative;z-index:2}
 #topo{height:130vh}
 #sobre{height:170vh}
 #trabalho{height:330vh}
-#projetos{height:420vh}
+#projetos{height:520vh}
 #registros{height:170vh}
 #skills{height:170vh}
 #contato{height:170vh}
@@ -82,7 +82,7 @@ main{position:relative;z-index:2}
 .hero .sub{margin-top:clamp(20px,3vh,30px);font-family:var(--mono);font-size:clamp(11px,1.1vw,14px);letter-spacing:.2em;text-transform:uppercase;color:var(--soft);text-shadow:0 1px 14px rgba(0,0,0,.7)}
 
 /* quem sou */
-.bio{font-size:clamp(16px,1.5vw,20px);line-height:1.6;max-width:62ch}
+.bio{font-size:clamp(16px,1.5vw,20px);line-height:1.6}
 .bio em{font-style:normal;color:var(--cyan)}
 .topics{display:flex;flex-wrap:wrap;gap:clamp(18px,3vw,44px);margin-top:clamp(20px,3vh,30px);padding-top:18px;border-top:1px solid var(--line)}
 .topic small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);margin-bottom:4px}
@@ -90,7 +90,7 @@ main{position:relative;z-index:2}
 .topic b i{font-style:normal;color:var(--cyan)}
 
 /* trabalho e projetos: um item por parada; os itens ficam empilhados e só o atual aparece */
-.stack{position:relative;width:min(760px,100%)}
+.stack{position:relative;width:100%}
 .item{position:absolute;left:0;top:0;width:100%;opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .8s var(--ease);pointer-events:none}
 .item.on{opacity:1;transform:none;pointer-events:auto;position:relative}
 .job{display:grid;grid-template-columns:clamp(120px,14vw,170px) minmax(0,1fr);gap:clamp(18px,3vw,36px);align-items:center}
@@ -103,6 +103,8 @@ main{position:relative;z-index:2}
 .proj img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;border-radius:14px;box-shadow:0 30px 60px -28px rgba(0,0,0,.9),0 0 0 1px rgba(34,211,238,.25)}
 .proj .cat{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--violet)}
 .proj .what{font-family:var(--display);font-size:clamp(15px,1.7vw,22px);line-height:1.25;margin:8px 0 10px}
+.proj .what a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(34,211,238,.55)}
+.proj .what a:hover{border-bottom-color:#fff}
 .proj .how{font-size:clamp(13.5px,1.15vw,16px);max-width:48ch}
 .steps{display:flex;gap:7px;margin-top:clamp(22px,3.6vh,34px)}
 .steps i{width:7px;height:7px;border-radius:50%;background:rgba(232,237,246,.25);transition:background .4s,transform .4s,box-shadow .4s}
@@ -117,12 +119,17 @@ main{position:relative;z-index:2}
 .rec-item small{display:block;font-size:12px;color:var(--soft);margin-top:2px}
 
 /* skills */
-.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,2vw,22px);margin-top:clamp(18px,3vh,28px);max-width:720px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,2vw,22px);margin-top:clamp(18px,3vh,28px)}
 .sk{display:flex;flex-direction:column;align-items:center;gap:10px;font-size:12px;letter-spacing:.04em;color:var(--soft)}
 .sk i{width:40px;height:40px;background:var(--c);-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;filter:drop-shadow(0 0 10px color-mix(in srgb,var(--c) 45%,transparent))}
 
 /* contato: só os links */
-.links{width:min(620px,100%)}
+/* cada seção tem o bloco do tamanho do seu conteúdo, para ficar centralizado de verdade */
+#sobre .block{width:min(680px,100%)}
+#trabalho .block,#projetos .block{width:min(760px,100%)}
+#skills .block{width:min(720px,100%)}
+#contato .block{width:min(620px,100%)}
+.links{width:100%}
 .link{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:clamp(12px,2vh,16px) 0;border-top:1px solid var(--line)}
 .link:last-child{border-bottom:1px solid var(--line)}
 .link small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);margin-bottom:2px}
@@ -232,8 +239,9 @@ main{position:relative;z-index:2}
           <article class="item proj"><img src="img/projeto-geopsic.jpg" alt="Plano 3D em grade com eixos X, Y e Z"><div><p class="cat">Educação · 3D</p><p class="what">Geopsics — ambiente 3D de estudo</p><p class="how">Ambiente virtual em 3D para estudar geometria analítica e física mecânica no navegador: pontos, vetores, planos, cônicas e quádricas, com modo AR sobre marcador.</p></div></article>
           <article class="item proj"><img src="img/projeto-cubatao.jpg" alt="Mapa escuro da região de Cubatão com rotas e congestionamentos"><div><p class="cat">Simulação</p><p class="what">Simulação de tráfego — Cubatão / Santos</p><p class="how">Tráfego entre a Imigrantes e Santos em três cenários lado a lado: sem obras, com a terceira pista sem o COPI e com ela. Congestionamento, nível de serviço HCM e volume por capacidade em tempo real.</p></div></article>
           <article class="item proj"><img src="img/projeto-onvoid.jpg" alt="Página inicial da ONVOID"><div><p class="cat">Web</p><p class="what">ONVOID — site institucional</p><p class="how">Landing page estática da ONVOID, com animações de rolagem, vídeo de fundo e gráficos vetoriais próprios.</p></div></article>
+          <article class="item proj"><img src="img/projeto-anvolts.jpg" alt="Painel do Anvolts com calendário, gráfico de notas e CRA"><div><p class="cat">Web · Educação</p><p class="what"><a href="https://anvolts.web.app" target="_blank" rel="noopener">Anvolts — organizador da graduação</a></p><p class="how">Aplicativo web para organizar o curso: fluxograma oficial da UFU pintado por matéria, grade de horários, provas, notas com CRA e MGA pela regra da universidade e ementas divididas em blocos de estudo. Login com Google e dados na nuvem por usuário.</p></div></article>
         </div>
-        <span class="steps" id="projSteps"><i class="on"></i><i></i><i></i><i></i></span>
+        <span class="steps" id="projSteps"><i class="on"></i><i></i><i></i><i></i><i></i></span>
       </div>
     </div>
   </section>
@@ -361,7 +369,7 @@ const aniso = Math.min(2, renderer.capabilities.getMaxAnisotropy());
 const loadTex = url => texLoader.loadAsync(url).then(t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t; });
 const [logoTex, projTex, recTex, corridorSrc, roomSrc] = await Promise.all([
   Promise.all(['grva', 'ibi', 'lab2code'].map(n => loadTex(`img/logo-${n}.png`))),
-  Promise.all(['mujoco', 'geopsic', 'cubatao', 'onvoid'].map(n => loadTex(`img/projeto-${n}.jpg`))),
+  Promise.all(['mujoco', 'geopsic', 'cubatao', 'onvoid', 'anvolts'].map(n => loadTex(`img/projeto-${n}.jpg`))),
   Promise.all(['artigo-geopsics', 'artigo-robotica', 'certificado-aeb-python', 'certificado-onc', 'certificado-obli', 'certificado-oba-2024'].map(n => loadTex(`img/${n}.jpg`))),
   gltf.loadAsync('3d/corredor.glb').then(r => r.scene),
   gltf.loadAsync('3d/sala.glb').then(r => r.scene)
@@ -406,7 +414,7 @@ function holoPanel(tex, w, x, y, z, ry, dark = 0x0a1a2a) {
 }
 const TOTEMS = [[6.3, -1.55], [12.6, 1.55], [18.9, -1.55]];
 TOTEMS.forEach(([x, z], i) => holoPanel(logoTex[i], 1.25, x, 1.55, z, z < 0 ? 0 : Math.PI));
-const screens = [75, 108, 252, 285].map((deg, i) => {
+const screens = [75, 108, 252, 285, 318].map((deg, i) => {
   const a = deg * Math.PI / 180, g = holoPanel(projTex[i], 2.2, ROOM.x + Math.cos(a) * 3.3, 1.6, Math.sin(a) * 3.3, 0, 0x06101c);
   g.lookAt(ROOM.x, 1.6, 0); return g;
 });
@@ -441,17 +449,18 @@ const STOPS = [
   ['#trabalho', .45, v(11.0, E, -.55), v(12.6, 1.65, 1.55)],
   ['#trabalho', .8, v(20.4, E, .6), v(18.9, 1.65, -1.55)],   // visto de costas para a sala
   ['#trabalho', 1, v(21.8, E, 0), v(40, 1.4, -1)],
-  ['#projetos', .06, at(-.2, 0), look(75 * D)],
-  ['#projetos', .31, at(-.1, .1), look(108 * D)],
-  ['#projetos', .56, at(0, -.1), look(252 * D)],
-  ['#projetos', .81, at(.1, 0), look(285 * D)],
+  ['#projetos', .05, at(-.2, 0), look(75 * D)],
+  ['#projetos', .24, at(-.1, .1), look(108 * D)],
+  ['#projetos', .43, at(0, -.1), look(252 * D)],
+  ['#projetos', .62, at(.1, 0), look(285 * D)],
+  ['#projetos', .81, at(.15, .1), look(318 * D)],
   ['#projetos', 1, at(.2, .1), look(200 * D)],
   ['#registros', .5, at(.1, .2), look(168 * D, 1.6)],
   ['#skills', .5, at(0, .3), look(35 * D, 1.6)],
   ['#contato', 0, at(.3, .1), look(0, 1.5)],
   ['#contato', 1, at(.6, 0), look(0, 1.1)]
 ];
-const SNAPS = { '#trabalho': [.1, .45, .8], '#projetos': [.06, .31, .56, .81] };
+const SNAPS = { '#trabalho': [.1, .45, .8], '#projetos': [.05, .24, .43, .62, .81] };
 const U_ROOM = (STOPS.findIndex(s => s[0] === '#projetos') - .6) / (STOPS.length - 1);
 const posCurve = new THREE.CatmullRomCurve3(STOPS.map(s => s[2]), false, 'centripetal');
 const tgtCurve = new THREE.CatmullRomCurve3(STOPS.map(s => s[3]), false, 'centripetal');
@@ -488,7 +497,7 @@ function stepper(sel, itemsSel, stepsSel, bounds) {
   ScrollTrigger.create({ trigger: sel, start: 'top top', end: 'bottom bottom', onUpdate: st => { let i = 0; while (i < bounds.length && st.progress >= bounds[i]) i++; show(i); } });
 }
 stepper('#trabalho', '#jobs .item', '#jobSteps i', [.3, .62]);
-stepper('#projetos', '#projs .item', '#projSteps i', [.19, .44, .69]);
+stepper('#projetos', '#projs .item', '#projSteps i', [.145, .335, .525, .715]);
 // encaixe: ao parar de rolar dentro dessas seções, a página assenta na parada mais próxima
 let settle = 0;
 addEventListener('scroll', () => {
