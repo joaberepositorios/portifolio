@@ -315,11 +315,12 @@ const CFG = {
   eye: 1.45,                 // altura dos olhos no corredor
   tiles: 3, tile: 8.3155,    // módulos do corredor (8,3 m cada, no eixo x)
   roomRadius: 10,            // raio da esfera do panorama
-  maxDpr: .9,                // teto de pixel ratio: abaixo de 1 de propósito, o desfoque do véu esconde
-  maxWidth: 1600,            // teto absoluto de largura do render, em qualquer tela
-  minScale: .5,              // piso do ajuste automático (fração do teto)
-  slowFrameMs: 22,           // acima disso (mediana), a resolução cai um degrau
-  idleFps: 12                // cadência da animação dos hologramas quando parado
+  // duas resoluções: em movimento, baixa (o desfoque do véu esconde); parado, um único quadro em resolução máxima
+  moveDpr: .75, moveWidth: 1400,   // enquanto rola
+  stillDpr: 2, stillWidth: 3840,   // quando para (até 4K)
+  minScale: .5,              // piso do ajuste automático da resolução em movimento
+  slowFrameMs: 22,           // acima disso (mediana), a resolução em movimento cai um degrau
+  stillAfter: .15            // segundos parado antes do quadro em resolução máxima
 };
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -337,9 +338,11 @@ catch (e) { canvas.remove(); $('#loader').classList.add('done'); throw e; }
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
-let scale = 1; // 1 = teto; o laço de desenho reduz sozinho se a máquina engasgar
-const applySize = () => { renderer.setPixelRatio(Math.min(devicePixelRatio || 1, CFG.maxDpr, CFG.maxWidth / innerWidth) * scale); renderer.setSize(innerWidth, innerHeight, false); };
-applySize();
+let scale = 1, curPr = 0; // scale: 1 = teto da resolução em movimento; cai sozinho se a máquina engasgar
+const prFor = still => still ? Math.min(devicePixelRatio || 1, CFG.stillDpr, CFG.stillWidth / innerWidth) : Math.min(devicePixelRatio || 1, CFG.moveDpr, CFG.moveWidth / innerWidth) * scale;
+// redimensionar só junto com um render no mesmo quadro: o canvas vazio entre um e outro era a "piscada"
+const setRes = still => { const pr = prFor(still); if (Math.abs(pr - curPr) < 1e-3) return; curPr = pr; renderer.setPixelRatio(pr); renderer.setSize(innerWidth, innerHeight, false); };
+setRes(true);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x04060b);
@@ -500,11 +503,11 @@ addEventListener('scroll', () => {
 }, { passive: true });
 
 /* ---------- 7) laço de desenho: só quando algo muda; resolução cai sozinha se travar ---------- */
-let dirty = true, mx = 0, my = 0, tmx = 0, tmy = 0, u = 0, uS = 0, lastAnim = 0;
-const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(), lookAt = new THREE.Vector3(), dir = new THREE.Vector3(), side = new THREE.Vector3();
+let dirty = true, u = 0, uS = 0;
+const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3();
 const frames = [];
-addEventListener('pointermove', e => { tmx = e.clientX / innerWidth - .5; tmy = e.clientY / innerHeight - .5; }, { passive: true });
-addEventListener('resize', () => { applySize(); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); measure(); dirty = true; });
+let lastMove = -1, stillDone = false;
+addEventListener('resize', () => { curPr = 0; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); measure(); dirty = true; });
 ScrollTrigger.addEventListener('refresh', () => { measure(); dirty = true; });
 measure(); uS = u = pathAt(scrollY);
 const render = () => renderer.render(scene, camera);
@@ -512,26 +515,25 @@ const render = () => renderer.render(scene, camera);
 gsap.ticker.add((time, dtMs) => {
   const dt = Math.min(dtMs / 1000, .05);
   u = pathAt(scrollY);
-  const k = reduce || SNAP ? 1 : 1 - Math.exp(-dt * 4.5), km = 1 - Math.exp(-dt * 3.5);
-  const du = u - uS, dm = Math.abs(tmx - mx) + Math.abs(tmy - my);
-  uS += du * k; mx += (tmx - mx) * km; my += (tmy - my) * km;
-  const moving = Math.abs(du) > 1e-5 || dm > 1e-4;
-  // hologramas da sala: animam em cadência baixa quando parado, e junto com o movimento quando rolando
-  if (uS > U_ROOM && document.visibilityState === 'visible' && !reduce && (moving || time - lastAnim > 1 / CFG.idleFps)) {
-    lastAnim = time; const t = time;
+  const k = reduce || SNAP ? 1 : 1 - Math.exp(-dt * 4.5);
+  const du = u - uS; uS += du * k;
+  const moving = Math.abs(du) > 1e-5;
+  if (moving) { lastMove = time; stillDone = false; }
+  const still = !moving && time - lastMove > CFG.stillAfter;
+  // hologramas da sala: só animam enquanto a página rola (parado, fica o quadro nítido)
+  if (moving && uS > U_ROOM && !reduce) {
+    const t = time;
     orb.rotation.y = t * .25; orb.children[0].rotation.x = t * .12; ringPts.rotation.y = -t * .35; ring2.rotation.z = t * .2;
     screens.forEach((g, i) => { g.position.y = 1.6 + Math.sin(t * 1.1 + i * 1.7) * .05; });
-    dirty = true;
   }
-  if (moving || dirty) {
+  if (moving || dirty || (still && !stillDone)) {
+    setRes(still);                      // em movimento: baixa; parado: máxima — sempre seguido do render, no mesmo quadro
     posCurve.getPoint(uS, camPos); tgtCurve.getPoint(uS, camTgt);
-    dir.subVectors(camTgt, camPos).normalize(); side.crossVectors(dir, camera.up).normalize();
-    lookAt.copy(camTgt).addScaledVector(side, mx * 1.2).addScaledVector(camera.up, -my * .6);
-    camera.position.copy(camPos); camera.lookAt(lookAt);
-    render(); dirty = false;
+    camera.position.copy(camPos); camera.lookAt(camTgt);
+    render(); dirty = false; if (still) stillDone = true;
     if (moving && !SNAP && scale > CFG.minScale) {
       frames.push(dtMs);
-      if (frames.length >= 40) { frames.sort((a, b) => a - b); if (frames[20] > CFG.slowFrameMs) { scale = Math.max(CFG.minScale, scale - .15); applySize(); } frames.length = 0; }
+      if (frames.length >= 40) { frames.sort((a, b) => a - b); if (frames[20] > CFG.slowFrameMs) scale = Math.max(CFG.minScale, scale - .15); frames.length = 0; }
     }
   }
   $('#hint').classList.toggle('gone', scrollY > 40);
