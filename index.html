@@ -315,9 +315,10 @@ const CFG = {
   eye: 1.45,                 // altura dos olhos no corredor
   tiles: 3, tile: 8.3155,    // módulos do corredor (8,3 m cada, no eixo x)
   roomRadius: 10,            // raio da esfera do panorama
-  maxDpr: 2,                 // resolução máxima (pixels reais da tela)
-  minDpr: .75,               // piso do ajuste automático
-  slowFrameMs: 24,           // acima disso (mediana), a resolução cai um degrau
+  maxDpr: 1.25,              // teto de pixel ratio (o desfoque do véu esconde o que passar disso)
+  maxWidth: 2048,            // teto absoluto: render em 2K, nunca acima (telas 4K/retina)
+  minScale: .6,              // piso do ajuste automático (fração do teto)
+  slowFrameMs: 22,           // acima disso (mediana), a resolução cai um degrau
   idleFps: 24                // cadência da animação dos hologramas quando parado
 };
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -336,8 +337,8 @@ catch (e) { canvas.remove(); $('#loader').classList.add('done'); throw e; }
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
-let dpr = Math.min(devicePixelRatio || 1, CFG.maxDpr);
-const applySize = () => { renderer.setPixelRatio(dpr); renderer.setSize(innerWidth, innerHeight, false); };
+let scale = 1; // 1 = teto; o laço de desenho reduz sozinho se a máquina engasgar
+const applySize = () => { renderer.setPixelRatio(Math.min(devicePixelRatio || 1, CFG.maxDpr, CFG.maxWidth / innerWidth) * scale); renderer.setSize(innerWidth, innerHeight, false); };
 applySize();
 
 const scene = new THREE.Scene();
@@ -353,7 +354,7 @@ const manager = new THREE.LoadingManager();
 manager.onProgress = (_, done, total) => { const p = done / total; $('#barFill').style.transform = `scaleX(${p})`; $('#pct').textContent = Math.round(p * 100) + '%'; };
 const texLoader = new THREE.TextureLoader(manager);
 const gltf = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder);
-const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+const aniso = Math.min(4, renderer.capabilities.getMaxAnisotropy());
 const loadTex = url => texLoader.loadAsync(url).then(t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t; });
 const [logoTex, projTex, recTex, corridorSrc, roomSrc] = await Promise.all([
   Promise.all(['grva', 'ibi', 'lab2code'].map(n => loadTex(`img/logo-${n}.png`))),
@@ -416,7 +417,7 @@ ringPts.rotation.x = .5; orb.add(ringPts);
 const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.0, .008, 6, 96), new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: .6 })); ring2.rotation.x = Math.PI / 2 - .3; orb.add(ring2);
 // partículas no ar do corredor
 {
-  const n = 350, p = new Float32Array(n * 3);
+  const n = 220, p = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) { p[i * 3] = -1 + Math.random() * (END_X + 1); p[i * 3 + 1] = .2 + Math.random() * 2.3; p[i * 3 + 2] = (Math.random() - .5) * 4; }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3));
   scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xbfe8ff, size: .025, transparent: true, opacity: .5, depthWrite: false })));
@@ -528,9 +529,9 @@ gsap.ticker.add((time, dtMs) => {
     lookAt.copy(camTgt).addScaledVector(side, mx * 1.2).addScaledVector(camera.up, -my * .6);
     camera.position.copy(camPos); camera.lookAt(lookAt);
     render(); dirty = false;
-    if (moving && !SNAP && dpr > CFG.minDpr) {
+    if (moving && !SNAP && scale > CFG.minScale) {
       frames.push(dtMs);
-      if (frames.length >= 40) { frames.sort((a, b) => a - b); if (frames[20] > CFG.slowFrameMs) { dpr = Math.max(CFG.minDpr, dpr - .25); applySize(); } frames.length = 0; }
+      if (frames.length >= 40) { frames.sort((a, b) => a - b); if (frames[20] > CFG.slowFrameMs) { scale = Math.max(CFG.minScale, scale - .15); applySize(); } frames.length = 0; }
     }
   }
   $('#hint').classList.toggle('gone', scrollY > 40);
