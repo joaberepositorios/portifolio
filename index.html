@@ -470,12 +470,16 @@ const lenis = !reduce && window.Lenis ? new Lenis({ lerp: .11, smoothWheel: true
 if (lenis) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
 const goTo = (t, d = 1.6) => lenis ? lenis.scrollTo(t, { duration: d }) : window.scrollTo({ top: typeof t === 'number' ? t : t.getBoundingClientRect().top + scrollY, behavior: 'smooth' });
 $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => { const t = $(a.getAttribute('href')); if (!t) return; e.preventDefault(); goTo(t, 2.2); }));
-// cada bloco aparece um pouco antes da sua seção começar e se dissolve um pouco depois de ela acabar
+// cada bloco sai por completo quando o fundo da sua seção cruza 45 % da tela, e o próximo só entra a partir desse mesmo ponto
+// (as janelas não se sobrepõem: nunca há dois blocos na tela ao mesmo tempo)
+// uma linha do tempo só por seção (entrada → pausa → saída): dois tweens soltos na mesma propriedade podiam
+// se atropelar num salto grande de rolagem e deixar um bloco preso na tela. Durações em "vh" de rolagem.
 $$('.room').forEach(sec => {
   const el = sec.querySelector('.stick'), hero = sec.id === 'topo';
-  const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: hero ? 'top top' : 'top 62%', end: 'bottom 38%', scrub: .8 } });
-  if (hero) tl.set(el, { autoAlpha: 1 }); else tl.fromTo(el, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .16, ease: 'none' });
-  tl.to({}, { duration: hero ? .82 : .68 }).to(el, { autoAlpha: 0, y: -30, duration: .16, ease: 'none' });
+  const span = sec.offsetHeight / innerHeight * 100 - (hero ? 45 : 0); // rolagem entre 'start' e 'end', em vh
+  const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: hero ? 'top top' : 'top 45%', end: 'bottom 45%', scrub: .6 } });
+  if (hero) tl.set(el, { autoAlpha: 1 }); else tl.fromTo(el, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 30, ease: 'none' });
+  tl.to({}, { duration: span - (hero ? 27 : 57) }).to(el, { autoAlpha: 0, y: -24, duration: 27, ease: 'none' });
 });
 // trabalho e projetos: um item em destaque por parada
 function stepper(sel, itemsSel, stepsSel, bounds) {
